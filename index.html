@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Modern Crest Private Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy-950:#060D1A; --navy-900:#0A1628; --navy-800:#0F2242; --navy-700:#16305C;
+  --gold:#D6A93C; --gold-2:#E9C86E; --gold-soft:rgba(214,169,60,.14);
+  --bg:#F4F6FB; --card:#FFFFFF; --ink:#0E1B33; --muted:#6B7793; --line:#E6EAF3;
+  --green:#1E9E6A; --red:#D64545;
+  --radius:18px;
+  --shadow:0 10px 30px rgba(10,22,40,.08);
+  --grad:linear-gradient(135deg,#12294D 0%,#0A1628 100%);
+  --grad-gold:linear-gradient(135deg,#E9C86E 0%,#D6A93C 55%,#B98A2A 100%);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+h1,h2,h3,.brand-font{font-family:'Sora',sans-serif}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,select{font-family:inherit}
+a{color:inherit;text-decoration:none}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#C9D2E4;border-radius:8px}
+
+/* ---------- App shell ---------- */
+#app{display:flex;min-height:100vh}
+.sidebar{display:none}
+.screen{display:none;width:100%;animation:fade .35s ease}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.page{max-width:760px;margin:0 auto;padding:20px 20px 110px}
+
+/* ---------- Logo / crest ---------- */
+.crest{width:44px;height:44px;flex:none}
+.crest-lg{width:84px;height:84px}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;border-radius:14px;padding:15px 22px;font-size:15px;transition:.2s;width:100%}
+.btn-gold{background:var(--grad-gold);color:#231A05;box-shadow:0 8px 20px rgba(214,169,60,.35)}
+.btn-gold:active{transform:scale(.97)}
+.btn-dark{background:var(--navy-900);color:#fff}
+.btn-ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+.icon-btn{width:42px;height:42px;border-radius:12px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--navy-800);flex:none}
+
+/* ---------- Onboarding / auth ---------- */
+.auth-wrap{min-height:100vh;background:var(--grad);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 22px;color:#fff;text-align:center;position:relative;overflow:hidden}
+.auth-wrap::before,.auth-wrap::after{content:"";position:absolute;border-radius:50%;filter:blur(2px)}
+.auth-wrap::before{width:340px;height:340px;background:radial-gradient(circle,rgba(214,169,60,.22),transparent 70%);top:-120px;right:-120px}
+.auth-wrap::after{width:420px;height:420px;background:radial-gradient(circle,rgba(38,86,168,.35),transparent 70%);bottom:-180px;left:-160px}
+.auth-card{position:relative;z-index:2;width:100%;max-width:420px;animation:fade .5s ease}
+.auth-card h1{font-size:clamp(24px,6vw,32px);margin:20px 0 10px;letter-spacing:-.5px}
+.auth-card p{color:#B9C4DA;font-size:15px;line-height:1.6;margin-bottom:28px}
+.dots{display:flex;gap:8px;justify-content:center;margin:26px 0}
+.dots span{width:8px;height:8px;border-radius:99px;background:rgba(255,255,255,.25);transition:.3s}
+.dots span.on{width:26px;background:var(--gold)}
+.field{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:15px 16px;color:#fff;font-size:15px;width:100%;margin-bottom:14px;outline:none;transition:.2s}
+.field::placeholder{color:#8A97B2}
+.field:focus{border-color:var(--gold)}
+.field-row{display:flex;gap:12px}
+.field-row .field{flex:1}
+
+/* PIN pad */
+.pin-row{display:flex;gap:14px;justify-content:center;margin:18px 0 26px}
+.pin-dot{width:16px;height:16px;border-radius:99px;border:2px solid rgba(255,255,255,.35);transition:.2s}
+.pin-dot.filled{background:var(--gold);border-color:var(--gold);box-shadow:0 0 12px rgba(214,169,60,.6)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:280px;margin:0 auto}
+.pin-key{aspect-ratio:1.25;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#fff;font-size:20px;font-family:'Sora';transition:.15s}
+.pin-key:active{background:var(--gold);color:#231A05}
+
+/* ---------- Headers ---------- */
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.topbar h2{font-size:20px;flex:1}
+.avatar{width:44px;height:44px;border-radius:14px;background:var(--grad);color:var(--gold-2);display:flex;align-items:center;justify-content:center;font-family:'Sora';font-weight:700;flex:none}
+.bell{position:relative}
+.bell::after{content:"";position:absolute;top:10px;right:11px;width:8px;height:8px;border-radius:99px;background:var(--red);border:2px solid #fff}
+
+/* ---------- Balance card ---------- */
+.balance-card{background:var(--grad);border-radius:24px;padding:24px;color:#fff;position:relative;overflow:hidden;box-shadow:0 18px 40px rgba(10,22,40,.25)}
+.balance-card::before{content:"";position:absolute;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(214,169,60,.28),transparent 70%);top:-90px;right:-70px}
+.balance-card::after{content:"";position:absolute;width:200px;height:200px;border-radius:50%;border:1px solid rgba(233,200,110,.25);bottom:-100px;left:-60px}
+.bc-label{color:#A8B6D1;font-size:13px;display:flex;align-items:center;gap:8px;position:relative;z-index:1}
+.bc-amount{font-family:'Sora';font-size:clamp(28px,7vw,38px);font-weight:700;margin:8px 0 4px;letter-spacing:-1px;position:relative;z-index:1}
+.bc-sub{color:#8FA1C2;font-size:13px;position:relative;z-index:1}
+.eye{color:var(--gold-2);cursor:pointer}
+
+/* ---------- Quick actions ---------- */
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0 6px}
+.action{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--navy-800);transition:.2s}
+.action:active{transform:scale(.95)}
+.action svg{width:22px;height:22px;stroke:var(--gold)}
+@media(hover:hover){.action:hover{box-shadow:var(--shadow);border-color:transparent}}
+
+/* ---------- Section titles ---------- */
+.sec{display:flex;align-items:center;justify-content:space-between;margin:22px 0 12px}
+.sec h3{font-size:16px}
+.sec a{font-size:13px;font-weight:600;color:var(--gold);cursor:pointer}
+
+/* ---------- Transaction list ---------- */
+.tcard{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.tx{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.tx:last-child{border-bottom:none;padding-bottom:0}
+.tx:first-child{padding-top:0}
+.tx-ico{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex:none}
+.tx-ico.in{background:#E4F6EE;color:var(--green)}
+.tx-ico.out{background:#FCECEC;color:var(--red)}
+.tx-mid{flex:1;min-width:0}
+.tx-mid b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-mid span{font-size:12px;color:var(--muted)}
+.tx-amt{font-family:'Sora';font-weight:600;font-size:14px;white-space:nowrap}
+.pos{color:var(--green)}.neg{color:var(--ink)}
+
+/* ---------- Cards screen ---------- */
+.card-carousel{display:flex;gap:14px;overflow-x:auto;padding:4px 2px 14px;scroll-snap-type:x mandatory}
+.bank-card{min-width:min(86%,330px);scroll-snap-align:center;border-radius:22px;padding:22px;color:#fff;position:relative;overflow:hidden;box-shadow:0 16px 34px rgba(10,22,40,.28)}
+.bank-card .chip{width:38px;height:28px;border-radius:6px;background:var(--grad-gold);position:relative}
+.bank-card .chip::after{content:"";position:absolute;inset:6px 4px;border:1px solid rgba(35,26,5,.4);border-radius:3px}
+.bank-card.dark{background:var(--grad)}
+.bank-card.gold{background:linear-gradient(135deg,#2A2110,#0A1628 60%);border:1px solid rgba(233,200,110,.5)}
+.bank-card.green{background:linear-gradient(135deg,#0E3B2E,#0A1628 70%)}
+.card-num{font-family:'Sora';letter-spacing:2.5px;font-size:16px;margin:26px 0 20px}
+.card-foot{display:flex;justify-content:space-between;align-items:flex-end;font-size:11px;color:#C4CFE3}
+.card-foot b{display:block;font-size:13px;color:#fff;margin-top:4px;font-family:'Sora'}
+.card-logo{display:flex;align-items:center;gap:8px;font-family:'Sora';font-weight:700;font-size:13px;color:var(--gold-2)}
+.dots-nav{display:flex;gap:6px;justify-content:center;margin-bottom:8px}
+.dots-nav span{width:6px;height:6px;border-radius:99px;background:#CBD4E6;transition:.25s}
+.dots-nav span.on{width:20px;background:var(--gold)}
+.card-tools{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px}
+
+/* ---------- Send flow ---------- */
+.amount-hero{text-align:center;padding:28px 0 10px}
+.amount-hero small{color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;font-size:11px}
+.amount-input{font-family:'Sora';font-size:clamp(38px,10vw,52px);font-weight:700;text-align:center;border:none;background:none;outline:none;width:100%;color:var(--ink);margin-top:6px}
+.contact-row{display:flex;gap:12px;overflow-x:auto;padding:6px 2px 14px}
+.contact{min-width:66px;text-align:center;cursor:pointer}
+.contact .cav{width:54px;height:54px;border-radius:18px;background:#fff;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:'Sora';font-weight:700;color:var(--navy-800);margin:0 auto 6px;transition:.2s}
+.contact.sel .cav{border-color:var(--gold);background:var(--gold-soft);color:var(--gold)}
+.contact span{font-size:11px;color:var(--muted);font-weight:600}
+.contact.sel span{color:var(--ink)}
+
+/* ---------- Profile / settings ---------- */
+.p-head{display:flex;align-items:center;gap:16px;background:var(--grad);border-radius:22px;padding:22px;color:#fff;margin-bottom:16px}
+.p-head .avatar{width:58px;height:58px;font-size:20px;background:rgba(233,200,110,.15);border:1px solid rgba(233,200,110,.4)}
+.p-head b{font-family:'Sora';font-size:17px;display:block}
+.p-head span{font-size:12px;color:#A8B6D1}
+.tier{margin-left:auto;background:var(--grad-gold);color:#231A05;font-size:11px;font-weight:700;padding:6px 12px;border-radius:99px;white-space:nowrap}
+.set-group{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+.set-item{display:flex;align-items:center;gap:12px;padding:15px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+.set-item:last-child{border-bottom:none}
+.set-item svg{width:20px;height:20px;stroke:var(--navy-700);flex:none}
+.set-item span{flex:1;font-size:14px;font-weight:500}
+.set-item small{color:var(--muted);font-size:12px}
+.switch{width:44px;height:26px;border-radius:99px;background:#D7DEEC;position:relative;transition:.2s;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:99px;background:#fff;transition:.2s;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.switch.on{background:var(--gold)}
+.switch.on::after{left:21px}
+
+/* ---------- Filter chips ---------- */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 12px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:8px 16px;border-radius:99px;background:#fff;border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap;transition:.2s}
+.chip.on{background:var(--navy-900);color:var(--gold-2);border-color:var(--navy-900)}
+
+/* ---------- Search ---------- */
+.search{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 16px;margin-bottom:14px}
+.search input{border:none;outline:none;flex:1;font-size:14px;background:none}
+.search svg{width:18px;height:18px;stroke:var(--muted);flex:none}
+
+/* ---------- Toast / modal ---------- */
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);background:var(--navy-900);color:#fff;padding:13px 22px;border-radius:99px;font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:.3s;z-index:60;box-shadow:0 12px 30px rgba(0,0,0,.3);white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.modal-bg{position:fixed;inset:0;background:rgba(6,13,26,.6);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;z-index:70}
+.modal-bg.open{display:flex}
+.sheet{background:#fff;width:100%;max-width:520px;border-radius:26px 26px 0 0;padding:26px 22px 30px;animation:up .3s ease;max-height:88vh;overflow-y:auto}
+@keyframes up{from{transform:translateY(40px);opacity:.5}to{transform:none;opacity:1}}
+.sheet h3{font-size:18px;margin-bottom:4px}
+.sheet .sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+.sheet .btn{margin-top:8px}
+
+/* ---------- Desktop / tablet layout ---------- */
+@media(min-width:900px){
+  .sidebar{display:flex;flex-direction:column;width:248px;flex:none;background:var(--navy-900);padding:26px 18px;position:sticky;top:0;height:100vh;color:#fff}
+  .side-brand{display:flex;align-items:center;gap:10px;font-family:'Sora';font-weight:700;font-size:15px;margin-bottom:34px;color:#fff}
+  .side-brand span{color:var(--gold-2)}
+  .side-nav{display:flex;flex-direction:column;gap:4px;flex:1}
+  .side-link{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;font-size:14px;font-weight:500;color:#93A2BF;cursor:pointer;transition:.2s}
+  .side-link svg{width:20px;height:20px;stroke:currentColor}
+  .side-link.on{background:rgba(233,200,110,.12);color:var(--gold-2)}
+  .side-link:hover:not(.on){background:rgba(255,255,255,.05);color:#fff}
+  .side-foot{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:14px;display:flex;gap:10px;align-items:center}
+  .side-foot b{font-size:13px;display:block}
+  .side-foot small{color:#93A2BF;font-size:11px}
+  .main{flex:1;min-width:0}
+  .page{max-width:980px;padding:32px 40px 40px}
+  .page.grid-2{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:start}
+  .grid-2 .col{min-width:0}
+  .grid-2 .col:first-child{grid-column:1}
+  .grid-2 .col.right{grid-column:2;grid-row:1 / span 10}
+  .actions{grid-template-columns:repeat(4,1fr);gap:14px}
+  .card-tools{gap:14px}
+  .bottombar{display:none}
+  .toast{bottom:32px}
+}
+@media(min-width:1200px){.sidebar{width:268px}.page{max-width:1100px}}
+
+/* ---------- Bottom bar ---------- */
+.bottombar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 6px calc(10px + env(safe-area-inset-bottom));z-index:50}
+.bnav{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--muted);padding:6px 12px;border-radius:12px;cursor:pointer}
+.bnav svg{width:22px;height:22px;stroke:currentColor}
+.bnav.on{color:var(--gold)}
+.bnav.center{background:var(--navy-900);color:#fff!important;border-radius:16px;padding:10px 14px;margin-top:-22px;box-shadow:0 8px 20px rgba(10,22,40,.3)}
+.bnav.center svg{stroke:var(--gold-2)}
+@media(min-width:900px){.bottombar{display:none}}
+
+/* misc */
+.small-note{text-align:center;font-size:12px;color:var(--muted);margin-top:14px}
+.auth-link{color:var(--gold-2);font-weight:600;cursor:pointer}
+.divider{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px;margin:20px 0}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.15)}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px;position:relative;z-index:1}
+.stat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px}
+.stat b{font-family:'Sora';font-size:15px;display:block}
+.stat span{font-size:11px;color:#A8B6D1}
+.h-scroll{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:none}
+.h-scroll::-webkit-scrollbar{display:none}
+.mini-offer{min-width:220px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}
+.mini-offer b{font-size:14px;display:block;margin-bottom:4px}
+.mini-offer p{font-size:12px;color:var(--muted);line-height:1.5}
+.mini-offer .tag{display:inline-block;margin-top:10px;background:var(--gold-soft);color:var(--gold);font-size:11px;font-weight:700;padding:5px 10px;border-radius:99px}
+
+/* ---------- Verification & tiers ---------- */
+.limit-banner{background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:16px;padding:15px 16px;margin-top:14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow)}
+.limit-banner .lb-ico{width:40px;height:40px;border-radius:12px;background:var(--gold-soft);color:var(--gold);display:flex;align-items:center;justify-content:center;flex:none}
+.limit-banner b{font-size:13px;display:block;font-family:'Sora'}
+.limit-banner small{color:var(--muted);font-size:12px;display:block;margin-top:2px}
+.limit-track{height:7px;background:#EDF1F8;border-radius:99px;margin-top:8px;overflow:hidden}
+.limit-fill{height:100%;border-radius:99px;background:var(--grad-gold);transition:width .6s ease}
+.limit-pct{font-size:11px;color:var(--muted);margin-top:4px}
+.btn-upgrade{margin-left:auto;background:var(--navy-900);color:var(--gold-2);font-size:12px;font-weight:700;padding:10px 14px;border-radius:12px;white-space:nowrap;flex:none}
+
+.tier-grid{display:grid;gap:12px;margin-bottom:16px}
+@media(min-width:640px){.tier-grid{grid-template-columns:repeat(3,1fr)}}
+.tier-card{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:18px;position:relative;transition:.2s}
+.tier-card.on{border-color:var(--gold);box-shadow:0 10px 26px rgba(214,169,60,.18)}
+.tier-card h4{font-family:'Sora';font-size:15px;display:flex;align-items:center;gap:8px}
+.tier-card h4 svg{width:18px;height:18px;stroke:var(--gold)}
+.tier-card .tl{font-family:'Sora';font-size:22px;font-weight:700;margin:8px 0 2px}
+.tier-card .tl small{font-size:12px;color:var(--muted);font-weight:500;font-family:'Inter'}
+.tier-card ul{list-style:none;margin:10px 0 14px}
+.tier-card li{font-size:12.5px;color:var(--muted);padding:4px 0 4px 22px;position:relative}
+.tier-card li::before{content:"";position:absolute;left:2px;top:9px;width:12px;height:6px;border-left:2px solid var(--green);border-bottom:2px solid var(--green);transform:rotate(-45deg)}
+.tier-current{position:absolute;top:14px;right:14px;background:var(--gold-soft);color:var(--gold);font-size:10px;font-weight:700;letter-spacing:.5px;padding:4px 10px;border-radius:99px}
+.btn-tier{width:100%;padding:11px;font-size:13px;border-radius:12px}
+.btn-tier.locked{background:#F0F3F9;color:var(--muted);cursor:not-allowed}
+.btn-tier.cta{background:var(--grad-gold);color:#231A05;font-weight:700}
+
+.wizard{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
+.wiz-head{padding:18px 18px 0}
+.stepper{display:flex;gap:0;margin:14px 0 10px}
+.step-dot{flex:1;text-align:center;position:relative;font-size:10px;font-weight:600;color:var(--muted);padding-top:22px}
+.step-dot::before{content:attr(data-n);position:absolute;top:0;left:50%;transform:translateX(-50%);width:22px;height:22px;border-radius:99px;background:#EDF1F8;color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.step-dot::after{content:"";position:absolute;top:11px;left:-50%;width:100%;height:2px;background:#EDF1F8}
+.step-dot:first-child::after{display:none}
+.step-dot.done::before{background:var(--green);color:#fff;content:"✓"}
+.step-dot.cur::before{background:var(--navy-900);color:var(--gold-2)}
+.step-dot.done::after,.step-dot.cur::after{background:var(--gold)}
+.progress{height:5px;background:#EDF1F8;border-radius:99px;overflow:hidden;margin:0 18px}
+.progress i{display:block;height:100%;background:var(--grad-gold);border-radius:99px;transition:width .4s ease}
+.wiz-body{padding:20px 18px 24px}
+.wstep{display:none;animation:fade .3s ease}
+.wstep.on{display:block}
+.wstep h3{font-size:17px;margin-bottom:4px}
+.wstep .wsub{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.5}
+.lbl{font-size:12px;font-weight:600;color:var(--muted);display:block;margin:14px 0 6px;text-transform:uppercase;letter-spacing:.4px}
+.inp{width:100%;border:1.5px solid var(--line);border-radius:13px;padding:14px 15px;font-size:15px;outline:none;background:#FBFCFE;transition:.2s;color:var(--ink)}
+.inp:focus{border-color:var(--gold);background:#fff}
+select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7793' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 15px center}
+
+.otp-row{display:flex;gap:10px;justify-content:center;margin:16px 0}
+.otp-in{width:46px;height:56px;border:1.5px solid var(--line);border-radius:14px;text-align:center;font-family:'Sora';font-size:22px;font-weight:700;outline:none;background:#FBFCFE;color:var(--ink);transition:.2s}
+.otp-in:focus{border-color:var(--gold);background:#fff;box-shadow:0 0 0 4px var(--gold-soft)}
+.otp-row.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.demo-code{text-align:center;font-size:12px;color:var(--muted);margin-bottom:16px}
+.demo-code a{color:var(--gold);font-weight:700;cursor:pointer}
+.resend{text-align:center;font-size:13px;color:var(--muted);margin-top:14px}
+.resend a{color:var(--navy-800);font-weight:700;cursor:pointer}
+.resend a.off{color:var(--muted);cursor:default;text-decoration:none}
+
+.drop{border:2px dashed #C9D2E4;border-radius:16px;padding:26px 16px;text-align:center;cursor:pointer;transition:.2s;background:#FBFCFE}
+.drop:hover{border-color:var(--gold);background:var(--gold-soft)}
+.drop svg{width:28px;height:28px;stroke:var(--gold);margin:0 auto 8px;display:block}
+.drop b{font-size:13.5px;display:block}
+.drop small{color:var(--muted);font-size:11.5px;margin-top:3px;display:block}
+.doc-chip{display:none;align-items:center;gap:10px;background:#E4F6EE;border:1px solid #BFE7D4;border-radius:13px;padding:12px 14px;margin-top:10px;font-size:13px}
+.doc-chip.show{display:flex}
+.doc-chip svg{width:20px;height:20px;stroke:var(--green);flex:none}
+.doc-chip b{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-chip button{color:var(--red);font-size:12px;font-weight:700}
+.secure-note{display:flex;gap:8px;align-items:flex-start;background:var(--gold-soft);border-radius:12px;padding:12px 14px;font-size:12px;color:#7A6210;line-height:1.5;margin-top:16px}
+.secure-note svg{width:16px;height:16px;stroke:var(--gold);flex:none;margin-top:1px}
+
+.rev-row{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.rev-row span{color:var(--muted)}
+.rev-row b{text-align:right;word-break:break-word;font-weight:600}
+.rev-row:last-child{border-bottom:none}
+.big-check{width:72px;height:72px;border-radius:50%;background:#E4F6EE;display:flex;align-items:center;justify-content:center;margin:8px auto 14px}
+.big-check svg{width:36px;height:36px;stroke:var(--green)}
+.wiz-nav{display:flex;gap:10px;margin-top:20px}
+.wiz-nav .btn{flex:1}
+@media(min-width:640px){.otp-in{width:54px;height:62px}}
+
+/* upgrade prompt sheet */
+.up-icon{width:56px;height:56px;border-radius:18px;background:var(--gold-soft);color:var(--gold);display:flex;align-items:center;justify-content:center;margin:4px auto 14px}
+.up-icon svg{width:28px;height:28px;stroke:var(--gold)}
+.sheet h3.up{text-align:center}
+.sheet .sub.up{text-align:center}
+
+/* ============ RESPONSIVE FIT FIXES (all devices) ============ */
+html,body{width:100%;overflow-x:hidden}
+img,svg{max-width:100%}
+.main{min-width:0;overflow-x:hidden}
+.screen.active{overflow-x:hidden}
+
+/* use dynamic viewport height so mobile browser chrome never clips auth screens */
+.auth-wrap{min-height:100vh;min-height:100dvh;overflow-y:auto}
+
+/* OTP boxes: flex to fit any screen width instead of fixed 46px×6 */
+.otp-row{display:flex;gap:8px;justify-content:center;margin:16px 0;width:100%}
+.otp-in{flex:1 1 0;min-width:0;max-width:56px;width:auto;height:52px}
+@media(min-width:640px){.otp-in{height:62px;max-width:60px}}
+
+/* card number scales with viewport, wraps cleanly at small sizes */
+.card-num{font-size:clamp(13px,4.4vw,16px);letter-spacing:clamp(1px,.8vw,2.5px)}
+.card-foot{flex-wrap:wrap;row-gap:10px}
+
+/* stepper fits 6 steps even on tiny screens */
+.step-dot{min-width:0;font-size:9.5px;letter-spacing:.2px}
+.step-dot::before{width:20px;height:20px;font-size:9px}
+.wiz-body{padding:18px 14px 22px;padding-bottom:calc(22px + env(safe-area-inset-bottom))}
+
+/* slightly tighter cards */
+.balance-card{padding:20px}
+.bank-card{padding:18px;min-width:min(88%,330px)}
+
+/* modals: bottom sheet on mobile, centered dialog on larger screens */
+@media(min-width:640px){.modal-bg{align-items:center}.sheet{border-radius:26px}}
+
+/* phones ≤480px */
+@media(max-width:480px){
+  .limit-banner{flex-wrap:wrap}
+  .limit-banner .btn-upgrade{margin-left:0;width:100%;padding:11px}
+  .limit-banner>div{flex-basis:100%}
+  .actions{gap:8px}
+  .action{padding:12px 4px;font-size:11px}
+  .topbar h2{font-size:18px}
+  .tx-ico{width:40px;height:40px}
+  .p-head>div:nth-child(2){flex:1;min-width:0}
+  .contact .cav{width:48px;height:48px}
+  .bottombar{padding-left:2px;padding-right:2px}
+  .bnav{padding:6px 8px}
+}
+
+/* very small phones ≤380px */
+@media(max-width:380px){
+  .page{padding:14px 14px 108px}
+  .otp-row{gap:6px}
+  .otp-in{height:46px;font-size:19px;border-radius:12px}
+  .balance-card{padding:18px;border-radius:20px}
+  .bc-amount{font-size:25px}
+  .stat-grid{gap:8px}
+  .stat{padding:10px}
+  .stat b{font-size:12.5px}
+  .tier-card{padding:15px}
+  .pin-key{border-radius:14px;font-size:18px}
+  .chips{gap:6px}
+  .chip{padding:7px 12px;font-size:12px}
+  .auth-card h1{font-size:23px}
+}
+
+/* large phones / small tablets 481–899px: two-column tier grid already kicks in at 640px */
+@media(min-width:481px) and (max-width:899px){
+  .page{max-width:640px}
+  .bank-card{min-width:min(70%,340px)}
+}
+
+/* ============ ADMIN CONSOLE ============ */
+.adm-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:8px}
+@media(min-width:640px){.adm-stats{grid-template-columns:repeat(4,1fr)}}
+.adm-stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.adm-stat .as-ico{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.adm-stat .as-ico svg{width:19px;height:19px}
+.as-gold{background:var(--gold-soft);color:var(--gold)}
+.as-green{background:#E4F6EE;color:var(--green)}
+.as-red{background:#FCECEC;color:var(--red)}
+.as-navy{background:#E8EEF9;color:var(--navy-700)}
+.adm-stat b{font-family:'Sora';font-size:20px;display:block;letter-spacing:-.5px}
+.adm-stat span{font-size:11.5px;color:var(--muted);font-weight:600}
+
+.tt{font-size:10px;font-weight:700;letter-spacing:.5px;padding:4px 10px;border-radius:99px;white-space:nowrap;text-transform:uppercase}
+.tt-basic{background:var(--gold-soft);color:var(--gold)}
+.tt-premium{background:#E4F6EE;color:var(--green)}
+.tt-private{background:var(--grad-gold);color:#231A05}
+.tt-frozen{background:#FCECEC;color:var(--red)}
+.tt-pending{background:#FFF4DC;color:#B8860B}
+.tt-rejected{background:#FCECEC;color:var(--red)}
+.tt-active{background:#E8EEF9;color:var(--navy-700)}
+
+.pend-card{background:#fff;border:1px solid var(--line);border-left:4px solid #B8860B;border-radius:16px;padding:15px 16px;margin-bottom:10px;box-shadow:var(--shadow)}
+.pend-card.frozen{border-left-color:var(--red)}
+.pend-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.pend-top .avatar{width:42px;height:42px;font-size:14px}
+.pend-top>div{flex:1;min-width:0}
+.pend-top b{font-size:14px;display:block;font-family:'Sora'}
+.pend-top small{font-size:12px;color:var(--muted)}
+.pend-req{font-size:12px;color:var(--muted);margin-bottom:12px}
+.pend-req b{color:var(--ink)}
+.pend-btns{display:flex;gap:10px}
+.pend-btns .btn{padding:11px;font-size:13px}
+.btn-green{background:#E4F6EE;color:var(--green);font-weight:700}
+.btn-redghost{background:#fff;border:1.5px solid #F3C1C1;color:var(--red);font-weight:700}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.adm-user{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.adm-user:last-child{border-bottom:none;padding-bottom:0}
+.adm-user:first-child{padding-top:0}
+.adm-user .avatar{width:42px;height:42px;font-size:13px}
+.adm-user>div.mu{flex:1;min-width:0}
+.adm-user b{font-size:13.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.adm-user small{font-size:11.5px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mu-tags{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap}
+.mu-bal{font-family:'Sora';font-weight:600;font-size:13.5px;white-space:nowrap}
+.btn-manage{background:var(--navy-900);color:var(--gold-2);font-size:11.5px;font-weight:700;padding:9px 13px;border-radius:11px;white-space:nowrap;flex:none}
+.log-item{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.log-item:last-child{border-bottom:none;padding-bottom:0}
+.log-item:first-child{padding-top:0}
+.log-dot{width:8px;height:8px;border-radius:99px;background:var(--gold);margin-top:5px;flex:none}
+.log-item small{color:var(--muted);display:block;font-size:11px;margin-top:2px}
+.empty-note{text-align:center;color:var(--muted);font-size:13px;padding:22px 10px}
+.amt-chips{display:flex;gap:8px;justify-content:center;margin:14px 0 4px;flex-wrap:wrap}
+.amt-chips button{background:#F0F3F9;border-radius:99px;padding:8px 15px;font-size:12.5px;font-weight:700;color:var(--navy-800)}
+.am-av{width:60px;height:60px;border-radius:20px;background:var(--grad);color:var(--gold-2);display:flex;align-items:center;justify-content:center;font-family:'Sora';font-weight:700;font-size:19px;margin:0 auto 10px}
+.am-tags{display:flex;gap:6px;justify-content:center;margin:6px 0 16px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<!-- ============ AUTH SCREENS ============ -->
+<section class="screen active" id="s-onboard">
+  <div class="auth-wrap">
+    <div class="auth-card" style="text-align:center">
+      <svg class="crest-lg" viewBox="0 0 64 64" fill="none" aria-label="Modern Crest logo">
+        <defs><linearGradient id="gA" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#E9C86E"/><stop offset="1" stop-color="#B98A2A"/></linearGradient></defs>
+        <path d="M32 3 L54 9 V30 C54 46 45 56 32 61 C19 56 10 46 10 30 V9 Z" fill="#0A1628" stroke="url(#gA)" stroke-width="2.5"/>
+        <path d="M32 8.5 L49 13 V30 C49 43 42 51 32 55.5 C22 51 15 43 15 30 V13 Z" fill="none" stroke="rgba(233,200,110,.35)" stroke-width="1"/>
+        <path d="M21 36 L32 15 L43 36 L32 30.5 Z" fill="url(#gA)"/>
+        <rect x="25" y="40" width="14" height="2.6" rx="1.3" fill="url(#gA)"/>
+        <rect x="27.5" y="45" width="9" height="2.2" rx="1.1" fill="rgba(233,200,110,.6)"/>
+      </svg>
+      <h1>Modern Crest<br><span style="color:var(--gold-2)">Private Bank</span></h1>
+      <p id="ob-text">Private banking, reimagined. Multi-currency accounts, virtual cards and instant global transfers — all in one elegant app.</p>
+      <div class="dots"><span class="on"></span><span></span><span></span></div>
+      <button class="btn btn-gold" id="ob-btn" onclick="nextOnboard()">Continue</button>
+      <p style="margin-top:18px;font-size:13px">Already a client? <a class="auth-link" onclick="showScreen('s-login')">Sign in</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="screen" id="s-login">
+  <div class="auth-wrap">
+    <div id="clerk-sign-in"></div>
+    <p style="text-align:center;font-size:11px;color:#5F6B85;margin-top:12px">Use a valid Clerk key to test login.</p>
+  </div>
+</section>
+
+<section class="screen" id="s-signup">
+  <div class="auth-wrap">
+    <div id="clerk-sign-up"></div>
+  </div>
+</section>
+
+<!-- ============ APP SHELL ============ -->
+<div id="shell" style="display:none">
+  <aside class="sidebar">
+    <div class="side-brand">
+      <svg class="crest" viewBox="0 0 64 64" fill="none" style="width:36px;height:36px"><path d="M32 3 L54 9 V30 C54 46 45 56 32 61 C19 56 10 46 10 30 V9 Z" fill="#0F2242" stroke="url(#gA)" stroke-width="3"/><path d="M21 36 L32 15 L43 36 L32 30.5 Z" fill="url(#gA)"/></svg>
+      Modern&nbsp;<span>Crest</span>
+    </div>
+    <nav class="side-nav" id="side-nav"></nav>
+    <div class="side-foot">
+      <div class="avatar" style="width:40px;height:40px;font-size:14px">AO</div>
+      <div style="flex:1"><b>Adaeze Okafor</b><small id="side-tier">Basic tier</small></div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ===== HOME ===== -->
+    <section class="screen" id="s-home">
+      <div class="page grid-2">
+        <div class="col">
+          <div class="topbar">
+            <div class="avatar">AO</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12px;color:var(--muted)" id="greet">Good morning</div>
+              <b style="font-family:'Sora';font-size:16px">Adaeze Okafor</b>
+            </div>
+            <button class="icon-btn bell" onclick="toast('No new notifications')">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+            </button>
+          </div>
+
+          <div class="balance-card">
+            <div class="bc-label">Total balance
+              <span class="eye" onclick="toggleBal()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="eye-ic"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+            </div>
+            <div class="bc-amount" id="bal">$3,240.55</div>
+            <div class="bc-sub" id="bal-sub">≈ €118,220.10 &nbsp;·&nbsp; +2.4% this month</div>
+            <div class="stat-grid">
+              <div class="stat"><b>$4,120</b><span>Income</span></div>
+              <div class="stat"><b>$1,890</b><span>Spent</span></div>
+              <div class="stat"><b>$12.5k</b><span>Savings</span></div>
+            </div>
+          </div>
+
+          <div class="limit-banner" id="limit-banner">
+        <div class="lb-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M12 8v4M12 15h.01"/></svg></div>
+        <div style="flex:1;min-width:0">
+          <b id="lb-title">Basic tier · $5,000 limit</b>
+          <small id="lb-sub">Verify with OTP to unlock your full Basic allowance</small>
+          <div class="limit-track"><div class="limit-fill" id="lb-fill" style="width:65%"></div></div>
+          <div class="limit-pct" id="lb-pct">$3,240.55 of $5,000 used (64.8%)</div>
+        </div>
+        <button class="btn-upgrade" onclick="goVerify()">Increase limit</button>
+      </div>
+
+      <div class="actions">
+            <button class="action" onclick="openSheet('send')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>Send</button>
+            <button class="action" onclick="toast('Share your payment link (demo)')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>Receive</button>
+            <button class="action" onclick="toast('Top up from linked bank (demo)')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M4 17h16v4H4z"/></svg>Top up</button>
+            <button class="action" onclick="toast('Bills & payments coming soon')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>Pay bills</button>
+          </div>
+        </div>
+
+        <div class="col right">
+          <div class="sec"><h3>Recent activity</h3><a onclick="go('s-tx')">See all</a></div>
+          <div class="tcard" id="recent-tx"></div>
+        </div>
+
+        <div class="col">
+          <div class="sec"><h3>For you</h3></div>
+          <div class="h-scroll">
+            <div class="mini-offer"><b>Auto-Invest</b><p>Invest spare change into U.S. stocks automatically, from just $2.</p><span class="tag">New</span></div>
+            <div class="mini-offer"><b>Vault Savings</b><p>Earn 5.1% APY on idle balances with Crest Vault.</p><span class="tag">5.1% APY</span></div>
+            <div class="mini-offer"><b>Private Concierge</b><p>24/7 dedicated banker for Private tier clients.</p><span class="tag">Private</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CARDS ===== -->
+    <section class="screen" id="s-cards">
+      <div class="page">
+        <div class="topbar"><h2>My Cards</h2>
+          <button class="btn btn-dark" style="width:auto;padding:11px 18px;font-size:13px" onclick="toast('Virtual card issued (demo)')">+ New card</button>
+        </div>
+
+        <div class="card-carousel" id="card-carousel" onscroll="cardDots()">
+          <div class="bank-card dark">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="chip"></div>
+              <div class="card-logo">MC</div>
+            </div>
+            <div class="card-num">5312 •••• •••• 8042</div>
+            <div class="card-foot"><div>CARD HOLDER<b>ADAEZE OKAFOR</b></div><div>EXP<b>09/29</b></div><div style="text-align:right">CVV<b id="cvv1" data-v="314">•••</b></div></div>
+          </div>
+          <div class="bank-card gold">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="chip"></div>
+              <div class="card-logo">MC</div>
+            </div>
+            <div class="card-num">4756 •••• •••• 2210</div>
+            <div class="card-foot"><div>CARD HOLDER<b>ADAEZE OKAFOR</b></div><div>EXP<b>02/28</b></div><div style="text-align:right">CVV<b id="cvv2" data-v="880">•••</b></div></div>
+          </div>
+          <div class="bank-card green">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="chip"></div>
+              <div class="card-logo">MC</div>
+            </div>
+            <div class="card-num">4285 •••• •••• 9931</div>
+            <div class="card-foot"><div>CARD HOLDER<b>ADAEZE OKAFOR</b></div><div>EXP<b>11/27</b></div><div style="text-align:right">CVV<b id="cvv3" data-v="552">•••</b></div></div>
+          </div>
+        </div>
+        <div class="dots-nav" id="card-dots"><span class="on"></span><span></span><span></span></div>
+
+        <div class="card-tools">
+          <button class="action" onclick="toggleFreeze()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2v20M4 6l16 12M20 6L4 18"/></svg><span id="freeze-txt">Freeze</span></button>
+          <button class="action" onclick="toggleCvv()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>Reveal</button>
+          <button class="action" onclick="toast('Card details copied (demo)')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy</button>
+          <button class="action" onclick="toast('Spending limits: $5,000 / day (demo)')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M2 14h4M10 8h4M18 16h4"/></svg>Limits</button>
+        </div>
+
+        <div class="sec"><h3>Linked accounts</h3></div>
+        <div class="tcard">
+          <div class="tx"><div class="tx-ico" style="background:var(--gold-soft);color:var(--gold)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h18M5 10V20M9 10v6M15 10v6M19 10v6M12 3l9 6H3z"/></svg></div>
+            <div class="tx-mid"><b>First Meridian Bank</b><span>Checking ••4291</span></div><span style="color:var(--muted);font-size:12px">Primary</span></div>
+          <div class="tx"><div class="tx-ico" style="background:#E4F6EE;color:var(--green)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+            <div class="tx-mid"><b>Crest Vault Savings</b><span>5.1% APY</span></div><span class="pos" style="font-size:13px;font-weight:600">$12,540</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TRANSACTIONS ===== -->
+    <section class="screen" id="s-tx">
+      <div class="page">
+        <div class="topbar"><h2>Transactions</h2></div>
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input placeholder="Search transactions…" oninput="filterTx(this.value)">
+        </div>
+        <div class="chips" id="tx-chips">
+          <button class="chip on" data-f="all" onclick="setFilter(this)">All</button>
+          <button class="chip" data-f="in" onclick="setFilter(this)">Money in</button>
+          <button class="chip" data-f="out" onclick="setFilter(this)">Money out</button>
+          <button class="chip" data-f="card" onclick="setFilter(this)">Card</button>
+          <button class="chip" data-f="transfer" onclick="setFilter(this)">Transfers</button>
+        </div>
+        <div class="tcard" id="tx-list"></div>
+      </div>
+    </section>
+
+    <!-- ===== VERIFY / TIERS ===== -->
+    <section class="screen" id="s-verify">
+      <div class="page">
+        <div class="topbar"><h2>Verification & Limits</h2></div>
+
+        <div class="tier-grid" id="tier-grid">
+          <div class="tier-card" id="tc-basic">
+            <span class="tier-current" id="tc-basic-badge">CURRENT</span>
+            <h4><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>Basic</h4>
+            <div class="tl">$5,000 <small>balance limit</small></div>
+            <ul><li>OTP phone verification</li><li>Virtual & physical cards</li><li>Local transfers</li></ul>
+            <button class="btn btn-tier locked" id="btn-basic">Included</button>
+          </div>
+          <div class="tier-card" id="tc-premium">
+            <span class="tier-current" style="display:none"></span>
+            <h4><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>Premium</h4>
+            <div class="tl">$50,000 <small>balance limit</small></div>
+            <ul><li>OTP verification</li><li>Government-issued ID</li><li>Proof of address</li></ul>
+            <button class="btn btn-tier cta" id="btn-premium" onclick="startWizard()">Upgrade to Premium</button>
+          </div>
+          <div class="tier-card" id="tc-private">
+            <span class="tier-current" style="display:none"></span>
+            <h4><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M32 3" style="display:none"/><path d="M2 9l4 4 4-4M6 13V4"/><path d="M12 21l4-4 4 4M16 17V6"/><path d="M2 15l2 2 2-2M4 17v4"/></svg>Private</h4>
+            <div class="tl">Unlimited <small>balance limit</small></div>
+            <ul><li>Everything in Premium</li><li>SSN / TIN verification</li><li>24/7 private concierge</li></ul>
+            <button class="btn btn-tier cta" id="btn-private" onclick="startWizard(4)">Go Private</button>
+          </div>
+        </div>
+
+        <!-- upgrade wizard -->
+        <div class="wizard" id="wizard" style="display:none">
+          <div class="wiz-head">
+            <div class="stepper" id="stepper">
+              <div class="step-dot" data-n="1">OTP</div>
+              <div class="step-dot" data-n="2">Details</div>
+              <div class="step-dot" data-n="3">ID</div>
+              <div class="step-dot" data-n="4">SSN</div>
+              <div class="step-dot" data-n="5">Address</div>
+              <div class="step-dot" data-n="6">Review</div>
+            </div>
+            <div class="progress"><i id="wiz-bar" style="width:0%"></i></div>
+          </div>
+          <div class="wiz-body">
+
+            <div class="wstep" id="ws-1">
+              <h3>Verify your phone</h3>
+              <p class="wsub">We sent a 6-digit code to <b>+1 ••• ••• 4472</b>. Enter it below to confirm your Basic tier.</p>
+              <div class="otp-row" id="otp-row">
+                <input class="otp-in" maxlength="1" inputmode="numeric" oninput="otpMove(this,0)" onkeydown="otpBack(this,0,event)">
+                <input class="otp-in" maxlength="1" inputmode="numeric" oninput="otpMove(this,1)" onkeydown="otpBack(this,1,event)">
+                <input class="otp-in" maxlength="1" inputmode="numeric" oninput="otpMove(this,2)" onkeydown="otpBack(this,2,event)">
+                <input class="otp-in" maxlength="1" inputmode="numeric" oninput="otpMove(this,3)" onkeydown="otpBack(this,3,event)">
+                <input class="otp-in" maxlength="1" inputmode="numeric" oninput="otpMove(this,4)" onkeydown="otpBack(this,4,event)">
+                <input class="otp-in" maxlength="1" inputmode="numeric" oninput="otpMove(this,5)" onkeydown="otpBack(this,5,event)">
+              </div>
+              <p class="demo-code">Demo code: <a onclick="fillOtp()">123456</a> — tap to autofill</p>
+              <p class="resend">Didn't get it? <a id="resend-link" class="off" onclick="resendOtp()">Resend in 30s</a></p>
+            </div>
+
+            <div class="wstep" id="ws-2">
+              <h3>Personal details</h3>
+              <p class="wsub">Tell us about yourself — exactly as shown on your government ID.</p>
+              <label class="lbl">Full legal name</label>
+              <input class="inp" id="v-name" placeholder="Adaeze Chiamaka Okafor">
+              <label class="lbl">Date of birth</label>
+              <input class="inp" id="v-dob" type="date">
+              <label class="lbl">Phone number</label>
+              <input class="inp" id="v-phone" placeholder="+1 555 010 4472" inputmode="tel">
+              <label class="lbl">Nationality</label>
+              <select class="inp" id="v-nat"><option>United States</option><option>Nigeria</option><option>United Kingdom</option><option>Canada</option><option>Kenya</option><option>Ghana</option></select>
+            </div>
+
+            <div class="wstep" id="ws-3">
+              <h3>Government-issued ID</h3>
+              <p class="wsub">Upload a clear photo of a valid passport, driver's license or national ID.</p>
+              <label class="lbl">ID type</label>
+              <select class="inp" id="v-idtype"><option>Passport</option><option>Driver's license</option><option>National ID card</option><option>Residence permit</option></select>
+              <label class="lbl">Document</label>
+              <div class="drop" onclick="document.getElementById('v-idfile').click()">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 20h16"/></svg>
+                <b>Tap to upload your ID</b>
+                <small>JPG, PNG or PDF · max 10 MB · front & back for licenses</small>
+              </div>
+              <input type="file" id="v-idfile" accept="image/*,.pdf" style="display:none" onchange="pickFile(this,'id')">
+              <div class="doc-chip" id="chip-id"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg><b id="chip-id-name"></b><button onclick="clearFile('id')">Remove</button></div>
+            </div>
+
+            <div class="wstep" id="ws-4">
+              <h3>SSN / TIN</h3>
+              <p class="wsub">Required for Private-tier limits. Encrypted with bank-grade security and never shared.</p>
+              <label class="lbl">Social Security Number</label>
+              <input class="inp" id="v-ssn" placeholder="123-45-6789" inputmode="numeric" maxlength="11" oninput="maskSsn(this)">
+              <label class="lbl">Confirm SSN</label>
+              <input class="inp" id="v-ssn2" placeholder="123-45-6789" inputmode="numeric" maxlength="11" oninput="maskSsn(this)">
+              <div class="secure-note"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Your SSN is encrypted with AES-256 and used only for identity verification, in line with KYC/AML regulations.</div>
+            </div>
+
+            <div class="wstep" id="ws-5">
+              <h3>Proof of address</h3>
+              <p class="wsub">A utility bill, bank statement or government letter dated within the last 3 months.</p>
+              <label class="lbl">Document type</label>
+              <select class="inp" id="v-adoc"><option>Utility bill</option><option>Bank statement</option><option>Government letter</option><option>Lease agreement</option></select>
+              <label class="lbl">Document</label>
+              <div class="drop" onclick="document.getElementById('v-addrfile').click()">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 9l9-6 9 6v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M9 21V12h6v9"/></svg>
+                <b>Tap to upload proof of address</b>
+                <small>JPG, PNG or PDF · max 10 MB</small>
+              </div>
+              <input type="file" id="v-addrfile" accept="image/*,.pdf" style="display:none" onchange="pickFile(this,'addr')">
+              <div class="doc-chip" id="chip-addr"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg><b id="chip-addr-name"></b><button onclick="clearFile('addr')">Remove</button></div>
+            </div>
+
+            <div class="wstep" id="ws-6">
+              <h3>Review & submit</h3>
+              <p class="wsub">Confirm everything is correct before submitting for review.</p>
+              <div class="rev-row"><span>Full name</span><b id="rev-name">—</b></div>
+              <div class="rev-row"><span>Date of birth</span><b id="rev-dob">—</b></div>
+              <div class="rev-row"><span>Nationality</span><b id="rev-nat">—</b></div>
+              <div class="rev-row"><span>ID document</span><b id="rev-id">—</b></div>
+              <div class="rev-row"><span>SSN</span><b id="rev-ssn">—</b></div>
+              <div class="rev-row"><span>Proof of address</span><b id="rev-addr">—</b></div>
+              <div class="secure-note"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>By submitting you agree to our identity verification terms. Reviews usually complete within 24 hours.</div>
+            </div>
+
+            <div class="wstep" id="ws-7" style="text-align:center">
+              <div class="big-check"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+              <h3>Submitted for review</h3>
+              <p class="wsub" style="margin-top:6px">Our compliance team is verifying your documents.<br>You'll be notified once approved — usually under 24h.</p>
+              <div class="progress" style="margin:0 10px 18px"><i id="pend-bar" style="width:5%"></i></div>
+              <p style="font-size:12px;color:var(--muted)" id="pend-txt">Reviewing documents…</p>
+            </div>
+
+            <div class="wiz-nav" id="wiz-nav">
+              <button class="btn btn-ghost" id="wiz-back" onclick="wizPrev()">Back</button>
+              <button class="btn btn-gold" id="wiz-next" onclick="wizNext()">Continue</button>
+            </div>
+          </div>
+        </div>
+
+        <p class="small-note">Limits apply to total balance. Higher tiers unlock after document verification.</p>
+      </div>
+    </section>
+
+    <!-- ===== ADMIN ===== -->
+    <section class="screen" id="s-admin">
+      <div class="page">
+        <div class="topbar">
+          <h2>Admin Console</h2>
+          <span class="tier" style="background:var(--navy-900);color:var(--gold-2)">ADMIN</span>
+        </div>
+
+        <div class="adm-stats" id="adm-stats"></div>
+
+        <div class="sec"><h3>Pending tier approvals</h3><span class="tt tt-pending" id="adm-pend-n">0</span></div>
+        <div id="adm-pending"></div>
+
+        <div class="sec"><h3>User management</h3></div>
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input placeholder="Search by name or email…" oninput="admSearch(this.value)">
+        </div>
+        <div class="chips" id="adm-chips">
+          <button class="chip on" data-f="all" onclick="admFilter(this)">All</button>
+          <button class="chip" data-f="basic" onclick="admFilter(this)">Basic</button>
+          <button class="chip" data-f="premium" onclick="admFilter(this)">Premium</button>
+          <button class="chip" data-f="private" onclick="admFilter(this)">Private</button>
+          <button class="chip" data-f="frozen" onclick="admFilter(this)">Frozen</button>
+        </div>
+        <div class="tcard" id="adm-users"></div>
+
+        <div class="sec"><h3>Activity log</h3></div>
+        <div class="tcard" id="adm-log"></div>
+        <p class="small-note">Demo dataset — connect the admin API for live data</p>
+      </div>
+    </section>
+
+    <!-- ===== PROFILE ===== -->
+    <section class="screen" id="s-profile">
+      <div class="page">
+        <div class="topbar"><h2>Profile & Settings</h2></div>
+        <div class="p-head">
+          <div class="avatar">AO</div>
+          <div><b>Adaeze Okafor</b><span>adaeze.okafor@crestmail.com</span></div>
+          <span class="tier" id="tier-badge">BASIC</span>
+        </div>
+        <div class="set-group">
+          <div class="set-item" onclick="toast('Account details (demo)')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg><span>Personal information</span><small>›</small></div>
+          <div class="set-item" onclick="goVerify()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Verification & limits</span><small id="kyc-status" style="color:var(--gold);font-weight:700">Basic</small></div>
+          <div class="set-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg><span>Default currency</span><small>USD ▾</small></div>
+        </div>
+        <div class="set-group">
+          <div class="set-item" onclick="toggleSwitch(this)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg><span>Instant notifications</span><span class="switch on"></span></div>
+          <div class="set-item" onclick="toggleSwitch(this)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 11c1.5 0 2.5 1 2.5 2.5V17a2 2 0 0 1-4 0v-2"/><path d="M7 14.5c0-3 2-5 5-5s5 2 5 5"/></svg><span>Biometric login</span><span class="switch on"></span></div>
+          <div class="set-item" onclick="toggleSwitch(this)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>Hide balances by default</span><span class="switch"></span></div>
+        </div>
+        <div class="set-group" id="admin-link-group">
+          <div class="set-item" onclick="go('s-admin')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M12 8v4M12 15h.01"/></svg><span>Admin console</span><small>›</small></div>
+        </div>
+        <div class="set-group">
+          <div class="set-item" onclick="toast('Support chat opening (demo)')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg><span>24/7 Private concierge</span><small>›</small></div>
+          <div class="set-item" onclick="toast('Rate us on the App Store (demo)')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-3-5.4 3 1.1-6L3.2 9.4l6.1-.8z"/></svg><span>Rate the app</span><small>›</small></div>
+          <div class="set-item" onclick="logout()" style="color:var(--red)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="stroke:var(--red)"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg><span style="color:var(--red)">Sign out</span></div>
+        </div>
+        <p class="small-note">Modern Crest Private Bank · v1.0.0 (frontend demo)</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- bottom nav -->
+  <nav class="bottombar" id="bottombar"></nav>
+</div>
+
+<!-- ============ SHEET / MODAL ============ -->
+<div class="modal-bg" id="modal" onclick="if(event.target===this)closeSheet()">
+  <div class="sheet">
+    <div id="sheet-send">
+      <h3>Send money</h3>
+      <p class="sub">Instant transfer, zero fees between Crest clients</p>
+      <div class="amount-hero" style="padding-top:6px">
+        <small>You send</small>
+        <input class="amount-input" id="send-amt" value="$250" inputmode="numeric" oninput="fmtAmt(this)">
+      </div>
+      <div class="sec"><h3 style="font-size:14px">To</h3></div>
+      <div class="contact-row" id="contacts"></div>
+      <button class="btn btn-gold" onclick="confirmSend()">Review & send</button>
+      <button class="btn btn-ghost" onclick="closeSheet()">Cancel</button>
+    </div>
+    <div id="sheet-confirm" style="display:none">
+      <div style="text-align:center;padding:10px 0 18px">
+        <svg width="64" height="64" viewBox="0 0 64 64" style="margin:0 auto"><circle cx="32" cy="32" r="30" fill="var(--gold-soft)"/><path d="M20 33l8 8 16-17" fill="none" stroke="var(--green)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h3 style="margin-top:10px" id="cf-title">Sent successfully</h3>
+        <p class="sub" id="cf-sub" style="margin-top:6px">Your transfer is on its way.</p>
+        <div class="tcard" style="box-shadow:none;text-align:left;margin-top:14px">
+          <div class="tx"><div class="tx-mid"><span style="font-size:12px;color:var(--muted)">Amount</span><b id="cf-amt" style="font-family:'Sora'">$250.00</b></div></div>
+          <div class="tx"><div class="tx-mid"><span style="font-size:12px;color:var(--muted)">To</span><b id="cf-to">—</b></div></div>
+          <div class="tx"><div class="tx-mid"><span style="font-size:12px;color:var(--muted)">Arrives</span><b style="color:var(--green)">Instantly</b></div></div>
+        </div>
+        <button class="btn btn-gold" onclick="closeSheet();toast('Receipt downloaded (demo)')">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- upgrade prompt -->
+<div class="modal-bg" id="modal2" onclick="if(event.target===this)closeUpgradePrompt()">
+  <div class="sheet" style="text-align:center">
+    <div class="up-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M12 8v4M12 15h.01"/></svg></div>
+    <h3 class="up">Upgrade required</h3>
+    <p class="sub up" id="up-msg">You've reached your Basic tier limit of $5,000.<br>Verify your ID, SSN and proof of address to unlock a $50,000+ limit.</p>
+    <button class="btn btn-gold" onclick="closeUpgradePrompt();goVerify()">Complete verification</button>
+    <button class="btn btn-ghost" onclick="closeUpgradePrompt()">Not now</button>
+  </div>
+</div>
+
+<!-- admin user actions -->
+<div class="modal-bg" id="modal3" onclick="if(event.target===this)admClose()">
+  <div class="sheet">
+    <div id="am-menu">
+      <div style="text-align:center">
+        <div class="am-av" id="am-av">—</div>
+        <h3 id="am-name">—</h3>
+        <p class="sub" id="am-email" style="margin-bottom:4px">—</p>
+        <div class="am-tags" id="am-tags"></div>
+        <p style="font-family:'Sora';font-size:26px;font-weight:700;margin:6px 0 18px" id="am-bal">—</p>
+      </div>
+      <button class="btn btn-gold" id="am-promote" onclick="admPromote()">Promote tier</button>
+      <button class="btn btn-ghost" id="am-demote" onclick="admDemote()">Demote tier</button>
+      <button class="btn btn-ghost" onclick="admFund('add')" style="color:var(--green);border-color:#BFE7D4">＋ Add funds</button>
+      <button class="btn btn-ghost" onclick="admFund('deduct')" style="color:var(--red);border-color:#F3C1C1">－ Deduct funds</button>
+      <button class="btn btn-dark" id="am-freeze" onclick="admFreeze()">Freeze account</button>
+      <button class="btn btn-ghost" onclick="admClose()" style="margin-top:6px">Close</button>
+    </div>
+    <div id="am-amt" style="display:none">
+      <h3 style="text-align:center" id="am-amt-title">Add funds</h3>
+      <p class="sub" style="text-align:center" id="am-amt-sub">—</p>
+      <input class="inp" id="am-amt-in" inputmode="numeric" placeholder="$0.00" style="font-family:'Sora';font-size:34px;font-weight:700;text-align:center;letter-spacing:-.5px">
+      <div class="amt-chips">
+        <button onclick="setAmt(100)">$100</button>
+        <button onclick="setAmt(500)">$500</button>
+        <button onclick="setAmt(1000)">$1,000</button>
+        <button onclick="setAmt(5000)">$5,000</button>
+      </div>
+      <button class="btn btn-gold" id="am-amt-go" onclick="admConfirmAmt()">Confirm</button>
+      <button class="btn btn-ghost" onclick="admBack()">Back</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- data ---------- */
+const txData=[
+ {n:"Stripe payout — Design retainer",d:"Today · 09:41",a:1850,type:"in",cat:"transfer"},
+ {n:"Whole Foods Market",d:"Yesterday · 18:22",a:-84.20,type:"out",cat:"card"},
+ {n:"Netflix subscription",d:"Yesterday · 08:00",a:-15.49,type:"out",cat:"card"},
+ {n:"Transfer from Chidi N.",d:"Mon · 14:05",a:600,type:"in",cat:"transfer"},
+ {n:"Shell fuel station",d:"Sun · 11:48",a:-52.75,type:"out",cat:"card"},
+ {n:"Upwork — FastTrack payout",d:"Fri · 16:30",a:920,type:"in",cat:"transfer"},
+ {n:"Amazon.com order",d:"Fri · 10:12",a:-129.99,type:"out",cat:"card"},
+ {n:"Crest Vault interest",d:"Oct 1 · 00:00",a:52.31,type:"in",cat:"transfer"},
+];
+const contacts=[["CN","Chidi N."],["TA","Tolu A."],["MK","Maya K."],["JB","Jonas B."],["+","New"]];
+
+/* ---------- screens & nav ---------- */
+const NAV=[
+ {id:"s-home",label:"Home",ic:'<path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/>'},
+ {id:"s-cards",label:"Cards",ic:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>'},
+ {id:"s-send",label:"Send",ic:'<path d="M12 19V5M5 12l7-7 7 7"/>',center:true,fn:()=>openSheet('send')},
+ {id:"s-verify",label:"Upgrade",desk:1,ic:'<path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/>'},
+ {id:"s-tx",label:"Activity",ic:'<path d="M3 12h4l3 8 4-16 3 8h4"/>'},
+ {id:"s-admin",label:"Admin",desk:1,ic:'<path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M12 8v4M12 15h.01"/>'},
+ {id:"s-profile",label:"Profile",ic:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/>'},
+];
+let sessionRole = null;
+function renderNav(){
+  let navItems = NAV;
+  if(sessionRole === 'admin') {
+    navItems = [
+      {id:"s-admin",label:"Home",ic:'<path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/>'},
+      {id:"s-profile",label:"Profile",ic:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/>'}
+    ];
+    let admGroup = document.getElementById('admin-link-group');
+    if(admGroup) admGroup.style.display = 'none';
+  } else {
+    navItems = NAV.filter(n => n.id !== 's-admin');
+    let admGroup = document.getElementById('admin-link-group');
+    if(admGroup) admGroup.style.display = 'none'; // hidden for proper users too
+  }
+  document.getElementById('bottombar').innerHTML=navItems.filter(n=>!n.desk).map(n=>
+    `<button class="bnav${n.center?' center':''}" data-id="${n.id}" onclick="navTap('${n.id}')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2">${n.ic}</svg>${n.label}</button>`).join('');
+  document.getElementById('side-nav').innerHTML=navItems.map(n=>
+    `<a class="side-link" data-id="${n.id}" onclick="navTap('${n.id}')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2">${n.ic}</svg>${n.label}</a>`).join('');
+}
+function navTap(id){const n=NAV.find(x=>x.id===id);if(n&&n.fn){n.fn();return;}go(id);}
+function go(id){
+  document.querySelectorAll('#shell .screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.bnav,.side-link').forEach(b=>b.classList.toggle('on',b.dataset.id===id));
+  window.scrollTo(0,0);
+  if(id==='s-admin')renderAdmin();
+}
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ---------- onboarding ---------- */
+const obMsgs=[
+ "Private banking, reimagined. Multi-currency accounts, virtual cards and instant global transfers — all in one elegant app.",
+ "Hold USD, GBP and EUR in your name. Receive payments from 190+ countries with your own account details.",
+ "Bank like royalty. Crest Vault savings, Auto-Invest and a 24/7 private concierge — exclusive to Modern Crest clients."
+];let obI=0;
+function nextOnboard(){
+  obI++;
+  if(obI>=obMsgs.length){showScreen('s-signup');return;}
+  document.getElementById('ob-text').textContent=obMsgs[obI];
+  document.querySelectorAll('#s-onboard .dots span').forEach((d,i)=>d.classList.toggle('on',i===obI));
+  if(obI===obMsgs.length-1) document.getElementById('ob-btn').textContent = "Get Started";
+}
+
+
+
+/* ---------- pin ---------- */
+let pin="";
+function pinReset(){pin="";drawPin();}
+function drawPin(){document.querySelectorAll('#pin-dots .pin-dot').forEach((d,i)=>d.classList.toggle('filled',i<pin.length));}
+function pinKey(k){
+  if(k==='del'){pin=pin.slice(0,-1);drawPin();return;}
+  if(k==='bio'){toast('Face ID recognized');enterApp();return;}
+  if(pin.length>=4)return;
+  pin+=k;drawPin();
+  if(pin.length===4)setTimeout(()=>{if(pin==='0000'){enterAdmin();}else{toast('Welcome back, Adaeze');enterApp();}},250);
+}
+function enterApp(){
+  sessionRole = 'user';
+  renderNav();
+  showScreen('s-home');document.getElementById('shell').style.display='flex';
+  document.getElementById('shell').classList.add('active');
+  go('s-home');
+  const h=new Date().getHours();
+  document.getElementById('greet').textContent=h<12?'Good morning':h<18?'Good afternoon':'Good evening';
+}
+function logout(){sessionRole = null; pinReset();document.getElementById('shell').style.display='none';showScreen('s-onboard');obI=0;document.getElementById('ob-text').textContent=obMsgs[0];document.querySelectorAll('#s-onboard .dots span').forEach((d,i)=>d.classList.toggle('on',i===0));}
+
+/* ---------- balance ---------- */
+let balHidden=false;
+function toggleBal(){
+  balHidden=!balHidden;
+  document.getElementById('bal').textContent=balHidden?'$ ••••••':fmtBal(BALANCE);
+  document.getElementById('bal-sub').textContent=balHidden?'Tap the eye to reveal':'≈ €2,981.30  ·  Basic tier · limit '+fmtLimit(tierLimit());
+}
+
+/* ---------- transactions ---------- */
+let txFilter='all',txSearch='';
+function txIcon(t){return t==='in'
+ ?'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 7L7 17M8 7h9v9"/></svg>'
+ :'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M16 17H7V8"/></svg>';}
+function txRow(t){return `<div class="tx"><div class="tx-ico ${t.type}">${txIcon(t.type)}</div>
+ <div class="tx-mid"><b>${t.n}</b><span>${t.d}</span></div>
+ <span class="tx-amt ${t.type==='in'?'pos':'neg'}">${t.type==='in'?'+':''}${Math.abs(t.a).toLocaleString('en-US',{style:'currency',currency:'USD'})}</span></div>`;}
+function renderTx(){
+  const list=txData.filter(t=>(txFilter==='all'||t.type===txFilter||t.cat===txFilter)&&(t.n.toLowerCase().includes(txSearch)));
+  document.getElementById('tx-list').innerHTML=list.length?list.map(txRow).join(''):'<p style="text-align:center;color:var(--muted);padding:24px;font-size:14px">No transactions found</p>';
+  document.getElementById('recent-tx').innerHTML=txData.slice(0,4).map(txRow).join('');
+}
+function setFilter(el){txFilter=el.dataset.f;document.querySelectorAll('#tx-chips .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderTx();}
+function filterTx(v){txSearch=v.toLowerCase();renderTx();}
+
+/* ---------- cards ---------- */
+function cardDots(){
+  const c=document.getElementById('card-carousel');
+  const i=Math.round(c.scrollLeft/(c.firstElementChild.offsetWidth+14));
+  document.querySelectorAll('#card-dots span').forEach((d,k)=>d.classList.toggle('on',k===i));
+}
+let frozen=false;
+function toggleFreeze(){frozen=!frozen;document.getElementById('freeze-txt').textContent=frozen?'Unfreeze':'Freeze';toast(frozen?'Card frozen':'Card active');}
+let cvvShown=false;
+function toggleCvv(){
+  cvvShown=!cvvShown;
+  [1,2,3].forEach(i=>{const el=document.getElementById('cvv'+i);el.textContent=cvvShown?el.dataset.v:'•••';});
+  if(cvvShown)setTimeout(toggleCvv,5000);
+}
+
+/* ---------- send sheet ---------- */
+let selContact=null;
+function renderContacts(){
+  document.getElementById('contacts').innerHTML=contacts.map(([i,n],k)=>
+   `<div class="contact${selContact===k?' sel':''}" onclick="pickContact(${k})"><div class="cav">${i}</div><span>${n}</span></div>`).join('');
+}
+function pickContact(k){
+  if(contacts[k][0]==='+'){toast('Add new recipient (demo)');return;}
+  selContact=k;renderContacts();
+}
+function fmtAmt(el){
+  let v=el.value.replace(/[^0-9.]/g,'');
+  if(v)el.value='$'+v;else el.value='';
+}
+function openSheet(which){
+  document.getElementById('sheet-send').style.display=which==='send'?'block':'none';
+  document.getElementById('sheet-confirm').style.display=which==='confirm'?'block':'none';
+  renderContacts();
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSheet(){document.getElementById('modal').classList.remove('open');document.body.style.overflow='';}
+function confirmSend(){
+  if(selContact===null){toast('Choose a recipient first');return;}
+  const raw=document.getElementById('send-amt').value.replace(/[^0-9.]/g,'')||'0';
+  const amt=parseFloat(raw);
+  const rem=remainingLimit();
+  if(amt>rem){openUpgradePrompt();return;}
+  document.getElementById('cf-amt').textContent=amt.toLocaleString('en-US',{style:'currency',currency:'USD'});
+  document.getElementById('cf-to').textContent=contacts[selContact][1]+' · Crest client';
+  openSheet('confirm');
+}
+
+/* ---------- misc ---------- */
+function toggleSwitch(el){el.querySelector('.switch').classList.toggle('on');}
+let toastT;
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+/* ================= TIERS & VERIFICATION ================= */
+const BALANCE=3240.55;
+const state={tier:'basic',wizardStep:0,files:{id:null,addr:null},otpResendT:null};
+const TIER_INFO={basic:{name:'Basic',limit:5000},premium:{name:'Premium',limit:50000},private:{name:'Private',limit:Infinity}};
+const WIZ_LAST=6;
+
+function fmtBal(v){return v.toLocaleString('en-US',{style:'currency',currency:'USD'});}
+function fmtLimit(l){return l===Infinity?'Unlimited':l.toLocaleString('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0});}
+function tierLimit(){return TIER_INFO[state.tier].limit;}
+function remainingLimit(){const l=tierLimit();return l===Infinity?Infinity:Math.max(0,l-BALANCE);}
+
+function updateLimitUI(){
+  const l=tierLimit(),pct=l===Infinity?0:Math.min(100,BALANCE/l*100);
+  const banner=document.getElementById('limit-banner');
+  if(l===Infinity){
+    document.getElementById('lb-title').textContent='Private tier · Unlimited';
+    document.getElementById('lb-sub').textContent='All verification complete — enjoy unlimited banking';
+    document.getElementById('lb-pct').textContent='No balance limits apply';
+    document.getElementById('lb-fill').style.width='0%';
+    banner.querySelector('.btn-upgrade').style.display='none';
+  }else{
+    document.getElementById('lb-title').textContent=TIER_INFO[state.tier].name+' tier · '+fmtLimit(l)+' limit';
+    document.getElementById('lb-sub').textContent=state.tier==='basic'?'OTP verified — add documents to unlock more':'One step away from Unlimited';
+    document.getElementById('lb-pct').textContent=fmtBal(BALANCE)+' of '+fmtLimit(l)+' used ('+pct.toFixed(1)+'%)';
+    document.getElementById('lb-fill').style.width=pct+'%';
+    banner.querySelector('.btn-upgrade').textContent=state.tier==='basic'?'Increase limit':'Go Unlimited';
+  }
+  const badge=document.getElementById('tier-badge');
+  badge.textContent=TIER_INFO[state.tier].name.toUpperCase();
+  badge.style.background=state.tier==='private'?'var(--grad-gold)':state.tier==='premium'?'#E4F6EE':'var(--gold-soft)';
+  badge.style.color=state.tier==='premium'?'var(--green)':state.tier==='private'?'#231A05':'var(--gold)';
+  document.getElementById('kyc-status').textContent=TIER_INFO[state.tier].name;
+  document.getElementById('kyc-status').style.color=state.tier==='basic'?'var(--gold)':'var(--green)';
+  document.getElementById('side-tier').textContent=TIER_INFO[state.tier]+' tier';
+  // tier cards
+  document.getElementById('tc-basic').classList.toggle('on',state.tier==='basic');
+  document.getElementById('tc-premium').classList.toggle('on',state.tier==='premium');
+  document.getElementById('tc-private').classList.toggle('on',state.tier==='private');
+  document.getElementById('tc-basic-badge').style.display=state.tier==='basic'?'block':'none';
+  const bp=document.getElementById('tc-premium').querySelector('.tier-current');
+  const bpr=document.getElementById('tc-private').querySelector('.tier-current');
+  bp.style.display=state.tier==='premium'?'block':'none';
+  bpr.style.display=state.tier==='private'?'block':'none';
+  const b1=document.getElementById('btn-basic'),b2=document.getElementById('btn-premium'),b3=document.getElementById('btn-private');
+  b1.className='btn btn-tier locked';b1.textContent=state.tier==='basic'?'Current plan':'Included';
+  if(state.tier==='basic'){b2.className='btn btn-tier cta';b2.textContent='Upgrade to Premium';b2.onclick=startWizard;
+    b3.className='btn btn-tier cta';b3.textContent='Go Private';b3.onclick=()=>startWizard(4);}
+  else if(state.tier==='premium'){b2.className='btn btn-tier locked';b2.textContent='Current plan';b2.onclick=null;
+    b3.className='btn btn-tier cta';b3.textContent='Go Private';b3.onclick=()=>startWizard(4);}
+  else{b2.className='btn btn-tier locked';b2.textContent='Unlocked';b2.onclick=null;
+    b3.className='btn btn-tier locked';b3.textContent='Current plan';b3.onclick=null;}
+}
+
+function goVerify(){go('s-verify');updateLimitUI();}
+
+/* ----- wizard ----- */
+function startWizard(step){
+  document.getElementById('wizard').style.display='block';
+  wizShow(step||1);
+  setTimeout(()=>document.getElementById('wizard').scrollIntoView({behavior:'smooth',block:'start'}),60);
+  if((step||1)===1)startResend();
+}
+function wizShow(n){
+  state.wizardStep=n;
+  document.querySelectorAll('.wstep').forEach(s=>s.classList.remove('on'));
+  const el=document.getElementById('ws-'+n);if(el)el.classList.add('on');
+  document.querySelectorAll('#stepper .step-dot').forEach((d,i)=>{
+    d.classList.toggle('done',i+1<n);d.classList.toggle('cur',i+1===n);});
+  document.getElementById('wiz-bar').style.width=Math.min(100,((n-1)/(WIZ_LAST-1))*100)+'%';
+  document.getElementById('wiz-nav').style.display=n===7?'none':'flex';
+  const back=document.getElementById('wiz-back'),next=document.getElementById('wiz-next');
+  back.style.visibility=n===1?'hidden':'visible';
+  next.textContent=n===WIZ_LAST?'Submit for review':n===1?'Verify & continue':'Continue';
+  if(n===WIZ_LAST)fillReview();
+  if(n===1)setTimeout(()=>{const o=document.querySelectorAll('.otp-in')[0];if(o)o.focus();},80);
+}
+function wizPrev(){if(state.wizardStep>1)wizShow(state.wizardStep-1);}
+function wizNext(){
+  const n=state.wizardStep;
+  if(n===1){
+    const code=[...document.querySelectorAll('.otp-in')].map(i=>i.value).join('');
+    if(code.length<6){document.getElementById('otp-row').classList.remove('shake');void document.getElementById('otp-row').offsetWidth;document.getElementById('otp-row').classList.add('shake');toast('Enter the 6-digit code');return;}
+    toast('Phone verified');wizShow(2);return;
+  }
+  if(n===2){
+    if(!document.getElementById('v-name').value.trim()){toast('Enter your full legal name');return;}
+    if(!document.getElementById('v-dob').value){toast('Enter your date of birth');return;}
+    wizShow(3);return;
+  }
+  if(n===3){
+    if(!state.files.id){toast('Upload your government ID');return;}
+    wizShow(4);return;
+  }
+  if(n===4){
+    const a=document.getElementById('v-ssn').value,b=document.getElementById('v-ssn2').value;
+    if(a.replace(/\D/g,'').length<9){toast('Enter a valid SSN');return;}
+    if(a!==b){toast('SSN entries do not match');return;}
+    wizShow(5);return;
+  }
+  if(n===5){
+    if(!state.files.addr){toast('Upload proof of address');return;}
+    wizShow(6);return;
+  }
+  if(n===WIZ_LAST){submitVerification();}
+}
+
+/* ----- otp ----- */
+function otpMove(el,i){
+  el.value=el.value.replace(/\D/g,'').slice(0,1);
+  const boxes=document.querySelectorAll('.otp-in');
+  if(el.value&&i<5)boxes[i+1].focus();
+}
+function otpBack(el,i,ev){
+  const boxes=document.querySelectorAll('.otp-in');
+  if(ev.key==='Backspace'&&!el.value&&i>0)boxes[i-1].focus();
+}
+function fillOtp(){
+  '123456'.split('').forEach((c,i)=>document.querySelectorAll('.otp-in')[i].value=c);
+  toast('Demo code applied');
+}
+function startResend(){
+  clearInterval(state.otpResendT);let s=30;
+  const link=document.getElementById('resend-link');
+  const tick=()=>{if(s<=0){clearInterval(state.otpResendT);link.classList.add('off');link.textContent='Resend code';link.onclick=resendOtp;}
+    else{link.classList.add('off');link.textContent='Resend in '+s+'s';link.onclick=null;s--;};};
+  tick();state.otpResendT=setInterval(tick,1000);
+}
+function resendOtp(){toast('New code sent (demo: 123456)');startResend();}
+
+/* ----- files ----- */
+function pickFile(input,kind){
+  if(!input.files||!input.files[0])return;
+  state.files[kind]=input.files[0].name;
+  document.getElementById('chip-'+kind+'-name').textContent=input.files[0].name;
+  document.getElementById('chip-'+kind).classList.add('show');
+  toast('Document attached');
+}
+function clearFile(kind){
+  state.files[kind]=null;
+  document.getElementById('chip-'+kind).classList.remove('show');
+  document.getElementById(kind==='id'?'v-idfile':'v-addrfile').value='';
+}
+
+/* ----- ssn masking ----- */
+function maskSsn(el){
+  let v=el.value.replace(/\D/g,'').slice(0,9);
+  el.value=v.length>5?v.slice(0,3)+'-'+v.slice(3,5)+'-'+v.slice(5):v.length>3?v.slice(0,3)+'-'+v.slice(3):v;
+}
+
+/* ----- review & submit ----- */
+function fillReview(){
+  document.getElementById('rev-name').textContent=document.getElementById('v-name').value||'—';
+  document.getElementById('rev-dob').textContent=document.getElementById('v-dob').value||'—';
+  document.getElementById('rev-nat').textContent=document.getElementById('v-nat').value;
+  document.getElementById('rev-id').textContent=document.getElementById('v-idtype').value+' · '+(state.files.id||'—');
+  document.getElementById('rev-ssn').textContent='•••-••-'+document.getElementById('v-ssn').value.replace(/\D/g,'').slice(-4);
+  document.getElementById('rev-addr').textContent=document.getElementById('v-adoc').value+' · '+(state.files.addr||'—');
+}
+function submitVerification(){
+  wizShow(7);
+  document.getElementById('wiz-bar').style.width='100%';
+  // simulate compliance review
+  let p=5;const bar=document.getElementById('pend-bar'),txt=document.getElementById('pend-txt');
+  const msgs=['Reviewing documents…','Cross-checking registries…','Final approval…'];
+  const iv=setInterval(()=>{
+    p+=Math.random()*9+4;
+    if(p>=100){p=100;clearInterval(iv);
+      txt.textContent='Approved';txt.style.color='var(--green)';txt.style.fontWeight='700';
+      state.tier='private';updateLimitUI();
+      toast('Congratulations — you are now Private tier');
+      document.querySelectorAll('#stepper .step-dot').forEach(d=>{d.classList.add('done');d.classList.remove('cur');});
+      setTimeout(()=>{document.getElementById('wizard').style.display='none';goVerify();},2200);
+    }else{txt.textContent=msgs[Math.min(2,Math.floor(p/40))];}
+    bar.style.width=p+'%';
+  },420);
+}
+
+/* ----- upgrade prompt ----- */
+function openUpgradePrompt(){
+  const rem=remainingLimit();
+  document.getElementById('up-msg').innerHTML=
+    (rem<=0?'You\u2019ve reached your '+TIER_INFO[state.tier].name+' tier limit of '+fmtLimit(tierLimit())+'.':
+     'This transfer exceeds your remaining allowance of <b>'+fmtBal(rem)+'</b>.')+
+    '<br>Verify your ID, SSN and proof of address to unlock a $50,000+ limit.';
+  closeSheet();
+  document.getElementById('modal2').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeUpgradePrompt(){document.getElementById('modal2').classList.remove('open');document.body.style.overflow='';}
+
+/* ================= ADMIN CONSOLE ================= */
+const ADM_USERS=[
+ {id:'u1',name:'Adaeze Okafor',email:'adaeze.okafor@crestmail.com',tier:'basic',balance:3240.55,status:'active',kyc:'verified',joined:'Mar 2025'},
+ {id:'u2',name:'Chidi Nwosu',email:'chidi.nwosu@crestmail.com',tier:'premium',balance:18240.00,status:'active',kyc:'verified',joined:'Jan 2025'},
+ {id:'u3',name:'Maya Kimani',email:'maya.kimani@crestmail.com',tier:'private',balance:96410.22,status:'active',kyc:'verified',joined:'Nov 2024'},
+ {id:'u4',name:'Tolu Adeyemi',email:'tolu.adeyemi@crestmail.com',tier:'basic',balance:890.10,status:'active',kyc:'pending',target:'premium',joined:'Sep 2026'},
+ {id:'u5',name:'Jonas Berg',email:'jonas.berg@crestmail.com',tier:'basic',balance:120.00,status:'frozen',kyc:'pending',target:'private',joined:'Oct 2026'},
+ {id:'u6',name:'Amina Diallo',email:'amina.diallo@crestmail.com',tier:'premium',balance:31050.75,status:'active',kyc:'pending',target:'private',joined:'Oct 2026'},
+ {id:'u7',name:'Sofia Reyes',email:'sofia.reyes@crestmail.com',tier:'basic',balance:2575.40,status:'active',kyc:'rejected',joined:'Aug 2026'},
+];
+let ADM_LOG=[
+ {t:'Today · 09:12',txt:'Maya Kimani upgraded to Private tier'},
+ {t:'Today · 08:47',txt:'$500.00 added to Chidi Nwosu'},
+ {t:'Yesterday · 17:03',txt:'Account frozen: Jonas Berg (suspicious activity)'},
+];
+const admState={q:'',filter:'all',sel:null,amtMode:'add'};
+const TIER_ORDER=['basic','premium','private'];
+
+function admInitials(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();}
+function admTag(t){return `<span class="tt tt-${t}">${t}</span>`;}
+
+function renderAdmin(){
+  const total=ADM_USERS.length;
+  const pending=ADM_USERS.filter(u=>u.kyc==='pending');
+  const held=ADM_USERS.reduce((s,u)=>s+u.balance,0);
+  const frozen=ADM_USERS.filter(u=>u.status==='frozen').length;
+  document.getElementById('adm-stats').innerHTML=`
+   <div class="adm-stat"><div class="as-ico as-navy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5 6.5-5s6.5 1.5 6.5 5"/><circle cx="17" cy="9" r="2.5"/><path d="M16 15.2c2.9.2 5.5 1.5 5.5 4.3"/></svg></div><b>${total}</b><span>Total users</span></div>
+   <div class="adm-stat"><div class="as-ico as-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><b>${pending.length}</b><span>Pending approvals</span></div>
+   <div class="adm-stat"><div class="as-ico as-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><b>${fmtBal(held)}</b><span>Total balance held</span></div>
+   <div class="adm-stat"><div class="as-ico as-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M4 6l16 12M20 6L4 18"/></svg></div><b>${frozen}</b><span>Frozen accounts</span></div>`;
+  document.getElementById('adm-pend-n').textContent=pending.length;
+
+  document.getElementById('adm-pending').innerHTML=pending.length?pending.map(u=>`
+   <div class="pend-card${u.status==='frozen'?' frozen':''}">
+     <div class="pend-top">
+       <div class="avatar">${admInitials(u.name)}</div>
+       <div><b>${u.name}</b><small>${u.email} · joined ${u.joined}</small></div>
+       ${admTag(u.tier)}
+     </div>
+     <p class="pend-req">Requested upgrade: <b>${u.tier==='basic'?'Basic → Premium':'Premium → Private'}</b> · Submitted documents: ID, proof of address${u.target==='private'?', SSN':''} ${u.status==='frozen'?'· <b style="color:var(--red)">ACCOUNT FROZEN</b>':''}</p>
+     <div class="pend-btns">
+       <button class="btn btn-green" ${u.status==='frozen'?'disabled':''} onclick="admApprove('${u.id}')">Approve upgrade</button>
+       <button class="btn btn-redghost" onclick="admReject('${u.id}')">Reject</button>
+     </div>
+   </div>`).join(''):'<div class="tcard empty-note">No pending approvals — all caught up</div>';
+
+  const list=ADM_USERS.filter(u=>
+    (admState.filter==='all'||(admState.filter==='frozen'?u.status==='frozen':u.tier===admState.filter))&&
+    (u.name.toLowerCase().includes(admState.q)||u.email.toLowerCase().includes(admState.q)));
+  document.getElementById('adm-users').innerHTML=list.length?list.map(u=>`
+   <div class="adm-user">
+     <div class="avatar">${admInitials(u.name)}</div>
+     <div class="mu">
+       <b>${u.name}</b><small>${u.email}</small>
+       <div class="mu-tags">${admTag(u.tier)}${u.status==='frozen'?admTag('frozen'):admTag('active')}${u.kyc==='pending'?admTag('pending'):u.kyc==='rejected'?admTag('rejected'):''}</div>
+     </div>
+     <span class="mu-bal">${fmtBal(u.balance)}</span>
+     <button class="btn-manage" onclick="admOpen('${u.id}')">Manage</button>
+   </div>`).join(''):'<p class="empty-note">No users match your search</p>';
+
+  document.getElementById('adm-log').innerHTML=ADM_LOG.slice(0,6).map(l=>
+   `<div class="log-item"><span class="log-dot"></span><div>${l.txt}<small>${l.t}</small></div></div>`).join('');
+}
+function admLog(txt){const d=new Date();ADM_LOG.unshift({t:'Today · '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'),txt});}
+function admSearch(v){admState.q=v.toLowerCase();renderAdmin();}
+function admFilter(el){admState.filter=el.dataset.f;document.querySelectorAll('#adm-chips .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderAdmin();}
+
+/* ----- approvals ----- */
+function admApprove(id){
+  const u=ADM_USERS.find(x=>x.id===id);if(!u)return;
+  u.tier=u.target||'premium';u.kyc='verified';u.target=null;
+  admLog(u.name+' upgraded to '+TIER_INFO[u.tier].name+' tier');
+  toast(u.name+' approved · now '+TIER_INFO[u.tier].name);renderAdmin();
+}
+function admReject(id){
+  const u=ADM_USERS.find(x=>x.id===id);if(!u)return;
+  u.kyc='rejected';u.target=null;
+  admLog('Upgrade rejected for '+u.name);
+  toast('Upgrade rejected for '+u.name);renderAdmin();
+}
+
+/* ----- user action sheet ----- */
+function admOpen(id){
+  const u=ADM_USERS.find(x=>x.id===id);if(!u)return;
+  admState.sel=u;admView('menu');
+  document.getElementById('am-av').textContent=admInitials(u.name);
+  document.getElementById('am-name').textContent=u.name;
+  document.getElementById('am-email').textContent=u.email+' · joined '+u.joined;
+  document.getElementById('am-tags').innerHTML=admTag(u.tier)+(u.status==='frozen'?admTag('frozen'):admTag('active'))+(u.kyc!=='verified'?admTag(u.kyc):'');
+  document.getElementById('am-bal').textContent=fmtBal(u.balance);
+  const ti=TIER_ORDER.indexOf(u.tier);
+  const pr=document.getElementById('am-promote'),de=document.getElementById('am-demote'),fr=document.getElementById('am-freeze');
+  if(ti>=2||u.status==='frozen'){pr.disabled=true;pr.style.opacity=.45;}else{pr.disabled=false;pr.style.opacity=1;pr.textContent='Promote to '+TIER_ORDER[ti+1].charAt(0).toUpperCase()+TIER_ORDER[ti+1].slice(1);}
+  if(ti<=0||u.status==='frozen'){de.disabled=true;de.style.opacity=.45;}else{de.disabled=false;de.style.opacity=1;de.textContent='Demote to '+TIER_ORDER[ti-1].charAt(0).toUpperCase()+TIER_ORDER[ti-1].slice(1);}
+  fr.textContent=u.status==='frozen'?'Unfreeze account':'Freeze account';
+  document.getElementById('modal3').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function admView(v){
+  document.getElementById('am-menu').style.display=v==='menu'?'block':'none';
+  document.getElementById('am-amt').style.display=v==='amt'?'block':'none';
+}
+function admClose(){document.getElementById('modal3').classList.remove('open');document.body.style.overflow='';}
+function admBack(){admView('menu');}
+
+function admPromote(){
+  const u=admState.sel;const ti=TIER_ORDER.indexOf(u.tier);if(ti>=2)return;
+  u.tier=TIER_ORDER[ti+1];if(u.kyc==='pending'&&u.target===u.tier){u.kyc='verified';u.target=null;}
+  admLog(u.name+' promoted to '+TIER_INFO[u.tier].name+' (manual)');toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');admOpen(u.id);renderAdmin();
+}
+function admDemote(){
+  const u=admState.sel;const ti=TIER_ORDER.indexOf(u.tier);if(ti<=0)return;
+  u.tier=TIER_ORDER[ti-1];
+  admLog(u.name+' demoted to '+TIER_INFO[u.tier].name+' (manual)');toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');admOpen(u.id);renderAdmin();
+}
+function admFreeze(){
+  const u=admState.sel;
+  u.status=u.status==='frozen'?'active':'frozen';
+  admLog((u.status==='frozen'?'Account frozen: ':'Account unfrozen: ')+u.name);
+  toast(u.status==='frozen'?u.name+' frozen':u.name+' reactivated');admOpen(u.id);renderAdmin();
+}
+function admFund(mode){
+  admState.amtMode=mode;const u=admState.sel;
+  document.getElementById('am-amt-title').textContent=mode==='add'?'Add funds':'Deduct funds';
+  document.getElementById('am-amt-sub').textContent=(mode==='add'?'Credit':'Debit')+' '+u.name+' · current balance '+fmtBal(u.balance);
+  document.getElementById('am-amt-in').value='';
+  document.getElementById('am-amt-go').textContent=mode==='add'?'Confirm & credit':'Confirm & debit';
+  document.getElementById('am-amt-go').style.background=mode==='add'?'var(--grad-gold)':'linear-gradient(135deg,#E05A5A,#B92E2E)';
+  document.getElementById('am-amt-go').style.color=mode==='add'?'#231A05':'#fff';
+  admView('amt');
+}
+function setAmt(v){document.getElementById('am-amt-in').value='$'+v.toLocaleString();}
+function admConfirmAmt(){
+  const u=admState.sel;
+  const raw=document.getElementById('am-amt-in').value.replace(/[^0-9.]/g,'');
+  const amt=parseFloat(raw);
+  if(!amt||amt<=0){toast('Enter a valid amount');return;}
+  if(admState.amtMode==='deduct'&&amt>u.balance){toast('Amount exceeds user balance');return;}
+  u.balance=admState.amtMode==='add'?u.balance+amt:Math.max(0,u.balance-amt);
+  admLog(fmtBal(amt)+(admState.amtMode==='add'?' added to ':' deducted from ')+u.name);
+  toast((admState.amtMode==='add'?'Credited ':'Debited ')+fmtBal(amt)+' → '+u.name);
+  admView('menu');admOpen(u.id);renderAdmin();
+}
+
+function enterAdmin(){
+  sessionRole = 'admin';
+  pinReset();
+  document.getElementById('shell').style.display='flex';
+  document.getElementById('shell').classList.add('active');
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  renderNav();
+  renderAdmin();go('s-admin');
+  toast('Signed in as Administrator');
+}
+
+updateLimitUI();
+renderNav();renderTx();
+
+// Initialize Clerk
+const CLERK_PUBLISHABLE_KEY = 'pk_test_Y2xlcmsuZXhhbXBsZS5jb20k'; // Replace with a valid Clerk Publishable Key!
+const script = document.createElement('script');
+script.setAttribute('data-clerk-publishable-key', CLERK_PUBLISHABLE_KEY);
+script.async = true;
+script.src = `https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js`;
+script.crossOrigin = 'anonymous';
+script.addEventListener('load', async function() {
+  try {
+    await window.Clerk.load();
+    if(window.Clerk.user) {
+      enterApp();
+    } else {
+      const si = document.getElementById('clerk-sign-in');
+      const su = document.getElementById('clerk-sign-up');
+      if (si) window.Clerk.mountSignIn(si);
+      if (su) window.Clerk.mountSignUp(su);
+    }
+  } catch (err) {
+    console.error("Clerk error (expected with dummy key): ", err);
+    toast("Clerk failed to load: check your Publishable Key");
+  }
+});
+document.body.appendChild(script);
+
+</script>
+</body>
+</html>
