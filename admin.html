@@ -391,7 +391,7 @@ a{text-decoration:none;color:inherit}
       <path d="M21 36 L32 15 L43 36 L32 30.5 Z" fill="url(#gA)"/>
     </svg>
     <h2 class="auth-title">Administrator Portal</h2>
-    <p class="auth-sub">Restricted personnel only · Authorized for James Harrison</p>
+    <p class="auth-sub">Restricted personnel only · Authorized for Tom Harrison</p>
     
     <div class="pin-row" id="pin-dots">
       <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
@@ -428,7 +428,7 @@ a{text-decoration:none;color:inherit}
         </svg>
         <div>
           <div class="brand-name">Modern <span>Crest</span></div>
-          <span class="adm-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg> Admin Console · James Harrison</span>
+          <span class="adm-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg> Admin Console · Tom Harrison</span>
         </div>
       </div>
       
@@ -544,13 +544,13 @@ function ensureUserAccounts(){
 ensureUserAccounts();
 
 let ADM_LOG = JSON.parse(localStorage.getItem('mcb_admin_log')) || [
- {t:'Today · 09:12',txt:'Admin Portal session initialized for James Harrison'},
+ {t:'Today · 09:12',txt:'Admin Portal session initialized for Tom Harrison'},
  {t:'Yesterday · 17:03',txt:'Account status verified'},
 ];
 
 const admState = {q:'',filter:'all',sel:null,amtMode:'add'};
 const TIER_ORDER = ['basic','premium','private'];
-const TIER_INFO = {basic:{name:'Basic',limit:5000},premium:{name:'Premium',limit:50000},private:{name:'Private',limit:Infinity}};
+const TIER_INFO = {basic:{name:'Basic',limit:100000},premium:{name:'Premium',limit:250000},private:{name:'Private',limit:Infinity}};
 
 function fmtBal(v){return (v||0).toLocaleString('en-US',{style:'currency',currency:'USD'});}
 function admInitials(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();}
@@ -577,7 +577,7 @@ function pinSubmit(){
     document.getElementById('auth-view').style.display='none';
     document.getElementById('app-view').style.display='block';
     renderAdmin();
-    toast('Authenticated as James Harrison');
+    toast('Authenticated as Tom Harrison');
   } else {
     toast('Invalid Admin PIN (Default: 0000)');
     pinReset();
@@ -669,7 +669,7 @@ function admApprove(id){
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   admLog('Approved upgrade: '+u.name+' → '+TIER_INFO[u.tier].name+' tier');
   toast('Upgrade approved for '+u.name);
-  sendTelegramAlert(`👑 <b>TIER UPGRADE APPROVED (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>Tier:</b> ${oldTier.toUpperCase()} ➔ <b>${u.tier.toUpperCase()}</b>\n<b>Approved By:</b> James Harrison (Dashboard)`);
+  sendTelegramAlert(`👑 <b>TIER UPGRADE APPROVED (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>Tier:</b> ${oldTier.toUpperCase()} ➔ <b>${u.tier.toUpperCase()}</b>\n<b>Approved By:</b> Tom Harrison (Dashboard)`);
   renderAdmin();
 }
 function admReject(id){
@@ -678,7 +678,7 @@ function admReject(id){
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   admLog('Rejected upgrade request for '+u.name);
   toast('Upgrade rejected for '+u.name);
-  sendTelegramAlert(`⚠️ <b>TIER UPGRADE REJECTED (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>Action By:</b> James Harrison (Dashboard)`);
+  sendTelegramAlert(`⚠️ <b>TIER UPGRADE REJECTED (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>Action By:</b> Tom Harrison (Dashboard)`);
   renderAdmin();
 }
 
@@ -706,16 +706,16 @@ function admPromote(){
   const u=admState.sel;const ti=TIER_ORDER.indexOf(u.tier);if(ti>=2)return;
   u.tier=TIER_ORDER[ti+1];if(u.kyc==='pending'&&u.target===u.tier){u.kyc='verified';u.target=null;}
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
-  admLog(u.name+' promoted to '+TIER_INFO[u.tier].name+' by James Harrison');
+  admLog(u.name+' promoted to '+TIER_INFO[u.tier].name+' by Tom Harrison');
   toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');
-  sendTelegramAlert(`👑 <b>CLIENT PROMOTED</b>\n\n<b>Client:</b> ${u.name}\n<b>New Tier:</b> ${u.tier.toUpperCase()}\n<b>By:</b> James Harrison`);
+  sendTelegramAlert(`👑 <b>CLIENT PROMOTED</b>\n\n<b>Client:</b> ${u.name}\n<b>New Tier:</b> ${u.tier.toUpperCase()}\n<b>By:</b> Tom Harrison`);
   admOpen(u.id);renderAdmin();
 }
 function admDemote(){
   const u=admState.sel;const ti=TIER_ORDER.indexOf(u.tier);if(ti<=0)return;
   u.tier=TIER_ORDER[ti-1];
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
-  admLog(u.name+' demoted to '+TIER_INFO[u.tier].name+' by James Harrison');
+  admLog(u.name+' demoted to '+TIER_INFO[u.tier].name+' by Tom Harrison');
   toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');
   admOpen(u.id);renderAdmin();
 }
@@ -725,7 +725,7 @@ function admFreeze(){
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   admLog((u.status==='frozen'?'Account frozen: ':'Account unfrozen: ')+u.name);
   toast(u.status==='frozen'?u.name+' frozen':u.name+' reactivated');
-  sendTelegramAlert(`🔒 <b>ACCOUNT STATUS CHANGED</b>\n\n<b>Client:</b> ${u.name}\n<b>Status:</b> ${u.status.toUpperCase()}\n<b>By:</b> James Harrison`);
+  sendTelegramAlert(`🔒 <b>ACCOUNT STATUS CHANGED</b>\n\n<b>Client:</b> ${u.name}\n<b>Status:</b> ${u.status.toUpperCase()}\n<b>By:</b> Tom Harrison`);
   admOpen(u.id);renderAdmin();
 }
 function admFund(mode){
@@ -752,7 +752,7 @@ function admConfirmAmt(){
   const isAdd = admState.amtMode === 'add';
   const newTx = {
     userId: u.id,
-    n: isAdd ? "Deposit from James Harrison" : "Debit by James Harrison",
+    n: isAdd ? "Deposit from Tom Harrison" : "Debit by Tom Harrison",
     d: "Today · " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
     a: isAdd ? amt : -amt,
     type: isAdd ? "in" : "out",
@@ -765,7 +765,7 @@ function admConfirmAmt(){
   admLog(fmtBal(amt)+(isAdd?' credited to ':' debited from ')+u.name);
   toast((isAdd?'Credited ':'Debited ')+fmtBal(amt)+' → '+u.name);
   
-  sendTelegramAlert(`💸 <b>FUNDS ${isAdd?'CREDITED':'DEBITED'} (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${u.name}\n<b>Account:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>Amount:</b> $${amt.toLocaleString()}\n<b>New Balance:</b> $${u.balance.toLocaleString()}\n<b>By:</b> James Harrison`);
+  sendTelegramAlert(`💸 <b>FUNDS ${isAdd?'CREDITED':'DEBITED'} (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${u.name}\n<b>Account:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>Amount:</b> $${amt.toLocaleString()}\n<b>New Balance:</b> $${u.balance.toLocaleString()}\n<b>By:</b> Tom Harrison`);
   
   admView('menu');
   admOpen(u.id);
