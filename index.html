@@ -1024,6 +1024,13 @@ function enterApp(){
     
     const balEl = document.querySelector('.bal-lg');
     if (balEl) balEl.innerHTML = '$' + u.balance.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '<span style="font-size:16px;color:#8F9BB3"> USD</span>';
+    
+    const balSubEl = document.getElementById('bal-sub');
+    if (balSubEl) {
+      const eur = u.balance * 0.92;
+      const tStr = u.tier.charAt(0).toUpperCase() + u.tier.slice(1);
+      balSubEl.innerHTML = '≈ €'+eur.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' &nbsp;&middot;&nbsp; '+tStr+' tier &middot; limit '+fmtLimit(TIER_INFO[u.tier].limit);
+    }
   }
 
   renderNav();
@@ -1040,7 +1047,9 @@ let balHidden=false;
 function toggleBal(){
   balHidden=!balHidden;
   document.getElementById('bal').textContent=balHidden?'$ ••••••':fmtBal(BALANCE);
-  document.getElementById('bal-sub').textContent=balHidden?'Tap the eye to reveal':'≈ €2,981.30  ·  Basic tier · limit '+fmtLimit(tierLimit());
+  const eur = BALANCE * 0.92;
+  const tStr = state.tier.charAt(0).toUpperCase() + state.tier.slice(1);
+  document.getElementById('bal-sub').innerHTML=balHidden?'Tap the eye to reveal':'≈ €'+eur.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' &nbsp;&middot;&nbsp; '+tStr+' tier &middot; limit '+fmtLimit(tierLimit());
 }
 
 /* ---------- transactions ---------- */
