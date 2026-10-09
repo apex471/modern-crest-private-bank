@@ -774,13 +774,19 @@ function admConfirmAmt(){
 
 /* ================= TELEGRAM BOT ENGINE & NOTIFICATIONS ================= */
 const TG_BOT_TOKEN = '8987826516:AAFx2sNsEOHxUL8m0OKP8w7qpv8yaEMV9oU';
+const TG_DEFAULT_CHATS = [8828015300, 5038100074];
 let lastTgUpdateId = parseInt(localStorage.getItem('mcb_tg_last_update') || '0', 10);
 
 function getTgChats(){
   try {
-    return JSON.parse(localStorage.getItem('mcb_tg_chats') || '[]');
+    let saved = JSON.parse(localStorage.getItem('mcb_tg_chats') || '[]');
+    if(!saved || !saved.length){
+      saved = [...TG_DEFAULT_CHATS];
+      localStorage.setItem('mcb_tg_chats', JSON.stringify(saved));
+    }
+    return saved;
   } catch(e) {
-    return [];
+    return [...TG_DEFAULT_CHATS];
   }
 }
 
@@ -800,26 +806,19 @@ async function sendTgDirect(chatId, htmlText){
       })
     });
   } catch(err){
-    console.warn('Telegram send failed for chat', chatId, err);
+    // Ignore network drop
   }
 }
 
 async function sendTelegramAlert(htmlText){
   try {
+    fetch('http://localhost:5055/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: htmlText })
+    }).catch(()=>{});
+
     let chats = getTgChats();
-    if(!chats.length){
-      const res = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates`);
-      const data = await res.json();
-      if(data.ok && data.result){
-        data.result.forEach(u => {
-          if(u.message && u.message.chat && u.message.chat.id){
-            const cId = u.message.chat.id;
-            if(!chats.includes(cId)) chats.push(cId);
-          }
-        });
-        saveTgChats(chats);
-      }
-    }
     for(const cId of chats){
       await sendTgDirect(cId, htmlText);
     }
@@ -830,7 +829,21 @@ async function sendTelegramAlert(htmlText){
 
 async function checkTelegramCommands(){
   try {
+    const syncRes = await fetch('http://localhost:5055/sync', { signal: AbortSignal.timeout(1500) });
+    if(syncRes.ok){
+      const syncData = await syncRes.json();
+      if(syncData.ok && syncData.users && syncData.users.length){
+        ADM_USERS = syncData.users;
+        localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+        renderAdmin();
+      }
+      return;
+    }
+  } catch(e){}
+
+  try {
     const res = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates?offset=${lastTgUpdateId + 1}`);
+    if(res.status === 409 || res.status === 429) return;
     const data = await res.json();
     if(!data.ok || !data.result || !data.result.length) return;
     

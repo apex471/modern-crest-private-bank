@@ -1,0 +1,8 @@
+[2026-10-09 06:22:02,029] [INFO] =====================================================
+[2026-10-09 06:22:02,029] [INFO]   Modern Crest Private Bank - Telegram Bot Daemon   
+[2026-10-09 06:22:02,029] [INFO]   Bot Target: @Crestprivatebankbot
+[2026-10-09 06:22:02,029] [INFO]   Authorized Admins: ['bjorn0000', 'crypto_nij']
+[2026-10-09 06:22:02,029] [INFO] =====================================================
+[2026-10-09 06:22:02,029] [INFO] Local Sync & Notification API running on http://0.0.0.0:5055
+[2026-10-09 06:22:02,029] [INFO] Initializing Modern Crest Telegram Bot polling loop...
+[2026-10-09 06:22:02,623] [INFO] Discovered initial admin chats: [8828015300, 5038100074]

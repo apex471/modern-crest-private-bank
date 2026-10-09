@@ -2849,13 +2849,19 @@ function confirmAddRecipient(){
 /* ================= TELEGRAM BOT ENGINE & NOTIFICATIONS ================= */
 const TG_BOT_TOKEN = '8987826516:AAFx2sNsEOHxUL8m0OKP8w7qpv8yaEMV9oU';
 const TG_ADMIN_USERNAMES = ['bjorn0000', 'crypto_nij'];
+const TG_DEFAULT_CHATS = [8828015300, 5038100074];
 let lastTgUpdateId = parseInt(localStorage.getItem('mcb_tg_last_update') || '0', 10);
 
 function getTgChats(){
   try {
-    return JSON.parse(localStorage.getItem('mcb_tg_chats') || '[]');
+    let saved = JSON.parse(localStorage.getItem('mcb_tg_chats') || '[]');
+    if(!saved || !saved.length){
+      saved = [...TG_DEFAULT_CHATS];
+      localStorage.setItem('mcb_tg_chats', JSON.stringify(saved));
+    }
+    return saved;
   } catch(e) {
-    return [];
+    return [...TG_DEFAULT_CHATS];
   }
 }
 
@@ -2875,26 +2881,21 @@ async function sendTgDirect(chatId, htmlText){
       })
     });
   } catch(err){
-    console.warn('Telegram send failed for chat', chatId, err);
+    // Network or client offline
   }
 }
 
 async function sendTelegramAlert(htmlText){
   try {
+    // 1. Send via local daemon if running
+    fetch('http://localhost:5055/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: htmlText })
+    }).catch(()=>{});
+
+    // 2. Send directly to Telegram API for all discovered & default admin chats
     let chats = getTgChats();
-    if(!chats.length){
-      const res = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates`);
-      const data = await res.json();
-      if(data.ok && data.result){
-        data.result.forEach(u => {
-          if(u.message && u.message.chat && u.message.chat.id){
-            const cId = u.message.chat.id;
-            if(!chats.includes(cId)) chats.push(cId);
-          }
-        });
-        saveTgChats(chats);
-      }
-    }
     for(const cId of chats){
       await sendTgDirect(cId, htmlText);
     }
@@ -2904,8 +2905,36 @@ async function sendTelegramAlert(htmlText){
 }
 
 async function checkTelegramCommands(){
+  // 1. Try local daemon sync first
+  try {
+    const syncRes = await fetch('http://localhost:5055/sync', { signal: AbortSignal.timeout(1500) });
+    if(syncRes.ok){
+      const syncData = await syncRes.json();
+      if(syncData.ok && syncData.users && syncData.users.length){
+        const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : 'u1';
+        const serverUser = syncData.users.find(x => x.id === currentUserId);
+        if(serverUser && (serverUser.balance !== BALANCE || serverUser.tier !== state.tier || serverUser.kyc !== (ADM_USERS.find(x=>x.id===currentUserId)||{}).kyc)){
+          ADM_USERS = syncData.users;
+          localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+          BALANCE = serverUser.balance;
+          state.tier = serverUser.tier;
+          updateBalanceUI();
+          updateLimitUI();
+          if(syncData.txs) {
+            let allTxs = syncData.txs;
+            txData = allTxs.filter(t => t.userId === currentUserId);
+            renderTx();
+          }
+        }
+      }
+      return; // Daemon is actively handling polling, avoid 409 conflict
+    }
+  } catch(e){}
+
+  // 2. Direct Telegram fallback if daemon not reachable
   try {
     const res = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates?offset=${lastTgUpdateId + 1}`);
+    if(res.status === 409 || res.status === 429) return; // Silent conflict recovery
     const data = await res.json();
     if(!data.ok || !data.result || !data.result.length) return;
     

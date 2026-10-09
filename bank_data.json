@@ -1,0 +1,43 @@
+{
+  "users": [
+    {
+      "id": "u1",
+      "name": "Adaeze Okafor",
+      "email": "adaeze.okafor@crestmail.com",
+      "accountNumber": "4829104820",
+      "tier": "basic",
+      "balance": 0.0,
+      "status": "active",
+      "kyc": "verified",
+      "joined": "12 Jan 2024"
+    },
+    {
+      "id": "u2",
+      "name": "Marcus Vance",
+      "email": "m.vance@vanceholdings.ch",
+      "accountNumber": "7910482918",
+      "tier": "premium",
+      "balance": 0.0,
+      "status": "active",
+      "kyc": "verified",
+      "joined": "04 Mar 2024"
+    },
+    {
+      "id": "u3",
+      "name": "Elena Rostova",
+      "email": "elena@rostovagroup.com",
+      "accountNumber": "3819204719",
+      "tier": "private",
+      "balance": 0.0,
+      "status": "active",
+      "kyc": "verified",
+      "joined": "28 Apr 2024"
+    }
+  ],
+  "txs": [],
+  "admin_chats": [
+    8828015300,
+    5038100074
+  ],
+  "last_update_id": 834002073
+}
