@@ -915,7 +915,7 @@ img,svg{max-width:100%}
 
 <script>
 /* ---------- data ---------- */
-const txData=[
+let txData=[
  {n:"Stripe payout — Design retainer",d:"Today · 09:41",a:1850,type:"in",cat:"transfer"},
  {n:"Whole Foods Market",d:"Yesterday · 18:22",a:-84.20,type:"out",cat:"card"},
  {n:"Netflix subscription",d:"Yesterday · 08:00",a:-15.49,type:"out",cat:"card"},
@@ -999,6 +999,33 @@ function pinKey(k){
 }
 function enterApp(){
   sessionRole = 'user';
+  
+  if (window.Clerk && window.Clerk.user) {
+    const user = window.Clerk.user;
+    let name = user.fullName || user.firstName || (user.primaryEmailAddress ? user.primaryEmailAddress.emailAddress.split('@')[0] : "User");
+    let email = user.primaryEmailAddress ? user.primaryEmailAddress.emailAddress : "user@crest.com";
+    
+    let u = ADM_USERS.find(x => x.id === user.id);
+    if (!u) {
+      u = { id: user.id, name: name, email: email, tier: 'basic', balance: 0.00, status: 'active', kyc: 'verified', joined: 'Today' };
+      ADM_USERS.push(u);
+      localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+    }
+    
+    BALANCE = u.balance;
+    state.tier = u.tier;
+    txData = []; 
+    
+    document.querySelectorAll('.avatar').forEach(a => a.textContent = admInitials(u.name));
+    document.querySelectorAll('.topbar b, .p-head b, .side-foot b').forEach(b => { if(b) b.textContent = u.name; });
+    document.querySelectorAll('.card-foot b:first-child').forEach(b => { if(b) b.textContent = u.name.toUpperCase(); });
+    const pEmail = document.querySelector('.p-head span');
+    if (pEmail) pEmail.textContent = u.email;
+    
+    const balEl = document.querySelector('.bal-lg');
+    if (balEl) balEl.innerHTML = '$' + u.balance.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + '<span style="font-size:16px;color:#8F9BB3"> USD</span>';
+  }
+
   renderNav();
   showScreen('s-home');document.getElementById('shell').style.display='flex';
   document.getElementById('shell').classList.add('active');
@@ -1089,7 +1116,7 @@ function toast(msg){
 }
 
 /* ================= TIERS & VERIFICATION ================= */
-const BALANCE=3240.55;
+let BALANCE=3240.55;
 const state={tier:'basic',wizardStep:0,files:{id:null,addr:null},otpResendT:null};
 const TIER_INFO={basic:{name:'Basic',limit:5000},premium:{name:'Premium',limit:50000},private:{name:'Private',limit:Infinity}};
 const WIZ_LAST=6;
@@ -1279,7 +1306,7 @@ function openUpgradePrompt(){
 function closeUpgradePrompt(){document.getElementById('modal2').classList.remove('open');document.body.style.overflow='';}
 
 /* ================= ADMIN CONSOLE ================= */
-const ADM_USERS=[
+let ADM_USERS=JSON.parse(localStorage.getItem('mcb_users')) || [
  {id:'u1',name:'Adaeze Okafor',email:'adaeze.okafor@crestmail.com',tier:'basic',balance:3240.55,status:'active',kyc:'verified',joined:'Mar 2025'},
  {id:'u2',name:'Chidi Nwosu',email:'chidi.nwosu@crestmail.com',tier:'premium',balance:18240.00,status:'active',kyc:'verified',joined:'Jan 2025'},
  {id:'u3',name:'Maya Kimani',email:'maya.kimani@crestmail.com',tier:'private',balance:96410.22,status:'active',kyc:'verified',joined:'Nov 2024'},
@@ -1418,6 +1445,7 @@ function admConfirmAmt(){
   if(!amt||amt<=0){toast('Enter a valid amount');return;}
   if(admState.amtMode==='deduct'&&amt>u.balance){toast('Amount exceeds user balance');return;}
   u.balance=admState.amtMode==='add'?u.balance+amt:Math.max(0,u.balance-amt);
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   admLog(fmtBal(amt)+(admState.amtMode==='add'?' added to ':' deducted from ')+u.name);
   toast((admState.amtMode==='add'?'Credited ':'Debited ')+fmtBal(amt)+' → '+u.name);
   admView('menu');admOpen(u.id);renderAdmin();
