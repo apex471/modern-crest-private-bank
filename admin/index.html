@@ -519,14 +519,29 @@ a{text-decoration:none;color:inherit}
 <script>
 /* ================= STATE & STORAGE ================= */
 let ADM_USERS = JSON.parse(localStorage.getItem('mcb_users')) || [
- {id:'u1',name:'Adaeze Okafor',email:'adaeze.okafor@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'verified',joined:'Mar 2025'},
- {id:'u2',name:'Chidi Nwosu',email:'chidi.nwosu@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'verified',joined:'Jan 2025'},
- {id:'u3',name:'Maya Kimani',email:'maya.kimani@crestmail.com',tier:'private',balance:0.00,status:'active',kyc:'verified',joined:'Nov 2024'},
- {id:'u4',name:'Tolu Adeyemi',email:'tolu.adeyemi@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'pending',target:'premium',joined:'Sep 2026'},
- {id:'u5',name:'Jonas Berg',email:'jonas.berg@crestmail.com',tier:'basic',balance:0.00,status:'frozen',kyc:'pending',target:'private',joined:'Oct 2026'},
- {id:'u6',name:'Amina Diallo',email:'amina.diallo@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'pending',target:'private',joined:'Oct 2026'},
- {id:'u7',name:'Sofia Reyes',email:'sofia.reyes@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'rejected',joined:'Aug 2026'},
+ {id:'u1',name:'Adaeze Okafor',email:'adaeze.okafor@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'verified',joined:'Mar 2025',accountNumber:'4829104820'},
+ {id:'u2',name:'Chidi Nwosu',email:'chidi.nwosu@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'verified',joined:'Jan 2025',accountNumber:'7391049281'},
+ {id:'u3',name:'Maya Kimani',email:'maya.kimani@crestmail.com',tier:'private',balance:0.00,status:'active',kyc:'verified',joined:'Nov 2024',accountNumber:'8192047193'},
+ {id:'u4',name:'Tolu Adeyemi',email:'tolu.adeyemi@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'pending',target:'premium',joined:'Sep 2026',accountNumber:'6281940172'},
+ {id:'u5',name:'Jonas Berg',email:'jonas.berg@crestmail.com',tier:'basic',balance:0.00,status:'frozen',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'5192840192'},
+ {id:'u6',name:'Amina Diallo',email:'amina.diallo@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'9182736450'},
+ {id:'u7',name:'Sofia Reyes',email:'sofia.reyes@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'rejected',joined:'Aug 2026',accountNumber:'3819204716'},
 ];
+
+function ensureUserAccounts(){
+  let changed = false;
+  ADM_USERS.forEach((u, idx) => {
+    if (!u.accountNumber) {
+      const hash = Math.abs((u.id + u.name).split('').reduce((acc, ch) => acc * 31 + ch.charCodeAt(0), 10482018 + idx * 7919)) % 9000000000 + 1000000000;
+      u.accountNumber = hash.toString();
+      changed = true;
+    }
+  });
+  if (changed) {
+    localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  }
+}
+ensureUserAccounts();
 
 let ADM_LOG = JSON.parse(localStorage.getItem('mcb_admin_log')) || [
  {t:'Today · 09:12',txt:'Admin Portal session initialized for James Harrison'},
@@ -609,7 +624,7 @@ function renderAdmin(){
 
   const list = ADM_USERS.filter(u=>
     (admState.filter==='all' || u.tier===admState.filter || (admState.filter==='frozen'&&u.status==='frozen')) &&
-    (u.name.toLowerCase().includes(admState.q) || u.email.toLowerCase().includes(admState.q) || u.id.toLowerCase().includes(admState.q))
+    (u.name.toLowerCase().includes(admState.q) || u.email.toLowerCase().includes(admState.q) || u.id.toLowerCase().includes(admState.q) || (u.accountNumber && u.accountNumber.includes(admState.q)))
   );
 
   document.getElementById('adm-users').innerHTML = list.length ? list.map(u=>`
@@ -617,7 +632,7 @@ function renderAdmin(){
       <div class="avatar">${admInitials(u.name)}</div>
       <div class="u-info">
         <b>${u.name}</b>
-        <small>${u.email}</small>
+        <small>${u.email} · Acct #${u.accountNumber || '—'}</small>
         <div style="margin-top:4px">
           ${admTag(u.tier)}${u.status==='frozen'?admTag('frozen'):admTag('active')}${u.kyc==='pending'?admTag('pending'):u.kyc==='rejected'?admTag('rejected'):''}
         </div>

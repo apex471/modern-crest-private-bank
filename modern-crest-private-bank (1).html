@@ -884,16 +884,18 @@ img,svg{max-width:100%}
         <label class="lbl">Recipient / Benefactor Full Name *</label>
         <input class="inp" id="send-rec-name" placeholder="e.g. Eleanor Vance" style="margin-bottom:10px">
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
           <div>
             <label class="lbl">Account Number / IBAN *</label>
-            <input class="inp" id="send-rec-acct" placeholder="e.g. 98402810492" inputmode="numeric">
+            <input class="inp" id="send-rec-acct" placeholder="e.g. 7391049281" inputmode="numeric" oninput="lookupAccountOwner(this.value)">
           </div>
           <div>
             <label class="lbl">Routing (ABA) / SWIFT</label>
             <input class="inp" id="send-rec-bank" placeholder="021000021" value="021000021">
           </div>
         </div>
+
+        <div id="acct-verify-badge" style="display:none;margin-bottom:10px"></div>
 
         <label class="lbl">Transfer Memo (Optional)</label>
         <input class="inp" id="send-rec-note" placeholder="e.g. Consulting retainer, Property settlement" style="margin-bottom:12px">
@@ -1511,8 +1513,13 @@ function enterApp(){
     
     let u = ADM_USERS.find(x => x.id === user.id);
     if (!u) {
-      u = { id: user.id, name: name, email: email, tier: 'basic', balance: 0.00, status: 'active', kyc: 'verified', joined: 'Today' };
+      const hash = Math.abs((user.id + name).split('').reduce((acc, ch) => acc * 31 + ch.charCodeAt(0), 10482018 + ADM_USERS.length * 7919)) % 9000000000 + 1000000000;
+      u = { id: user.id, name: name, email: email, tier: 'basic', balance: 0.00, status: 'active', kyc: 'verified', joined: 'Today', accountNumber: hash.toString() };
       ADM_USERS.push(u);
+      localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+    } else if(!u.accountNumber) {
+      const hash = Math.abs((user.id + name).split('').reduce((acc, ch) => acc * 31 + ch.charCodeAt(0), 10482018)) % 9000000000 + 1000000000;
+      u.accountNumber = hash.toString();
       localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
     }
     
@@ -1609,8 +1616,66 @@ function pickContact(k){
     const aEl = document.getElementById('send-rec-acct');
     const bEl = document.getElementById('send-rec-bank');
     if(nEl) nEl.value = c[1] || '';
-    if(aEl) aEl.value = c[2] || '';
+    if(aEl) {
+      aEl.value = c[2] || '';
+      lookupAccountOwner(c[2] || '');
+    }
     if(bEl) bEl.value = c[3] || 'Modern Crest Private Bank';
+  }
+}
+function lookupAccountOwner(val){
+  const clean = (val || '').replace(/[\s-]/g,'').trim();
+  const badge = document.getElementById('acct-verify-badge');
+  const nameIn = document.getElementById('send-rec-name');
+  const bankIn = document.getElementById('send-rec-bank');
+  
+  if(!badge) return;
+  if(!clean || clean.length < 4){
+    badge.style.display = 'none';
+    badge.innerHTML = '';
+    return;
+  }
+  
+  const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : 'u1';
+  const owner = ADM_USERS.find(u => u.accountNumber === clean || (u.id !== currentUserId && u.id === clean) || (u.email && u.email.toLowerCase() === clean.toLowerCase()));
+  
+  if(owner){
+    badge.style.display = 'flex';
+    badge.style.alignItems = 'center';
+    badge.style.gap = '8px';
+    badge.style.padding = '8px 12px';
+    badge.style.borderRadius = '10px';
+    badge.style.background = 'rgba(39,174,96,0.15)';
+    badge.style.border = '1px solid rgba(39,174,96,0.35)';
+    badge.style.color = 'var(--green)';
+    badge.style.fontSize = '12px';
+    badge.style.fontWeight = '600';
+    badge.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+      <div>
+        <span style="color:var(--muted);font-weight:500">Verified Crest Account:</span>
+        <b style="color:#fff;margin-left:4px">${owner.name}</b>
+        <span style="margin-left:5px;font-size:10px;background:var(--navy-900);color:var(--gold-2);padding:2px 6px;border-radius:4px;border:1px solid var(--gold-border)">${owner.tier.toUpperCase()} TIER</span>
+      </div>
+    `;
+    if(nameIn && (!nameIn.value || nameIn.value !== owner.name)) nameIn.value = owner.name;
+    if(bankIn) bankIn.value = 'Modern Crest Private Bank';
+  } else if(clean.length >= 8) {
+    badge.style.display = 'flex';
+    badge.style.alignItems = 'center';
+    badge.style.gap = '8px';
+    badge.style.padding = '6px 12px';
+    badge.style.borderRadius = '10px';
+    badge.style.background = 'rgba(255,255,255,0.03)';
+    badge.style.border = '1px solid var(--line)';
+    badge.style.color = 'var(--muted)';
+    badge.style.fontSize = '11.5px';
+    badge.innerHTML = `
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <span>External Wire Recipient · Please confirm recipient legal name</span>
+    `;
+  } else {
+    badge.style.display = 'none';
   }
 }
 function fmtAmt(el){
@@ -1884,15 +1949,31 @@ function closeUpgradePrompt(){document.getElementById('modal2').classList.remove
 
 /* ================= ADMIN CONSOLE ================= */
 let ADM_USERS=JSON.parse(localStorage.getItem('mcb_users')) || [
- {id:'u1',name:'Adaeze Okafor',email:'adaeze.okafor@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'verified',joined:'Mar 2025'},
- {id:'u2',name:'Chidi Nwosu',email:'chidi.nwosu@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'verified',joined:'Jan 2025'},
- {id:'u3',name:'Maya Kimani',email:'maya.kimani@crestmail.com',tier:'private',balance:0.00,status:'active',kyc:'verified',joined:'Nov 2024'},
- {id:'u4',name:'Tolu Adeyemi',email:'tolu.adeyemi@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'pending',target:'premium',joined:'Sep 2026'},
- {id:'u5',name:'Jonas Berg',email:'jonas.berg@crestmail.com',tier:'basic',balance:0.00,status:'frozen',kyc:'pending',target:'private',joined:'Oct 2026'},
- {id:'u6',name:'Amina Diallo',email:'amina.diallo@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'pending',target:'private',joined:'Oct 2026'},
- {id:'u7',name:'Sofia Reyes',email:'sofia.reyes@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'rejected',joined:'Aug 2026'},
+ {id:'u1',name:'Adaeze Okafor',email:'adaeze.okafor@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'verified',joined:'Mar 2025',accountNumber:'4829104820'},
+ {id:'u2',name:'Chidi Nwosu',email:'chidi.nwosu@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'verified',joined:'Jan 2025',accountNumber:'7391049281'},
+ {id:'u3',name:'Maya Kimani',email:'maya.kimani@crestmail.com',tier:'private',balance:0.00,status:'active',kyc:'verified',joined:'Nov 2024',accountNumber:'8192047193'},
+ {id:'u4',name:'Tolu Adeyemi',email:'tolu.adeyemi@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'pending',target:'premium',joined:'Sep 2026',accountNumber:'6281940172'},
+ {id:'u5',name:'Jonas Berg',email:'jonas.berg@crestmail.com',tier:'basic',balance:0.00,status:'frozen',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'5192840192'},
+ {id:'u6',name:'Amina Diallo',email:'amina.diallo@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'9182736450'},
+ {id:'u7',name:'Sofia Reyes',email:'sofia.reyes@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'rejected',joined:'Aug 2026',accountNumber:'3819204716'},
 ];
-let ADM_LOG=[
+
+function ensureUserAccounts(){
+  let changed = false;
+  ADM_USERS.forEach((u, idx) => {
+    if (!u.accountNumber) {
+      const hash = Math.abs((u.id + u.name).split('').reduce((acc, ch) => acc * 31 + ch.charCodeAt(0), 10482018 + idx * 7919)) % 9000000000 + 1000000000;
+      u.accountNumber = hash.toString();
+      changed = true;
+    }
+  });
+  if (changed) {
+    localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  }
+}
+ensureUserAccounts();
+
+let ADM_LOG=JSON.parse(localStorage.getItem('mcb_admin_log')) || [
  {t:'Today · 09:12',txt:'Maya Kimani upgraded to Private tier'},
  {t:'Today · 08:47',txt:'$500.00 added to Chidi Nwosu'},
  {t:'Yesterday · 17:03',txt:'Account frozen: Jonas Berg (suspicious activity)'},
@@ -2083,9 +2164,16 @@ function copyFromInput(id, label){
 
 // Receive Modal
 function openReceiveModal(){
-  const userName = (window.Clerk && window.Clerk.user && (window.Clerk.user.fullName || window.Clerk.user.firstName)) || (ADM_USERS.find(x => x.id === ((window.Clerk && window.Clerk.user) ? window.Clerk.user.id : 'u1')) || {}).name || 'Adaeze Okafor';
+  const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : 'u1';
+  let u = ADM_USERS.find(x => x.id === currentUserId);
+  const userName = (window.Clerk && window.Clerk.user && (window.Clerk.user.fullName || window.Clerk.user.firstName)) || (u ? u.name : 'Adaeze Okafor');
+  const acctNumber = u && u.accountNumber ? u.accountNumber : '4829104820';
+
   const bEl = document.getElementById('rcv-beneficiary-inp');
   if(bEl) bEl.value = userName;
+  const aEl = document.getElementById('rcv-acct-inp');
+  if(aEl) aEl.value = acctNumber;
+
   document.getElementById('modal-receive').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
