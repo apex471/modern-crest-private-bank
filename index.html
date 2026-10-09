@@ -1465,8 +1465,22 @@ renderNav();renderTx();
       } else {
         const si = document.getElementById('clerk-sign-in');
         const su = document.getElementById('clerk-sign-up');
-        if (si) window.Clerk.mountSignIn(si);
-        if (su) window.Clerk.mountSignUp(su);
+        const redirectUrl = window.location.href.split('#')[0];
+        
+        if (si) {
+          window.Clerk.mountSignIn(si, { 
+            routing: 'virtual',
+            afterSignInUrl: redirectUrl,
+            afterSignUpUrl: redirectUrl
+          });
+        }
+        if (su) {
+          window.Clerk.mountSignUp(su, { 
+            routing: 'virtual',
+            afterSignInUrl: redirectUrl,
+            afterSignUpUrl: redirectUrl
+          });
+        }
       }
     } catch (err) {
       console.error("Clerk load error:", err);
