@@ -466,7 +466,6 @@ img,svg{max-width:100%}
       <div class="dots"><span class="on"></span><span></span><span></span></div>
       <button class="btn btn-gold" id="ob-btn" onclick="nextOnboard()">Continue</button>
       <p style="margin-top:18px;font-size:13px">Already a client? <a class="auth-link" onclick="window.Clerk.redirectToSignIn()">Sign in</a></p>
-      <p style="margin-top:14px;font-size:12px"><a class="auth-link" style="opacity:0.75;font-weight:600;cursor:pointer" onclick="openAdminPinModal()">Staff / Admin Portal</a></p>
     </div>
   </div>
 </section>
@@ -824,9 +823,6 @@ img,svg{max-width:100%}
           <div class="set-item" onclick="toggleSwitch(this)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 11c1.5 0 2.5 1 2.5 2.5V17a2 2 0 0 1-4 0v-2"/><path d="M7 14.5c0-3 2-5 5-5s5 2 5 5"/></svg><span>Biometric login</span><span class="switch on"></span></div>
           <div class="set-item" onclick="toggleSwitch(this)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>Hide balances by default</span><span class="switch"></span></div>
         </div>
-        <div class="set-group" id="admin-link-group">
-          <div class="set-item" onclick="openAdminPinModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M12 8v4M12 15h.01"/></svg><span>Admin Console</span><small style="color:var(--gold);font-weight:700">James Harrison ›</small></div>
-        </div>
         <div class="set-group">
           <div class="set-item" onclick="toast('Support chat opening (demo)')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg><span>24/7 Private concierge</span><small>›</small></div>
           <div class="set-item" onclick="toast('Rate us on the App Store (demo)')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-3-5.4 3 1.1-6L3.2 9.4l6.1-.8z"/></svg><span>Rate the app</span><small>›</small></div>
@@ -956,18 +952,7 @@ const NAV=[
 ];
 let sessionRole = null;
 function renderNav(){
-  let navItems = NAV;
-  if(sessionRole === 'admin') {
-    navItems = [
-      {id:"s-admin",label:"Admin",ic:'<path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M12 8v4M12 15h.01"/>'},
-      {id:"s-home",label:"Client View",ic:'<path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/>'},
-      {id:"s-profile",label:"Profile",ic:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/>'}
-    ];
-  } else {
-    navItems = NAV.filter(n => n.id !== 's-admin');
-  }
-  let admGroup = document.getElementById('admin-link-group');
-  if(admGroup) admGroup.style.display = 'block';
+  let navItems = NAV.filter(n => n.id !== 's-admin');
   document.getElementById('bottombar').innerHTML=navItems.filter(n=>!n.desk).map(n=>
     `<button class="bnav${n.center?' center':''}" data-id="${n.id}" onclick="navTap('${n.id}')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2">${n.ic}</svg>${n.label}</button>`).join('');
   document.getElementById('side-nav').innerHTML=navItems.map(n=>
@@ -1615,8 +1600,8 @@ renderNav();renderTx();
       if (window.Clerk.user) {
         enterApp();
       }
-      if (window.location.hash === '#admin' || window.location.search.includes('admin=true')) {
-        openAdminPinModal();
+      if (window.location.pathname.startsWith('/admin') || window.location.pathname.endsWith('/admin') || window.location.hash === '#admin') {
+        window.location.href = '/admin/';
       }
     } catch (err) {
       console.error("Clerk load error:", err);

@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Modern Crest Private Bank · Admin Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy-950:#050C16;
+  --navy-900:#0A1628;
+  --navy-850:#0F2242;
+  --navy-800:#162E56;
+  --navy-700:#1F3F73;
+  --gold:#D6A93C;
+  --gold-2:#F0D076;
+  --gold-soft:rgba(214,169,60,.12);
+  --gold-border:rgba(214,169,60,.35);
+  --grad-gold:linear-gradient(135deg,#F0D076 0%,#D6A93C 50%,#A3781A 100%);
+  --grad:linear-gradient(135deg,#0F2242 0%,#162E56 100%);
+  --green:#27AE60;
+  --red:#EB5757;
+  --bg:#0A1628;
+  --surface:#0F2242;
+  --surface-2:#162E56;
+  --text:#FFFFFF;
+  --muted:#8F9BB3;
+  --border:rgba(255,255,255,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased}
+body{
+  background:var(--navy-950);
+  color:var(--text);
+  font-family:'Plus Jakarta Sans',sans-serif;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+button,input{font-family:inherit;border:none;outline:none}
+a{text-decoration:none;color:inherit}
+
+/* Layout */
+.admin-container{
+  max-width:1100px;
+  margin:0 auto;
+  padding:24px 20px 60px;
+  width:100%;
+}
+
+/* Auth View */
+#auth-view{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:radial-gradient(circle at 50% 20%, rgba(214,169,60,.12) 0%, transparent 60%), var(--navy-950);
+}
+.auth-box{
+  background:var(--surface);
+  border:1px solid var(--gold-border);
+  border-radius:24px;
+  padding:40px 32px;
+  width:100%;
+  max-width:420px;
+  text-align:center;
+  box-shadow:0 24px 60px rgba(0,0,0,.6), 0 0 30px rgba(214,169,60,.1);
+}
+.auth-logo{width:64px;height:64px;margin:0 auto 16px}
+.auth-title{font-family:'Sora';font-size:22px;font-weight:700;letter-spacing:-.3px;margin-bottom:6px}
+.auth-sub{font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.5}
+
+.pin-row{display:flex;gap:14px;justify-content:center;margin:18px 0 28px}
+.pin-dot{width:16px;height:16px;border-radius:99px;border:2px solid rgba(255,255,255,.3);transition:.2s}
+.pin-dot.filled{background:var(--gold);border-color:var(--gold);box-shadow:0 0 12px rgba(214,169,60,.6)}
+
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:280px;margin:0 auto}
+.pin-key{aspect-ratio:1.25;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#fff;font-size:20px;font-family:'Sora';font-weight:600;cursor:pointer;transition:.15s}
+.pin-key:active{background:var(--gold);color:#231A05;transform:scale(.96)}
+
+/* Header */
+.adm-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:20px 0 28px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:32px;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-name{font-family:'Sora';font-size:20px;font-weight:700;letter-spacing:-.3px}
+.brand-name span{color:var(--gold-2)}
+.adm-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:var(--gold-soft);
+  color:var(--gold-2);
+  border:1px solid var(--gold-border);
+  padding:4px 12px;
+  border-radius:99px;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.5px;
+  text-transform:uppercase;
+}
+.header-actions{display:flex;align-items:center;gap:12px}
+.btn-lock{
+  background:rgba(255,255,255,.06);
+  color:var(--muted);
+  border:1px solid var(--border);
+  padding:8px 16px;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:.2s;
+}
+.btn-lock:hover{background:rgba(235,87,87,.15);color:var(--red);border-color:rgba(235,87,87,.3)}
+
+/* Stats Grid */
+.adm-stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+  margin-bottom:36px;
+}
+.adm-stat{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:20px 18px;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  overflow:hidden;
+}
+.adm-stat::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);
+}
+.as-ico{
+  width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+}
+.as-ico svg{width:20px;height:20px}
+.as-navy{background:rgba(255,255,255,.08);color:#fff}
+.as-gold{background:var(--gold-soft);color:var(--gold-2)}
+.as-green{background:rgba(39,174,96,.15);color:var(--green)}
+.as-red{background:rgba(235,87,87,.15);color:var(--red)}
+.adm-stat b{font-family:'Sora';font-size:24px;font-weight:700;letter-spacing:-.5px;margin-bottom:4px}
+.adm-stat span{font-size:12px;color:var(--muted)}
+
+/* Section Titles */
+.sec-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:16px;
+}
+.sec-head h3{font-family:'Sora';font-size:17px;font-weight:700;letter-spacing:-.2px}
+.tt-count{
+  background:var(--gold);
+  color:#231A05;
+  font-size:11px;
+  font-weight:800;
+  padding:2px 8px;
+  border-radius:99px;
+}
+
+/* Pending Approvals */
+.pend-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:14px;
+  margin-bottom:36px;
+}
+.pend-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.pend-card.frozen{border-color:rgba(235,87,87,.4);background:rgba(235,87,87,.04)}
+.pend-user{display:flex;align-items:center;gap:12px}
+.avatar{
+  width:42px;height:42px;border-radius:14px;background:var(--surface-2);color:var(--gold-2);
+  display:flex;align-items:center;justify-content:center;font-family:'Sora';font-weight:700;font-size:14px;
+  border:1px solid var(--border);flex:none;
+}
+.pend-user b{display:block;font-size:14px;font-weight:700}
+.pend-user small{color:var(--muted);font-size:12px}
+.pend-req{font-size:12.5px;color:var(--muted);background:rgba(255,255,255,.03);padding:10px 12px;border-radius:10px;line-height:1.4}
+.pend-req b{color:#fff}
+.pend-actions{display:flex;gap:10px}
+.btn{
+  padding:10px 16px;
+  border-radius:12px;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.15s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+.btn-green{background:var(--green);color:#fff;flex:1}
+.btn-green:hover{opacity:.9}
+.btn-redghost{background:rgba(235,87,87,.12);color:var(--red);border:1px solid rgba(235,87,87,.25)}
+.btn-redghost:hover{background:rgba(235,87,87,.2)}
+.btn-gold{background:var(--grad-gold);color:#231A05}
+.btn-gold:hover{opacity:.95}
+.btn-ghost{background:rgba(255,255,255,.06);color:#fff;border:1px solid var(--border)}
+.btn-ghost:hover{background:rgba(255,255,255,.1)}
+.btn-dark{background:#1B0E12;color:var(--red);border:1px solid rgba(235,87,87,.3)}
+
+/* Directory & Filters */
+.dir-toolbar{
+  display:flex;
+  gap:12px;
+  margin-bottom:16px;
+  flex-wrap:wrap;
+}
+.search-box{
+  flex:1;
+  min-width:240px;
+  position:relative;
+}
+.search-box svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;stroke:var(--muted)}
+.search-box input{
+  width:100%;
+  background:var(--surface);
+  border:1px solid var(--border);
+  padding:12px 14px 12px 42px;
+  border-radius:14px;
+  color:#fff;
+  font-size:13.5px;
+}
+.search-box input:focus{border-color:var(--gold-border)}
+.filter-chips{display:flex;gap:8px;overflow-x:auto}
+.chip{
+  background:var(--surface);
+  border:1px solid var(--border);
+  color:var(--muted);
+  padding:8px 16px;
+  border-radius:99px;
+  font-size:12.5px;
+  font-weight:600;
+  cursor:pointer;
+  transition:.15s;
+  white-space:nowrap;
+}
+.chip.on{background:var(--gold-soft);color:var(--gold-2);border-color:var(--gold-border)}
+
+/* User Table / List */
+.user-list{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  overflow:hidden;
+  margin-bottom:36px;
+}
+.user-row{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:16px 20px;
+  border-bottom:1px solid var(--border);
+  transition:.15s;
+}
+.user-row:last-child{border-bottom:none}
+.user-row:hover{background:rgba(255,255,255,.02)}
+.u-info{flex:1;min-width:0}
+.u-info b{display:block;font-size:14px;font-weight:700;margin-bottom:2px}
+.u-info small{color:var(--muted);font-size:12px}
+.tt{
+  display:inline-block;
+  padding:3px 8px;
+  border-radius:6px;
+  font-size:10.5px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.3px;
+  margin-right:4px;
+}
+.tt-basic{background:rgba(214,169,60,.15);color:var(--gold-2)}
+.tt-premium{background:rgba(39,174,96,.15);color:var(--green)}
+.tt-private{background:var(--grad-gold);color:#231A05}
+.tt-frozen{background:rgba(235,87,87,.2);color:var(--red)}
+.tt-pending{background:rgba(214,169,60,.2);color:var(--gold-2)}
+.tt-verified{background:rgba(39,174,96,.15);color:var(--green)}
+.tt-rejected{background:rgba(235,87,87,.15);color:var(--red)}
+
+.u-bal{
+  font-family:'Sora';
+  font-size:15px;
+  font-weight:700;
+  text-align:right;
+  margin-right:12px;
+}
+.btn-manage{
+  background:rgba(255,255,255,.07);
+  color:#fff;
+  border:1px solid var(--border);
+  padding:8px 14px;
+  border-radius:10px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.15s;
+}
+.btn-manage:hover{background:var(--gold-soft);color:var(--gold-2);border-color:var(--gold-border)}
+
+/* Log List */
+.log-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:16px 20px;
+}
+.log-item{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  padding:12px 0;
+  border-bottom:1px solid var(--border);
+  font-size:13px;
+}
+.log-item:last-child{border-bottom:none}
+.log-dot{width:8px;height:8px;border-radius:99px;background:var(--gold);margin-top:6px;flex:none}
+.log-item small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+
+/* Modal */
+.modal-bg{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,.75);
+  backdrop-filter:blur(10px);
+  z-index:999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  opacity:0;pointer-events:none;transition:.2s;
+}
+.modal-bg.open{opacity:1;pointer-events:auto}
+.sheet{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:28px 24px;
+  width:100%;
+  max-width:440px;
+  box-shadow:0 24px 60px rgba(0,0,0,.6);
+}
+.am-av{width:64px;height:64px;border-radius:20px;background:var(--grad);color:var(--gold-2);display:flex;align-items:center;justify-content:center;font-family:'Sora';font-weight:700;font-size:20px;margin:0 auto 12px;border:1px solid var(--gold-border)}
+.amt-chips{display:flex;gap:8px;justify-content:center;margin:16px 0 8px;flex-wrap:wrap}
+.amt-chips button{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:99px;padding:8px 16px;font-size:13px;font-weight:700;color:#fff;cursor:pointer}
+.amt-chips button:hover{background:var(--gold-soft);color:var(--gold-2);border-color:var(--gold-border)}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(100px);
+  background:var(--navy-900);color:#fff;border:1px solid var(--gold-border);
+  padding:12px 24px;border-radius:99px;font-size:13.5px;font-weight:600;
+  box-shadow:0 12px 30px rgba(0,0,0,.5);z-index:10000;opacity:0;transition:.25s ease;
+  pointer-events:none;
+}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+@media(max-width:768px){
+  .adm-stats{grid-template-columns:repeat(2,1fr)}
+  .admin-container{padding:16px 14px 40px}
+}
+</style>
+</head>
+<body>
+
+<!-- AUTH GATEWAY -->
+<div id="auth-view">
+  <div class="auth-box">
+    <svg class="auth-logo" viewBox="0 0 64 64" fill="none">
+      <defs><linearGradient id="gA" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#E9C86E"/><stop offset="1" stop-color="#B98A2A"/></linearGradient></defs>
+      <path d="M32 3 L54 9 V30 C54 46 45 56 32 61 C19 56 10 46 10 30 V9 Z" fill="#0A1628" stroke="url(#gA)" stroke-width="2.5"/>
+      <path d="M21 36 L32 15 L43 36 L32 30.5 Z" fill="url(#gA)"/>
+    </svg>
+    <h2 class="auth-title">Administrator Portal</h2>
+    <p class="auth-sub">Restricted personnel only · Authorized for James Harrison</p>
+    
+    <div class="pin-row" id="pin-dots">
+      <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+    </div>
+    
+    <div class="pin-pad">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <button class="pin-key" onclick="pinKey('del')">⌫</button>
+      <button class="pin-key" onclick="pinKey('0')">0</button>
+      <button class="pin-key" onclick="pinSubmit()" style="font-size:14px;font-weight:700">OK</button>
+    </div>
+    
+    <p style="margin-top:24px;font-size:11.5px;color:var(--muted)">Security PIN: <b>0000</b></p>
+  </div>
+</div>
+
+<!-- ADMIN CONSOLE -->
+<div id="app-view" style="display:none">
+  <div class="admin-container">
+    
+    <header class="adm-header">
+      <div class="brand">
+        <svg viewBox="0 0 64 64" fill="none" style="width:34px;height:34px">
+          <path d="M32 3 L54 9 V30 C54 46 45 56 32 61 C19 56 10 46 10 30 V9 Z" fill="#0F2242" stroke="url(#gA)" stroke-width="3"/>
+          <path d="M21 36 L32 15 L43 36 L32 30.5 Z" fill="url(#gA)"/>
+        </svg>
+        <div>
+          <div class="brand-name">Modern <span>Crest</span></div>
+          <span class="adm-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg> Admin Console · James Harrison</span>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <button class="btn-lock" onclick="logoutAdmin()">Lock / Sign out</button>
+      </div>
+    </header>
+
+    <!-- Stats -->
+    <div class="adm-stats" id="adm-stats"></div>
+
+    <!-- Pending KYC Approvals -->
+    <div class="sec-head">
+      <h3>Pending Tier Approvals</h3>
+      <span class="tt-count" id="adm-pend-n">0</span>
+    </div>
+    <div class="pend-grid" id="adm-pending"></div>
+
+    <!-- Users Management -->
+    <div class="sec-head">
+      <h3>User Management Directory</h3>
+    </div>
+    <div class="dir-toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input placeholder="Search by client name, email, or user ID…" oninput="admSearch(this.value)">
+      </div>
+      <div class="filter-chips" id="adm-chips">
+        <button class="chip on" data-f="all" onclick="admFilter(this)">All</button>
+        <button class="chip" data-f="basic" onclick="admFilter(this)">Basic</button>
+        <button class="chip" data-f="premium" onclick="admFilter(this)">Premium</button>
+        <button class="chip" data-f="private" onclick="admFilter(this)">Private</button>
+        <button class="chip" data-f="frozen" onclick="admFilter(this)">Frozen</button>
+      </div>
+    </div>
+    
+    <div class="user-list" id="adm-users"></div>
+
+    <!-- Activity Log -->
+    <div class="sec-head">
+      <h3>Administrative Audit Log</h3>
+    </div>
+    <div class="log-card" id="adm-log"></div>
+
+  </div>
+</div>
+
+<!-- Modal: User Management & Funds -->
+<div class="modal-bg" id="modal3" onclick="if(event.target===this)admClose()">
+  <div class="sheet">
+    <div id="am-menu">
+      <div style="text-align:center">
+        <div class="am-av" id="am-av">—</div>
+        <h3 id="am-name" style="font-family:'Sora';font-size:18px;margin-bottom:4px">—</h3>
+        <p class="sub" id="am-email" style="font-size:12.5px;color:var(--muted);margin-bottom:8px">—</p>
+        <div class="am-tags" id="am-tags" style="display:flex;gap:6px;justify-content:center;margin-bottom:14px"></div>
+        <p style="font-family:'Sora';font-size:26px;font-weight:700;margin-bottom:20px" id="am-bal">—</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button class="btn btn-gold" id="am-promote" onclick="admPromote()">Promote tier</button>
+        <button class="btn btn-ghost" id="am-demote" onclick="admDemote()">Demote tier</button>
+        <button class="btn btn-ghost" onclick="admFund('add')" style="color:var(--green);border-color:rgba(39,174,96,.3)">＋ Add funds (Deposit)</button>
+        <button class="btn btn-ghost" onclick="admFund('deduct')" style="color:var(--red);border-color:rgba(235,87,87,.3)">－ Deduct funds (Debit)</button>
+        <button class="btn btn-dark" id="am-freeze" onclick="admFreeze()">Freeze account</button>
+        <button class="btn btn-ghost" onclick="admClose()" style="margin-top:4px">Close</button>
+      </div>
+    </div>
+    <div id="am-amt" style="display:none;text-align:center">
+      <h3 style="font-family:'Sora';font-size:18px;margin-bottom:6px" id="am-amt-title">Add funds</h3>
+      <p class="sub" style="font-size:12.5px;color:var(--muted);margin-bottom:16px" id="am-amt-sub">—</p>
+      <input id="am-amt-in" inputmode="numeric" placeholder="$0.00" style="width:100%;font-family:'Sora';font-size:32px;font-weight:700;text-align:center;padding:12px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:#fff;margin-bottom:12px">
+      <div class="amt-chips">
+        <button onclick="setAmt(100)">$100</button>
+        <button onclick="setAmt(500)">$500</button>
+        <button onclick="setAmt(1000)">$1,000</button>
+        <button onclick="setAmt(5000)">$5,000</button>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button class="btn btn-gold" style="flex:1" id="am-amt-go" onclick="admConfirmAmt()">Confirm</button>
+        <button class="btn btn-ghost" style="flex:1" onclick="admBack()">Back</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= STATE & STORAGE ================= */
+let ADM_USERS = JSON.parse(localStorage.getItem('mcb_users')) || [
+ {id:'u1',name:'Adaeze Okafor',email:'adaeze.okafor@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'verified',joined:'Mar 2025'},
+ {id:'u2',name:'Chidi Nwosu',email:'chidi.nwosu@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'verified',joined:'Jan 2025'},
+ {id:'u3',name:'Maya Kimani',email:'maya.kimani@crestmail.com',tier:'private',balance:0.00,status:'active',kyc:'verified',joined:'Nov 2024'},
+ {id:'u4',name:'Tolu Adeyemi',email:'tolu.adeyemi@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'pending',target:'premium',joined:'Sep 2026'},
+ {id:'u5',name:'Jonas Berg',email:'jonas.berg@crestmail.com',tier:'basic',balance:0.00,status:'frozen',kyc:'pending',target:'private',joined:'Oct 2026'},
+ {id:'u6',name:'Amina Diallo',email:'amina.diallo@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'pending',target:'private',joined:'Oct 2026'},
+ {id:'u7',name:'Sofia Reyes',email:'sofia.reyes@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'rejected',joined:'Aug 2026'},
+];
+
+let ADM_LOG = JSON.parse(localStorage.getItem('mcb_admin_log')) || [
+ {t:'Today · 09:12',txt:'Admin Portal session initialized for James Harrison'},
+ {t:'Yesterday · 17:03',txt:'Account status verified'},
+];
+
+const admState = {q:'',filter:'all',sel:null,amtMode:'add'};
+const TIER_ORDER = ['basic','premium','private'];
+const TIER_INFO = {basic:{name:'Basic',limit:5000},premium:{name:'Premium',limit:50000},private:{name:'Private',limit:Infinity}};
+
+function fmtBal(v){return (v||0).toLocaleString('en-US',{style:'currency',currency:'USD'});}
+function admInitials(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();}
+function admTag(t){return `<span class="tt tt-${t}">${t}</span>`;}
+
+let toastT;
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+/* ================= PIN AUTH ================= */
+let pin="";
+function pinReset(){pin="";drawPin();}
+function drawPin(){document.querySelectorAll('#pin-dots .pin-dot').forEach((d,i)=>d.classList.toggle('filled',i<pin.length));}
+function pinKey(k){
+  if(k==='del'){pin=pin.slice(0,-1);drawPin();return;}
+  if(pin.length>=4)return;
+  pin+=k;drawPin();
+  if(pin.length===4)setTimeout(pinSubmit, 200);
+}
+function pinSubmit(){
+  if(pin==='0000'){
+    document.getElementById('auth-view').style.display='none';
+    document.getElementById('app-view').style.display='block';
+    renderAdmin();
+    toast('Authenticated as James Harrison');
+  } else {
+    toast('Invalid Admin PIN (Default: 0000)');
+    pinReset();
+  }
+}
+function logoutAdmin(){
+  pinReset();
+  document.getElementById('app-view').style.display='none';
+  document.getElementById('auth-view').style.display='flex';
+  toast('Signed out from Admin Console');
+}
+
+/* ================= ADMIN ACTIONS ================= */
+function renderAdmin(){
+  // Ensure we have fresh storage data
+  const storedUsers = localStorage.getItem('mcb_users');
+  if(storedUsers) ADM_USERS = JSON.parse(storedUsers);
+
+  const total = ADM_USERS.length;
+  const pending = ADM_USERS.filter(u=>u.kyc==='pending');
+  const held = ADM_USERS.reduce((s,u)=>s+u.balance,0);
+  const frozen = ADM_USERS.filter(u=>u.status==='frozen').length;
+
+  document.getElementById('adm-stats').innerHTML=`
+    <div class="adm-stat"><div class="as-ico as-navy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5 6.5-5s6.5 1.5 6.5 5"/><circle cx="17" cy="9" r="2.5"/><path d="M16 15.2c2.9.2 5.5 1.5 5.5 4.3"/></svg></div><b>${total}</b><span>Total users</span></div>
+    <div class="adm-stat"><div class="as-ico as-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><b>${pending.length}</b><span>Pending approvals</span></div>
+    <div class="adm-stat"><div class="as-ico as-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><b>${fmtBal(held)}</b><span>Total balance held</span></div>
+    <div class="adm-stat"><div class="as-ico as-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M4 6l16 12M20 6L4 18"/></svg></div><b>${frozen}</b><span>Frozen accounts</span></div>`;
+
+  document.getElementById('adm-pend-n').textContent = pending.length;
+  document.getElementById('adm-pending').innerHTML = pending.length ? pending.map(u=>`
+    <div class="pend-card${u.status==='frozen'?' frozen':''}">
+      <div class="pend-user">
+        <div class="avatar">${admInitials(u.name)}</div>
+        <div style="flex:1"><b>${u.name}</b><small>${u.email} · joined ${u.joined||'Recently'}</small></div>
+        ${admTag(u.tier)}
+      </div>
+      <p class="pend-req">Requested upgrade: <b>${u.tier==='basic'?'Basic → Premium':'Premium → Private'}</b> · Submitted ID & documents ${u.status==='frozen'?'· <b style="color:var(--red)">ACCOUNT FROZEN</b>':''}</p>
+      <div class="pend-actions">
+        <button class="btn btn-green" ${u.status==='frozen'?'disabled':''} onclick="admApprove('${u.id}')">Approve</button>
+        <button class="btn btn-redghost" onclick="admReject('${u.id}')">Reject</button>
+      </div>
+    </div>`).join('') : '<p style="color:var(--muted);font-size:13.5px;padding:12px 0">No pending tier approval requests.</p>';
+
+  const list = ADM_USERS.filter(u=>
+    (admState.filter==='all' || u.tier===admState.filter || (admState.filter==='frozen'&&u.status==='frozen')) &&
+    (u.name.toLowerCase().includes(admState.q) || u.email.toLowerCase().includes(admState.q) || u.id.toLowerCase().includes(admState.q))
+  );
+
+  document.getElementById('adm-users').innerHTML = list.length ? list.map(u=>`
+    <div class="user-row">
+      <div class="avatar">${admInitials(u.name)}</div>
+      <div class="u-info">
+        <b>${u.name}</b>
+        <small>${u.email}</small>
+        <div style="margin-top:4px">
+          ${admTag(u.tier)}${u.status==='frozen'?admTag('frozen'):admTag('active')}${u.kyc==='pending'?admTag('pending'):u.kyc==='rejected'?admTag('rejected'):''}
+        </div>
+      </div>
+      <span class="u-bal">${fmtBal(u.balance)}</span>
+      <button class="btn-manage" onclick="admOpen('${u.id}')">Manage</button>
+    </div>`).join('') : '<p style="text-align:center;color:var(--muted);padding:24px;font-size:13.5px">No users found matching your search</p>';
+
+  document.getElementById('adm-log').innerHTML = ADM_LOG.map(l=>`
+    <div class="log-item">
+      <span class="log-dot"></span>
+      <div>${l.txt}<small>${l.t}</small></div>
+    </div>`).join('');
+}
+
+function admSearch(v){admState.q=v.toLowerCase();renderAdmin();}
+function admFilter(el){
+  admState.filter=el.dataset.f;
+  document.querySelectorAll('#adm-chips .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderAdmin();
+}
+function admLog(txt){
+  const now = new Date();
+  const timeStr = 'Today · ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  ADM_LOG.unshift({t:timeStr,txt:txt});
+  localStorage.setItem('mcb_admin_log', JSON.stringify(ADM_LOG));
+}
+
+function admApprove(id){
+  const u=ADM_USERS.find(x=>x.id===id);if(!u)return;
+  u.tier=u.target||'premium';u.kyc='verified';u.target=null;
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  admLog('Approved upgrade: '+u.name+' → '+TIER_INFO[u.tier].name+' tier');
+  toast('Upgrade approved for '+u.name);
+  renderAdmin();
+}
+function admReject(id){
+  const u=ADM_USERS.find(x=>x.id===id);if(!u)return;
+  u.kyc='rejected';u.target=null;
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  admLog('Rejected upgrade request for '+u.name);
+  toast('Upgrade rejected for '+u.name);
+  renderAdmin();
+}
+
+function admOpen(id){
+  const u=ADM_USERS.find(x=>x.id===id);if(!u)return;
+  admState.sel=u;
+  document.getElementById('am-av').textContent=admInitials(u.name);
+  document.getElementById('am-name').textContent=u.name;
+  document.getElementById('am-email').textContent=u.email+' · joined '+(u.joined||'Recently');
+  document.getElementById('am-tags').innerHTML=admTag(u.tier)+(u.status==='frozen'?admTag('frozen'):admTag('active'))+(u.kyc==='pending'?admTag('pending'):u.kyc==='rejected'?admTag('rejected'):'');
+  document.getElementById('am-bal').textContent=fmtBal(u.balance);
+  document.getElementById('am-freeze').textContent=u.status==='frozen'?'Reactivate account':'Freeze account';
+  admView('menu');
+  document.getElementById('modal3').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function admView(which){
+  document.getElementById('am-menu').style.display=which==='menu'?'block':'none';
+  document.getElementById('am-amt').style.display=which==='amt'?'block':'none';
+}
+function admClose(){document.getElementById('modal3').classList.remove('open');document.body.style.overflow='';}
+function admBack(){admView('menu');}
+
+function admPromote(){
+  const u=admState.sel;const ti=TIER_ORDER.indexOf(u.tier);if(ti>=2)return;
+  u.tier=TIER_ORDER[ti+1];if(u.kyc==='pending'&&u.target===u.tier){u.kyc='verified';u.target=null;}
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  admLog(u.name+' promoted to '+TIER_INFO[u.tier].name+' by James Harrison');
+  toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');
+  admOpen(u.id);renderAdmin();
+}
+function admDemote(){
+  const u=admState.sel;const ti=TIER_ORDER.indexOf(u.tier);if(ti<=0)return;
+  u.tier=TIER_ORDER[ti-1];
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  admLog(u.name+' demoted to '+TIER_INFO[u.tier].name+' by James Harrison');
+  toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');
+  admOpen(u.id);renderAdmin();
+}
+function admFreeze(){
+  const u=admState.sel;
+  u.status=u.status==='frozen'?'active':'frozen';
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  admLog((u.status==='frozen'?'Account frozen: ':'Account unfrozen: ')+u.name);
+  toast(u.status==='frozen'?u.name+' frozen':u.name+' reactivated');
+  admOpen(u.id);renderAdmin();
+}
+function admFund(mode){
+  admState.amtMode=mode;const u=admState.sel;
+  document.getElementById('am-amt-title').textContent=mode==='add'?'Add funds (Deposit)':'Deduct funds (Debit)';
+  document.getElementById('am-amt-sub').textContent=(mode==='add'?'Credit ':'Debit ')+u.name+' · Current balance '+fmtBal(u.balance);
+  document.getElementById('am-amt-in').value='';
+  document.getElementById('am-amt-go').textContent=mode==='add'?'Confirm & credit':'Confirm & debit';
+  document.getElementById('am-amt-go').style.background=mode==='add'?'var(--grad-gold)':'linear-gradient(135deg,#E05A5A,#B92E2E)';
+  document.getElementById('am-amt-go').style.color=mode==='add'?'#231A05':'#fff';
+  admView('amt');
+}
+function setAmt(v){document.getElementById('am-amt-in').value='$'+v.toLocaleString();}
+function admConfirmAmt(){
+  const u=admState.sel;
+  const raw=document.getElementById('am-amt-in').value.replace(/[^0-9.]/g,'');
+  const amt=parseFloat(raw);
+  if(!amt||amt<=0){toast('Enter a valid amount');return;}
+  if(admState.amtMode==='deduct'&&amt>u.balance){toast('Amount exceeds user balance');return;}
+  
+  u.balance = admState.amtMode==='add' ? u.balance + amt : Math.max(0, u.balance - amt);
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+
+  const isAdd = admState.amtMode === 'add';
+  const newTx = {
+    userId: u.id,
+    n: isAdd ? "Deposit from James Harrison" : "Debit by James Harrison",
+    d: "Today · " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+    a: isAdd ? amt : -amt,
+    type: isAdd ? "in" : "out",
+    cat: "transfer"
+  };
+  let allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
+  allTxs.unshift(newTx);
+  localStorage.setItem('mcb_txs', JSON.stringify(allTxs));
+
+  admLog(fmtBal(amt)+(isAdd?' credited to ':' debited from ')+u.name);
+  toast((isAdd?'Credited ':'Debited ')+fmtBal(amt)+' → '+u.name);
+  admView('menu');
+  admOpen(u.id);
+  renderAdmin();
+}
+</script>
+</body>
+</html>
