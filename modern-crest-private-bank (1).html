@@ -466,6 +466,7 @@ img,svg{max-width:100%}
       <div class="dots"><span class="on"></span><span></span><span></span></div>
       <button class="btn btn-gold" id="ob-btn" onclick="nextOnboard()">Continue</button>
       <p style="margin-top:18px;font-size:13px">Already a client? <a class="auth-link" onclick="window.Clerk.redirectToSignIn()">Sign in</a></p>
+      <p style="margin-top:14px;font-size:12px"><a class="auth-link" style="opacity:0.75;font-weight:600;cursor:pointer" onclick="openAdminPinModal()">Staff / Admin Portal</a></p>
     </div>
   </div>
 </section>
@@ -769,8 +770,14 @@ img,svg{max-width:100%}
     <section class="screen" id="s-admin">
       <div class="page">
         <div class="topbar">
-          <h2>Admin Console</h2>
-          <span class="tier" style="background:var(--navy-900);color:var(--gold-2)">ADMIN</span>
+          <div>
+            <h2>Admin Console</h2>
+            <small style="color:var(--muted);font-size:12px">Logged in as James Harrison</small>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn btn-ghost" style="padding:6px 14px;font-size:12px;height:34px" onclick="enterApp()">Client View</button>
+            <span class="tier" style="background:var(--navy-900);color:var(--gold-2)">ADMIN</span>
+          </div>
         </div>
 
         <div class="adm-stats" id="adm-stats"></div>
@@ -818,7 +825,7 @@ img,svg{max-width:100%}
           <div class="set-item" onclick="toggleSwitch(this)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>Hide balances by default</span><span class="switch"></span></div>
         </div>
         <div class="set-group" id="admin-link-group">
-          <div class="set-item" onclick="go('s-admin')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M12 8v4M12 15h.01"/></svg><span>Admin console</span><small>›</small></div>
+          <div class="set-item" onclick="openAdminPinModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M12 8v4M12 15h.01"/></svg><span>Admin Console</span><small style="color:var(--gold);font-weight:700">James Harrison ›</small></div>
         </div>
         <div class="set-group">
           <div class="set-item" onclick="toast('Support chat opening (demo)')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg><span>24/7 Private concierge</span><small>›</small></div>
@@ -911,6 +918,25 @@ img,svg{max-width:100%}
   </div>
 </div>
 
+<!-- admin PIN modal -->
+<div class="modal-bg" id="modal-admin-pin" onclick="if(event.target===this)closeAdminPinModal()">
+  <div class="sheet" style="text-align:center;max-width:340px;margin:0 auto">
+    <div style="width:48px;height:48px;border-radius:50%;background:var(--gold-soft);color:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M12 8v4M12 15h.01"/></svg>
+    </div>
+    <h3 style="font-size:18px;margin-bottom:6px">Admin Portal</h3>
+    <p class="sub" style="font-size:13px;margin-bottom:16px">Enter Administrator PIN to sign in</p>
+    <div style="margin-bottom:18px">
+      <input type="password" id="admin-pin-in" maxlength="4" inputmode="numeric" placeholder="••••" style="font-family:'Sora';font-size:26px;letter-spacing:10px;text-align:center;width:150px;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff" onkeyup="if(this.value.length===4)submitAdminPin()">
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-gold" style="flex:1" onclick="submitAdminPin()">Sign in</button>
+      <button class="btn btn-ghost" style="flex:1" onclick="closeAdminPinModal()">Cancel</button>
+    </div>
+    <p style="margin-top:14px;font-size:11px;color:var(--muted)">Default Admin PIN: <b>0000</b></p>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -933,16 +959,15 @@ function renderNav(){
   let navItems = NAV;
   if(sessionRole === 'admin') {
     navItems = [
-      {id:"s-admin",label:"Home",ic:'<path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/>'},
+      {id:"s-admin",label:"Admin",ic:'<path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M12 8v4M12 15h.01"/>'},
+      {id:"s-home",label:"Client View",ic:'<path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/>'},
       {id:"s-profile",label:"Profile",ic:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/>'}
     ];
-    let admGroup = document.getElementById('admin-link-group');
-    if(admGroup) admGroup.style.display = 'none';
   } else {
     navItems = NAV.filter(n => n.id !== 's-admin');
-    let admGroup = document.getElementById('admin-link-group');
-    if(admGroup) admGroup.style.display = 'none'; // hidden for proper users too
   }
+  let admGroup = document.getElementById('admin-link-group');
+  if(admGroup) admGroup.style.display = 'block';
   document.getElementById('bottombar').innerHTML=navItems.filter(n=>!n.desk).map(n=>
     `<button class="bnav${n.center?' center':''}" data-id="${n.id}" onclick="navTap('${n.id}')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2">${n.ic}</svg>${n.label}</button>`).join('');
   document.getElementById('side-nav').innerHTML=navItems.map(n=>
@@ -976,6 +1001,34 @@ function nextOnboard(){
 }
 
 
+
+/* ---------- admin pin modal logic ---------- */
+function openAdminPinModal(){
+  const m = document.getElementById('modal-admin-pin');
+  if(m) {
+    m.classList.add('open');
+    document.body.style.overflow='hidden';
+    const inp = document.getElementById('admin-pin-in');
+    if(inp) { inp.value = ''; setTimeout(()=>inp.focus(), 150); }
+  }
+}
+function closeAdminPinModal(){
+  const m = document.getElementById('modal-admin-pin');
+  if(m) {
+    m.classList.remove('open');
+    document.body.style.overflow='';
+  }
+}
+function submitAdminPin(){
+  const inp = document.getElementById('admin-pin-in');
+  if(inp && inp.value === '0000') {
+    closeAdminPinModal();
+    enterAdmin();
+  } else {
+    toast('Incorrect Admin PIN (Default: 0000)');
+    if(inp) inp.value = '';
+  }
+}
 
 /* ---------- pin ---------- */
 let pin="";
@@ -1561,6 +1614,9 @@ renderNav();renderTx();
       await window.Clerk.load();
       if (window.Clerk.user) {
         enterApp();
+      }
+      if (window.location.hash === '#admin' || window.location.search.includes('admin=true')) {
+        openAdminPinModal();
       }
     } catch (err) {
       console.error("Clerk load error:", err);
