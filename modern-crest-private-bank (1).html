@@ -466,6 +466,10 @@ img,svg{max-width:100%}
 .opt-card.sel{border-color:var(--gold);background:var(--gold-soft)}
 .opt-card b{display:block;font-size:13px;margin-bottom:2px}
 .opt-card span{font-size:11px;color:var(--muted)}
+.rcv-field-group{margin-bottom:9px}
+.rcv-label{font-size:10.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px}
+.rcv-val-row{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:5px 10px}
+.rcv-inp{background:transparent;border:none;color:#fff;font-family:'Sora',sans-serif;font-size:13px;font-weight:600;flex:1;outline:none;user-select:all;min-width:0}
 </style>
 </head>
 <body>
@@ -864,13 +868,42 @@ img,svg{max-width:100%}
   <div class="sheet">
     <div id="sheet-send">
       <h3>Send money</h3>
-      <p class="sub">Instant transfer, zero fees between Crest clients</p>
+      <p class="sub">Instant transfer, zero fees between verified accounts</p>
       <div class="amount-hero" style="padding-top:6px">
         <small>You send</small>
         <input class="amount-input" id="send-amt" value="$250" inputmode="numeric" oninput="fmtAmt(this)">
       </div>
-      <div class="sec"><h3 style="font-size:14px">To</h3></div>
+      
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 6px">
+        <span style="font-size:12px;font-weight:700;color:var(--gold-2);text-transform:uppercase;letter-spacing:.6px">Saved Benefactors</span>
+        <button class="btn-copy-sm" onclick="openAddRecipientModal()" style="font-size:11px;padding:3px 8px">＋ Add Benefactor</button>
+      </div>
       <div class="contact-row" id="contacts"></div>
+
+      <div style="margin-top:14px;text-align:left">
+        <label class="lbl">Recipient / Benefactor Full Name *</label>
+        <input class="inp" id="send-rec-name" placeholder="e.g. Eleanor Vance" style="margin-bottom:10px">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div>
+            <label class="lbl">Account Number / IBAN *</label>
+            <input class="inp" id="send-rec-acct" placeholder="e.g. 98402810492" inputmode="numeric">
+          </div>
+          <div>
+            <label class="lbl">Routing (ABA) / SWIFT</label>
+            <input class="inp" id="send-rec-bank" placeholder="021000021" value="021000021">
+          </div>
+        </div>
+
+        <label class="lbl">Transfer Memo (Optional)</label>
+        <input class="inp" id="send-rec-note" placeholder="e.g. Consulting retainer, Property settlement" style="margin-bottom:12px">
+
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);cursor:pointer;margin-bottom:14px">
+          <input type="checkbox" id="send-save-beneficiary" checked style="accent-color:var(--gold);width:15px;height:15px">
+          <span>Save this recipient to Beneficiaries for future transfers</span>
+        </label>
+      </div>
+
       <button class="btn btn-gold" onclick="confirmSend()">Review & send</button>
       <button class="btn btn-ghost" onclick="closeSheet()">Cancel</button>
     </div>
@@ -956,22 +989,73 @@ img,svg{max-width:100%}
 
 <!-- Receive Modal -->
 <div class="modal-bg" id="modal-receive" onclick="if(event.target===this)closeReceiveModal()">
-  <div class="sheet">
-    <div style="text-align:center;margin-bottom:14px">
-      <div style="width:48px;height:48px;border-radius:50%;background:var(--gold-soft);color:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 10px">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+  <div class="sheet" style="max-width:440px">
+    <div style="text-align:center;margin-bottom:12px">
+      <div style="width:44px;height:44px;border-radius:50%;background:var(--gold-soft);color:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 8px">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
       </div>
       <h3 style="font-size:18px">Receive Funds</h3>
       <p class="sub" style="font-size:12.5px">Direct bank transfer details for wire & ACH</p>
     </div>
-    <div class="m-detail-box">
-      <div class="m-row"><span>Beneficiary</span><b id="rcv-beneficiary">Adaeze Okafor</b></div>
-      <div class="m-row"><span>Bank Name</span><b>Modern Crest Private Bank</b></div>
-      <div class="m-row"><span>Routing (ABA)</span><b>021000021 <button class="btn-copy-sm" onclick="copyText('021000021','Routing number')">Copy</button></b></div>
-      <div class="m-row"><span>Account Number</span><b>4829104820 <button class="btn-copy-sm" onclick="copyText('4829104820','Account number')">Copy</button></b></div>
-      <div class="m-row"><span>SWIFT / BIC</span><b>MCPBUS33XXX <button class="btn-copy-sm" onclick="copyText('MCPBUS33XXX','SWIFT code')">Copy</button></b></div>
-      <div class="m-row"><span>Payment Link</span><b>crest.me/pay <button class="btn-copy-sm" onclick="copyText('https://moderncrestprivatebank.group/pay','Payment link')">Copy Link</button></b></div>
+    
+    <div class="m-detail-box" style="margin:10px 0;background:rgba(255,255,255,0.03);border:1px solid rgba(233,200,110,0.2)">
+      <div class="rcv-field-group">
+        <div class="rcv-label">Beneficiary Legal Name</div>
+        <div class="rcv-val-row">
+          <input class="rcv-inp" id="rcv-beneficiary-inp" readonly value="Adaeze Okafor">
+          <button class="btn-copy-sm" onclick="copyFromInput('rcv-beneficiary-inp','Beneficiary Name')">Copy</button>
+        </div>
+      </div>
+
+      <div class="rcv-field-group">
+        <div class="rcv-label">Receiving Bank Name</div>
+        <div class="rcv-val-row">
+          <input class="rcv-inp" id="rcv-bank-inp" readonly value="Modern Crest Private Bank, N.A.">
+          <button class="btn-copy-sm" onclick="copyFromInput('rcv-bank-inp','Bank Name')">Copy</button>
+        </div>
+      </div>
+
+      <div class="rcv-field-group">
+        <div class="rcv-label">Routing Number (ABA / Wire)</div>
+        <div class="rcv-val-row">
+          <input class="rcv-inp" id="rcv-routing-inp" readonly value="021000021">
+          <button class="btn-copy-sm" onclick="copyFromInput('rcv-routing-inp','Routing Number')">Copy</button>
+        </div>
+      </div>
+
+      <div class="rcv-field-group">
+        <div class="rcv-label">Account Number</div>
+        <div class="rcv-val-row">
+          <input class="rcv-inp" id="rcv-acct-inp" readonly value="4829104820">
+          <button class="btn-copy-sm" onclick="copyFromInput('rcv-acct-inp','Account Number')">Copy</button>
+        </div>
+      </div>
+
+      <div class="rcv-field-group">
+        <div class="rcv-label">SWIFT / BIC (International)</div>
+        <div class="rcv-val-row">
+          <input class="rcv-inp" id="rcv-swift-inp" readonly value="MCPBUS33XXX">
+          <button class="btn-copy-sm" onclick="copyFromInput('rcv-swift-inp','SWIFT Code')">Copy</button>
+        </div>
+      </div>
+
+      <div class="rcv-field-group">
+        <div class="rcv-label">Bank Headquarters Address</div>
+        <div class="rcv-val-row">
+          <input class="rcv-inp" id="rcv-addr-inp" readonly value="One Wall Street, New York, NY 10005">
+          <button class="btn-copy-sm" onclick="copyFromInput('rcv-addr-inp','Bank Address')">Copy</button>
+        </div>
+      </div>
+
+      <div class="rcv-field-group" style="margin-bottom:0">
+        <div class="rcv-label">Account Currency</div>
+        <div class="rcv-val-row">
+          <input class="rcv-inp" id="rcv-cur-inp" readonly value="USD (United States Dollar)">
+          <button class="btn-copy-sm" onclick="copyFromInput('rcv-cur-inp','Account Currency')">Copy</button>
+        </div>
+      </div>
     </div>
+    
     <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="copyFullBankingDetails()">Share Complete Bank Details</button>
     <button class="btn btn-ghost" style="width:100%" onclick="closeReceiveModal()">Close</button>
   </div>
@@ -979,29 +1063,82 @@ img,svg{max-width:100%}
 
 <!-- Top Up Modal -->
 <div class="modal-bg" id="modal-topup" onclick="if(event.target===this)closeTopUpModal()">
-  <div class="sheet">
-    <div style="text-align:center;margin-bottom:14px">
-      <div style="width:48px;height:48px;border-radius:50%;background:rgba(39,174,96,.15);color:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 10px">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M4 17h16v4H4z"/></svg>
+  <div class="sheet" style="max-width:440px">
+    <div style="text-align:center;margin-bottom:12px">
+      <div style="width:44px;height:44px;border-radius:50%;background:rgba(39,174,96,.15);color:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 8px">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M4 17h16v4H4z"/></svg>
       </div>
       <h3 style="font-size:18px">Top Up Account</h3>
-      <p class="sub" style="font-size:12.5px">Instant deposit from your linked checking or debit card</p>
+      <p class="sub" style="font-size:12.5px">Deposit funds via manual card authorization or external bank wire</p>
     </div>
-    <label class="lbl">Funding Source</label>
-    <select class="inp" id="topup-source" style="margin-bottom:14px">
-      <option value="meridian">First Meridian Bank ••4291 (Checking)</option>
-      <option value="debit">Instant Debit Card (Visa ••8830)</option>
-      <option value="ach">External Bank Wire (ACH)</option>
-    </select>
-    <label class="lbl">Deposit Amount (USD)</label>
-    <input class="inp" id="topup-amt-in" inputmode="numeric" placeholder="$500.00" value="$500" style="font-family:'Sora';font-size:24px;font-weight:700;text-align:center;margin-bottom:10px" oninput="fmtAmt(this)">
-    <div class="amt-chips" style="margin-bottom:18px">
+
+    <!-- Funding Method Switcher -->
+    <div class="opt-grid" style="grid-template-columns:1fr 1fr;margin:10px 0 12px">
+      <div class="opt-card sel" id="topup-tab-card" onclick="switchTopUpMethod('card')">
+        <b style="color:var(--gold-2)">💳 Card Payment</b>
+        <span>Instant Deposit</span>
+      </div>
+      <div class="opt-card" id="topup-tab-wire" onclick="switchTopUpMethod('wire')">
+        <b>🏛️ External Bank</b>
+        <span>ACH / Wire Transfer</span>
+      </div>
+    </div>
+
+    <!-- Card Form -->
+    <div id="topup-card-form">
+      <label class="lbl">Cardholder Legal Name *</label>
+      <input class="inp" id="topup-card-name" placeholder="Name on card" style="margin-bottom:10px">
+
+      <label class="lbl">Card Number *</label>
+      <input class="inp" id="topup-card-num" placeholder="4000 0000 0000 0000" maxlength="19" inputmode="numeric" oninput="fmtCardNum(this)" style="margin-bottom:10px;font-family:'Sora';letter-spacing:1px">
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+        <div>
+          <label class="lbl">Expiry *</label>
+          <input class="inp" id="topup-card-exp" placeholder="MM/YY" maxlength="5" inputmode="numeric" oninput="fmtCardExp(this)">
+        </div>
+        <div>
+          <label class="lbl">CVV / CVC *</label>
+          <input class="inp" id="topup-card-cvv" placeholder="•••" maxlength="4" type="password" inputmode="numeric">
+        </div>
+        <div>
+          <label class="lbl">Billing ZIP *</label>
+          <input class="inp" id="topup-card-zip" placeholder="10001" maxlength="10">
+        </div>
+      </div>
+    </div>
+
+    <!-- Wire Form -->
+    <div id="topup-wire-form" style="display:none">
+      <label class="lbl">External Bank Name *</label>
+      <input class="inp" id="topup-wire-bank" placeholder="e.g. JPMorgan Chase, Wells Fargo" style="margin-bottom:10px">
+
+      <label class="lbl">Bank Account Holder Name *</label>
+      <input class="inp" id="topup-wire-holder" placeholder="Name on external account" style="margin-bottom:10px">
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div>
+          <label class="lbl">Routing (ABA) *</label>
+          <input class="inp" id="topup-wire-routing" placeholder="9 digits" maxlength="9" inputmode="numeric">
+        </div>
+        <div>
+          <label class="lbl">Account Number *</label>
+          <input class="inp" id="topup-wire-acct" placeholder="External account #" inputmode="numeric">
+        </div>
+      </div>
+    </div>
+
+    <label class="lbl" style="margin-top:6px">Deposit Amount (USD) *</label>
+    <input class="inp" id="topup-amt-in" inputmode="numeric" placeholder="$500.00" value="$500" style="font-family:'Sora';font-size:24px;font-weight:700;text-align:center;margin-bottom:8px" oninput="fmtAmt(this)">
+    
+    <div class="amt-chips" style="margin-bottom:16px">
       <button onclick="setTopUpAmt(100)">$100</button>
       <button onclick="setTopUpAmt(500)">$500</button>
       <button onclick="setTopUpAmt(1000)">$1,000</button>
       <button onclick="setTopUpAmt(5000)">$5,000</button>
     </div>
-    <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="confirmTopUp()">Confirm & Deposit</button>
+
+    <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="confirmTopUp()">Confirm & Authorize Deposit</button>
     <button class="btn btn-ghost" style="width:100%" onclick="closeTopUpModal()">Cancel</button>
   </div>
 </div>
@@ -1226,13 +1363,15 @@ img,svg{max-width:100%}
 <!-- Add Recipient Modal -->
 <div class="modal-bg" id="modal-add-recipient" onclick="if(event.target===this)closeAddRecipientModal()">
   <div class="sheet">
-    <h3 style="text-align:center;font-size:18px;margin-bottom:6px">Add New Recipient</h3>
-    <p class="sub" style="text-align:center;font-size:12.5px;margin-bottom:16px">Save beneficiary for instant global transfers</p>
-    <label class="lbl">Recipient Full Name</label>
-    <input class="inp" id="new-rec-name" placeholder="e.g. Liam Vance" style="margin-bottom:12px">
-    <label class="lbl">Crest Email or Account Number</label>
-    <input class="inp" id="new-rec-acct" placeholder="e.g. liam.vance@crestmail.com" style="margin-bottom:18px">
-    <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="confirmAddRecipient()">Add Recipient</button>
+    <h3 style="text-align:center;font-size:18px;margin-bottom:6px">Add Benefactor</h3>
+    <p class="sub" style="text-align:center;font-size:12.5px;margin-bottom:16px">Save beneficiary details for instant global transfers</p>
+    <label class="lbl">Benefactor Full Legal Name *</label>
+    <input class="inp" id="new-rec-name" placeholder="e.g. Eleanor Vance" style="margin-bottom:10px">
+    <label class="lbl">Account Number / IBAN *</label>
+    <input class="inp" id="new-rec-acct" placeholder="e.g. 98402810492" inputmode="numeric" style="margin-bottom:10px">
+    <label class="lbl">Bank Name or Routing / SWIFT</label>
+    <input class="inp" id="new-rec-bank" placeholder="Modern Crest Private Bank" value="Modern Crest Private Bank" style="margin-bottom:18px">
+    <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="confirmAddRecipient()">Save Benefactor</button>
     <button class="btn btn-ghost" style="width:100%" onclick="closeAddRecipientModal()">Cancel</button>
   </div>
 </div>
@@ -1242,7 +1381,7 @@ img,svg{max-width:100%}
 <script>
 /* ---------- data ---------- */
 let txData=[];
-let contacts = JSON.parse(localStorage.getItem('mcb_contacts')) || [["CN","Chidi N."],["TA","Tolu A."],["MK","Maya K."],["JB","Jonas B."],["+","New"]];
+let contacts = JSON.parse(localStorage.getItem('mcb_contacts')) || [];
 
 /* ---------- screens & nav ---------- */
 const NAV=[
@@ -1451,12 +1590,28 @@ function toggleCvv(){
 /* ---------- send sheet ---------- */
 let selContact=null;
 function renderContacts(){
-  document.getElementById('contacts').innerHTML=contacts.map(([i,n],k)=>
-   `<div class="contact${selContact===k?' sel':''}" onclick="pickContact(${k})"><div class="cav">${i}</div><span>${n}</span></div>`).join('');
+  const wrap = document.getElementById('contacts');
+  if(!wrap) return;
+  if(contacts.length === 0){
+    wrap.innerHTML = `<div style="font-size:12px;color:var(--muted);padding:6px 0;width:100%;text-align:center">No saved benefactors yet. Enter recipient details below.</div>`;
+    return;
+  }
+  wrap.innerHTML = contacts.map(([i,n,acct,bank],k)=>
+   `<div class="contact${selContact===k?' sel':''}" onclick="pickContact(${k})"><div class="cav">${i}</div><span>${n.split(' ')[0]}</span></div>`
+  ).join('');
 }
 function pickContact(k){
-  if(contacts[k][0]==='+'){openAddRecipientModal();return;}
-  selContact=k;renderContacts();
+  selContact=k;
+  renderContacts();
+  const c = contacts[k];
+  if(c){
+    const nEl = document.getElementById('send-rec-name');
+    const aEl = document.getElementById('send-rec-acct');
+    const bEl = document.getElementById('send-rec-bank');
+    if(nEl) nEl.value = c[1] || '';
+    if(aEl) aEl.value = c[2] || '';
+    if(bEl) bEl.value = c[3] || 'Modern Crest Private Bank';
+  }
 }
 function fmtAmt(el){
   let v=el.value.replace(/[^0-9.]/g,'');
@@ -1471,14 +1626,35 @@ function openSheet(which){
 }
 function closeSheet(){document.getElementById('modal').classList.remove('open');document.body.style.overflow='';}
 function confirmSend(){
-  if(selContact===null){toast('Choose a recipient first');return;}
+  const recNameIn = document.getElementById('send-rec-name');
+  const recAcctIn = document.getElementById('send-rec-acct');
+  const recBankIn = document.getElementById('send-rec-bank');
+  
+  const recipientName = recNameIn ? recNameIn.value.trim() : '';
+  const recipientAcct = recAcctIn ? recAcctIn.value.trim() : '';
+  const recipientBank = recBankIn ? recBankIn.value.trim() : 'Modern Crest Private Bank';
+  
+  if(!recipientName){toast('Please enter recipient full name');if(recNameIn)recNameIn.focus();return;}
+  if(!recipientAcct){toast('Please enter recipient account number');if(recAcctIn)recAcctIn.focus();return;}
+
   const raw=document.getElementById('send-amt').value.replace(/[^0-9.]/g,'')||'0';
   const amt=parseFloat(raw);
   if(!amt||amt<=0){toast('Enter a valid amount');return;}
-  if(amt>BALANCE){toast('Insufficient funds');return;}
+  if(amt>BALANCE){toast('Insufficient funds in balance');return;}
   const rem=remainingLimit();
   if(amt>rem){openUpgradePrompt();return;}
   
+  const saveCheck = document.getElementById('send-save-beneficiary');
+  if(saveCheck && saveCheck.checked){
+    const exists = contacts.some(c => c[1].toLowerCase() === recipientName.toLowerCase() || (c[2] && c[2] === recipientAcct));
+    if(!exists){
+      const initials = recipientName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() || 'MC';
+      contacts.push([initials, recipientName, recipientAcct, recipientBank]);
+      localStorage.setItem('mcb_contacts', JSON.stringify(contacts));
+      renderContacts();
+    }
+  }
+
   BALANCE = Math.max(0, BALANCE - amt);
   const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : 'u1';
   let u = ADM_USERS.find(x => x.id === currentUserId);
@@ -1487,7 +1663,6 @@ function confirmSend(){
     localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   }
 
-  const recipientName = contacts[selContact][1];
   const newTx = {
     userId: currentUserId,
     n: "Transfer to " + recipientName,
@@ -1502,11 +1677,10 @@ function confirmSend(){
   
   txData.unshift(newTx);
   renderTx();
-  
   updateBalanceUI();
 
   document.getElementById('cf-amt').textContent=amt.toLocaleString('en-US',{style:'currency',currency:'USD'});
-  document.getElementById('cf-to').textContent=recipientName+' · Crest client';
+  document.getElementById('cf-to').textContent=recipientName+' · '+recipientBank;
   openSheet('confirm');
 }
 
@@ -1899,12 +2073,19 @@ function copyText(txt, label){
     toast(label + ' copied');
   }
 }
+function copyFromInput(id, label){
+  const el = document.getElementById(id);
+  if(el){
+    el.select();
+    copyText(el.value, label);
+  }
+}
 
 // Receive Modal
 function openReceiveModal(){
-  const userName = (window.Clerk && window.Clerk.user && (window.Clerk.user.fullName || window.Clerk.user.firstName)) || 'Adaeze Okafor';
-  const el = document.getElementById('rcv-beneficiary');
-  if(el) el.textContent = userName;
+  const userName = (window.Clerk && window.Clerk.user && (window.Clerk.user.fullName || window.Clerk.user.firstName)) || (ADM_USERS.find(x => x.id === ((window.Clerk && window.Clerk.user) ? window.Clerk.user.id : 'u1')) || {}).name || 'Adaeze Okafor';
+  const bEl = document.getElementById('rcv-beneficiary-inp');
+  if(bEl) bEl.value = userName;
   document.getElementById('modal-receive').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -1913,14 +2094,52 @@ function closeReceiveModal(){
   document.body.style.overflow = '';
 }
 function copyFullBankingDetails(){
-  const userName = (window.Clerk && window.Clerk.user && (window.Clerk.user.fullName || window.Clerk.user.firstName)) || 'Adaeze Okafor';
-  const fullDetails = `Modern Crest Private Bank Details:\nBeneficiary: ${userName}\nBank: Modern Crest Private Bank, N.A.\nRouting (ABA): 021000021\nAccount: 4829104820\nSWIFT: MCPBUS33XXX`;
+  const userName = (document.getElementById('rcv-beneficiary-inp') ? document.getElementById('rcv-beneficiary-inp').value : '') || 'Adaeze Okafor';
+  const bank = document.getElementById('rcv-bank-inp') ? document.getElementById('rcv-bank-inp').value : 'Modern Crest Private Bank, N.A.';
+  const routing = document.getElementById('rcv-routing-inp') ? document.getElementById('rcv-routing-inp').value : '021000021';
+  const acct = document.getElementById('rcv-acct-inp') ? document.getElementById('rcv-acct-inp').value : '4829104820';
+  const swift = document.getElementById('rcv-swift-inp') ? document.getElementById('rcv-swift-inp').value : 'MCPBUS33XXX';
+  const addr = document.getElementById('rcv-addr-inp') ? document.getElementById('rcv-addr-inp').value : 'One Wall Street, New York, NY 10005';
+  
+  const fullDetails = `MODERN CREST PRIVATE BANK\nDirect Wire & ACH Dossier:\n\nBeneficiary: ${userName}\nBank: ${bank}\nRouting (ABA): ${routing}\nAccount: ${acct}\nSWIFT/BIC: ${swift}\nBank Address: ${addr}\nCurrency: USD`;
   copyText(fullDetails, 'Full banking details');
   closeReceiveModal();
 }
 
 // Top Up Modal
+let topUpMethod = 'card';
+function switchTopUpMethod(m){
+  topUpMethod = m;
+  const tabCard = document.getElementById('topup-tab-card');
+  const tabWire = document.getElementById('topup-tab-wire');
+  const formCard = document.getElementById('topup-card-form');
+  const formWire = document.getElementById('topup-wire-form');
+  
+  if(tabCard) tabCard.classList.toggle('sel', m === 'card');
+  if(tabWire) tabWire.classList.toggle('sel', m === 'wire');
+  if(formCard) formCard.style.display = m === 'card' ? 'block' : 'none';
+  if(formWire) formWire.style.display = m === 'wire' ? 'block' : 'none';
+}
+function fmtCardNum(el){
+  let v = el.value.replace(/\D/g, '').slice(0, 16);
+  el.value = v.replace(/(\d{4})(?=\d)/g, '$1 ');
+}
+function fmtCardExp(el){
+  let v = el.value.replace(/\D/g, '').slice(0, 4);
+  if(v.length >= 2){
+    el.value = v.slice(0,2) + '/' + v.slice(2);
+  } else {
+    el.value = v;
+  }
+}
 function openTopUpModal(){
+  const userName = (window.Clerk && window.Clerk.user && (window.Clerk.user.fullName || window.Clerk.user.firstName)) || '';
+  const cName = document.getElementById('topup-card-name');
+  if(cName && !cName.value && userName) cName.value = userName;
+  const wHolder = document.getElementById('topup-wire-holder');
+  if(wHolder && !wHolder.value && userName) wHolder.value = userName;
+  
+  switchTopUpMethod('card');
   document.getElementById('modal-topup').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -1934,7 +2153,34 @@ function setTopUpAmt(v){
 function confirmTopUp(){
   const raw = document.getElementById('topup-amt-in').value.replace(/[^0-9.]/g,'');
   const amt = parseFloat(raw);
-  if(!amt || amt <= 0){toast('Enter a valid top up amount');return;}
+  if(!amt || amt <= 0){toast('Enter a valid deposit amount');return;}
+  
+  let sourceDescription = '';
+  if(topUpMethod === 'card'){
+    const cardName = document.getElementById('topup-card-name') ? document.getElementById('topup-card-name').value.trim() : '';
+    const cardNum = document.getElementById('topup-card-num') ? document.getElementById('topup-card-num').value.replace(/\s+/g,'') : '';
+    const cardExp = document.getElementById('topup-card-exp') ? document.getElementById('topup-card-exp').value.trim() : '';
+    const cardCvv = document.getElementById('topup-card-cvv') ? document.getElementById('topup-card-cvv').value.trim() : '';
+    
+    if(!cardName){toast('Please enter cardholder name');return;}
+    if(cardNum.length < 15){toast('Please enter a valid 16-digit card number');return;}
+    if(cardExp.length < 4){toast('Please enter expiration date (MM/YY)');return;}
+    if(cardCvv.length < 3){toast('Please enter card CVV/CVC');return;}
+    
+    sourceDescription = 'Debit Card (•••• ' + cardNum.slice(-4) + ')';
+  } else {
+    const bankName = document.getElementById('topup-wire-bank') ? document.getElementById('topup-wire-bank').value.trim() : '';
+    const holder = document.getElementById('topup-wire-holder') ? document.getElementById('topup-wire-holder').value.trim() : '';
+    const routing = document.getElementById('topup-wire-routing') ? document.getElementById('topup-wire-routing').value.trim() : '';
+    const acct = document.getElementById('topup-wire-acct') ? document.getElementById('topup-wire-acct').value.trim() : '';
+    
+    if(!bankName){toast('Please enter external bank name');return;}
+    if(!holder){toast('Please enter account holder name');return;}
+    if(routing.length < 9){toast('Please enter 9-digit ABA routing number');return;}
+    if(!acct){toast('Please enter external account number');return;}
+    
+    sourceDescription = bankName + ' Wire (••' + acct.slice(-4) + ')';
+  }
   
   BALANCE += amt;
   const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : 'u1';
@@ -1944,10 +2190,9 @@ function confirmTopUp(){
     localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   }
   
-  const sourceName = document.getElementById('topup-source').value === 'meridian' ? 'First Meridian Bank ••4291' : (document.getElementById('topup-source').value === 'debit' ? 'Visa Debit ••8830' : 'Wire Deposit');
   const newTx = {
     userId: currentUserId,
-    n: "Top Up via " + sourceName,
+    n: "Top Up via " + sourceDescription,
     d: "Today · " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
     a: amt,
     type: "in",
@@ -2199,8 +2444,12 @@ function closeVaultModal(){
 
 // Add Recipient Modal
 function openAddRecipientModal(){
-  document.getElementById('new-rec-name').value = '';
-  document.getElementById('new-rec-acct').value = '';
+  const n = document.getElementById('new-rec-name');
+  const a = document.getElementById('new-rec-acct');
+  const b = document.getElementById('new-rec-bank');
+  if(n) n.value = '';
+  if(a) a.value = '';
+  if(b) b.value = 'Modern Crest Private Bank';
   document.getElementById('modal-add-recipient').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -2209,16 +2458,31 @@ function closeAddRecipientModal(){
   document.body.style.overflow = '';
 }
 function confirmAddRecipient(){
-  const name = document.getElementById('new-rec-name').value.trim();
-  if(!name){toast('Please enter recipient name');return;}
-  const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() || 'MC';
+  const nIn = document.getElementById('new-rec-name');
+  const aIn = document.getElementById('new-rec-acct');
+  const bIn = document.getElementById('new-rec-bank');
+  const name = nIn ? nIn.value.trim() : '';
+  const acct = aIn ? aIn.value.trim() : '';
+  const bank = bIn ? bIn.value.trim() : 'Modern Crest Private Bank';
   
-  contacts.splice(contacts.length - 1, 0, [initials, name]);
+  if(!name){toast('Please enter benefactor name');return;}
+  if(!acct){toast('Please enter account number / IBAN');return;}
+  
+  const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() || 'MC';
+  contacts.push([initials, name, acct, bank]);
   localStorage.setItem('mcb_contacts', JSON.stringify(contacts));
-  selContact = contacts.length - 2;
+  selContact = contacts.length - 1;
   renderContacts();
+  
+  const sn = document.getElementById('send-rec-name');
+  const sa = document.getElementById('send-rec-acct');
+  const sb = document.getElementById('send-rec-bank');
+  if(sn) sn.value = name;
+  if(sa) sa.value = acct;
+  if(sb) sb.value = bank;
+  
   closeAddRecipientModal();
-  toast(name + ' added to recipients');
+  toast(name + ' saved to Benefactors');
 }
 
 updateBalanceUI();
