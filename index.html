@@ -1469,16 +1469,16 @@ renderNav();renderTx();
         
         if (si) {
           window.Clerk.mountSignIn(si, { 
-            routing: 'virtual',
-            afterSignInUrl: redirectUrl,
-            afterSignUpUrl: redirectUrl
+            routing: 'hash',
+            fallbackRedirectUrl: redirectUrl,
+            forceRedirectUrl: redirectUrl
           });
         }
         if (su) {
           window.Clerk.mountSignUp(su, { 
-            routing: 'virtual',
-            afterSignInUrl: redirectUrl,
-            afterSignUpUrl: redirectUrl
+            routing: 'hash',
+            fallbackRedirectUrl: redirectUrl,
+            forceRedirectUrl: redirectUrl
           });
         }
       }
