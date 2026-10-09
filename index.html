@@ -465,23 +465,12 @@ img,svg{max-width:100%}
       <p id="ob-text">Private banking, reimagined. Multi-currency accounts, virtual cards and instant global transfers — all in one elegant app.</p>
       <div class="dots"><span class="on"></span><span></span><span></span></div>
       <button class="btn btn-gold" id="ob-btn" onclick="nextOnboard()">Continue</button>
-      <p style="margin-top:18px;font-size:13px">Already a client? <a class="auth-link" onclick="showScreen('s-login')">Sign in</a></p>
+      <p style="margin-top:18px;font-size:13px">Already a client? <a class="auth-link" onclick="window.Clerk.redirectToSignIn()">Sign in</a></p>
     </div>
   </div>
 </section>
 
-<section class="screen" id="s-login">
-  <div class="auth-wrap">
-    <div id="clerk-sign-in"></div>
-    <p style="text-align:center;font-size:11px;color:#5F6B85;margin-top:12px">Use a valid Clerk key to test login.</p>
-  </div>
-</section>
 
-<section class="screen" id="s-signup">
-  <div class="auth-wrap">
-    <div id="clerk-sign-up"></div>
-  </div>
-</section>
 
 <!-- ============ APP SHELL ============ -->
 <div id="shell" style="display:none">
@@ -989,7 +978,7 @@ const obMsgs=[
 ];let obI=0;
 function nextOnboard(){
   obI++;
-  if(obI>=obMsgs.length){showScreen('s-signup');return;}
+  if(obI>=obMsgs.length){window.Clerk.redirectToSignUp();return;}
   document.getElementById('ob-text').textContent=obMsgs[obI];
   document.querySelectorAll('#s-onboard .dots span').forEach((d,i)=>d.classList.toggle('on',i===obI));
   if(obI===obMsgs.length-1) document.getElementById('ob-btn').textContent = "Get Started";
@@ -1462,25 +1451,6 @@ renderNav();renderTx();
       await window.Clerk.load();
       if (window.Clerk.user) {
         enterApp();
-      } else {
-        const si = document.getElementById('clerk-sign-in');
-        const su = document.getElementById('clerk-sign-up');
-        const redirectUrl = window.location.href.split('#')[0];
-        
-        if (si) {
-          window.Clerk.mountSignIn(si, { 
-            routing: 'hash',
-            fallbackRedirectUrl: redirectUrl,
-            forceRedirectUrl: redirectUrl
-          });
-        }
-        if (su) {
-          window.Clerk.mountSignUp(su, { 
-            routing: 'hash',
-            fallbackRedirectUrl: redirectUrl,
-            forceRedirectUrl: redirectUrl
-          });
-        }
       }
     } catch (err) {
       console.error("Clerk load error:", err);
