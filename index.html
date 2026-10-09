@@ -27,6 +27,33 @@ a{color:inherit;text-decoration:none}
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-thumb{background:#C9D2E4;border-radius:8px}
 
+/* Strip Netlify Injected Drawer, Feedback Widgets & Badges */
+#netlify-drawer,
+#netlify-drawer-root,
+[data-netlify-drawer],
+[data-netlify-badge],
+.netlify-badge,
+.netlify-drawer,
+netlify-drawer,
+iframe[src*="netlify.com"],
+iframe[src*="netlify.app"],
+iframe[id*="netlify"],
+div[class*="netlify-drawer"],
+div[id*="netlify-drawer"],
+div[class*="NetlifyBadge"],
+div[id*="netlify-badge"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+  z-index: -9999 !important;
+}
+
 /* ---------- App shell ---------- */
 #app{display:flex;min-height:100vh}
 .sidebar{display:none}
@@ -511,6 +538,25 @@ img,svg{max-width:100%}
   .l-mockup-wrap{padding:20px}
 }
 </style>
+<script>
+/* Zero-trace Netlify drawer & badge stripper */
+(function(){
+  function stripNetlify(){
+    var sel = '#netlify-drawer,#netlify-drawer-root,[data-netlify-drawer],[data-netlify-badge],.netlify-badge,.netlify-drawer,netlify-drawer,iframe[src*="netlify"],div[class*="netlify"],div[id*="netlify"]';
+    document.querySelectorAll(sel).forEach(function(el){
+      try{el.remove();}catch(e){el.style.display='none';}
+    });
+  }
+  stripNetlify();
+  if(window.addEventListener){
+    window.addEventListener('DOMContentLoaded',stripNetlify);
+    window.addEventListener('load',stripNetlify);
+  }
+  if(window.MutationObserver){
+    new MutationObserver(function(){stripNetlify();}).observe(document.documentElement||document.body,{childList:true,subtree:true});
+  }
+})();
+</script>
 </head>
 <body>
 

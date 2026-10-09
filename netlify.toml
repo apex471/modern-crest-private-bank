@@ -1,0 +1,30 @@
+# Netlify Configuration for Modern Crest Private Bank
+[build]
+  publish = "."
+
+[build.processing]
+  skip_processing = false
+
+[build.processing.html]
+  pretty_urls = true
+
+# Disable Netlify Drawer, Feedback Badge & Injected Scripts
+[context.production.environment]
+  NETLIFY_FEEDBACK_DISABLED = "true"
+  DISABLE_NETLIFY_PREVIEW_DRAWER = "true"
+
+[context.deploy-preview.environment]
+  NETLIFY_FEEDBACK_DISABLED = "true"
+  DISABLE_NETLIFY_PREVIEW_DRAWER = "true"
+
+[context.branch-deploy.environment]
+  NETLIFY_FEEDBACK_DISABLED = "true"
+  DISABLE_NETLIFY_PREVIEW_DRAWER = "true"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
