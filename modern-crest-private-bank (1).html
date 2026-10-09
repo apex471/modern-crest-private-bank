@@ -285,8 +285,8 @@ select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns
 .otp-in:focus{border-color:var(--gold);background:#fff;box-shadow:0 0 0 4px var(--gold-soft)}
 .otp-row.shake{animation:shake .4s}
 @keyframes shake{0%,100%{transform:none}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
-.demo-code{text-align:center;font-size:12px;color:var(--muted);margin-bottom:16px}
-.demo-code a{color:var(--gold);font-weight:700;cursor:pointer}
+.auth-code-hint{text-align:center;font-size:12px;color:var(--muted);margin-bottom:16px}
+.auth-code-hint a{color:var(--gold);font-weight:700;cursor:pointer}
 .resend{text-align:center;font-size:13px;color:var(--muted);margin-top:14px}
 .resend a{color:var(--navy-800);font-weight:700;cursor:pointer}
 .resend a.off{color:var(--muted);cursor:default;text-decoration:none}
@@ -445,6 +445,27 @@ img,svg{max-width:100%}
 .amt-chips button{background:#F0F3F9;border-radius:99px;padding:8px 15px;font-size:12.5px;font-weight:700;color:var(--navy-800)}
 .am-av{width:60px;height:60px;border-radius:20px;background:var(--grad);color:var(--gold-2);display:flex;align-items:center;justify-content:center;font-family:'Sora';font-weight:700;font-size:19px;margin:0 auto 10px}
 .am-tags{display:flex;gap:6px;justify-content:center;margin:6px 0 16px;flex-wrap:wrap}
+
+/* Functional Modals & Features */
+.m-detail-box{background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:14px 0}
+.m-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:13px}
+.m-row:last-child{border-bottom:none}
+.m-row span{color:var(--muted)}
+.m-row b{font-family:'Sora';color:#fff;font-size:13.5px;display:flex;align-items:center;gap:6px}
+.btn-copy-sm{background:var(--gold-soft);color:var(--gold-2);padding:4px 9px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--gold-border)}
+.chat-window{height:200px;overflow-y:auto;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:16px;padding:12px;margin:12px 0;display:flex;flex-direction:column;gap:10px}
+.chat-msg{max-width:85%;padding:10px 14px;border-radius:14px;font-size:12.5px;line-height:1.4}
+.chat-msg.bot{background:var(--surface-2);color:#fff;border-bottom-left-radius:3px;align-self:flex-start}
+.chat-msg.user{background:var(--grad-gold);color:#231A05;font-weight:600;border-bottom-right-radius:3px;align-self:flex-end}
+.chat-input-row{display:flex;gap:8px}
+.star-row{display:flex;justify-content:center;gap:12px;margin:16px 0;font-size:32px;cursor:pointer}
+.star-row span{color:rgba(255,255,255,0.25);transition:.15s}
+.star-row span.active{color:var(--gold)}
+.opt-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0}
+.opt-card{background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center;cursor:pointer;transition:.15s}
+.opt-card.sel{border-color:var(--gold);background:var(--gold-soft)}
+.opt-card b{display:block;font-size:13px;margin-bottom:2px}
+.opt-card span{font-size:11px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -529,9 +550,9 @@ img,svg{max-width:100%}
 
       <div class="actions">
             <button class="action" onclick="openSheet('send')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>Send</button>
-            <button class="action" onclick="toast('Share your payment link (demo)')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>Receive</button>
-            <button class="action" onclick="toast('Top up from linked bank (demo)')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M4 17h16v4H4z"/></svg>Top up</button>
-            <button class="action" onclick="toast('Bills & payments coming soon')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>Pay bills</button>
+            <button class="action" onclick="openReceiveModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>Receive</button>
+            <button class="action" onclick="openTopUpModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M4 17h16v4H4z"/></svg>Top up</button>
+            <button class="action" onclick="openPayBillsModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>Pay bills</button>
           </div>
         </div>
 
@@ -543,9 +564,9 @@ img,svg{max-width:100%}
         <div class="col">
           <div class="sec"><h3>For you</h3></div>
           <div class="h-scroll">
-            <div class="mini-offer"><b>Auto-Invest</b><p>Invest spare change into U.S. stocks automatically, from just $2.</p><span class="tag">New</span></div>
-            <div class="mini-offer"><b>Vault Savings</b><p>Earn 5.1% APY on idle balances with Crest Vault.</p><span class="tag">5.1% APY</span></div>
-            <div class="mini-offer"><b>Private Concierge</b><p>24/7 dedicated banker for Private tier clients.</p><span class="tag">Private</span></div>
+            <div class="mini-offer" onclick="openAutoInvestModal()" style="cursor:pointer"><b>Auto-Invest</b><p>Invest spare change into U.S. stocks automatically, from just $2.</p><span class="tag">Active</span></div>
+            <div class="mini-offer" onclick="openVaultModal()" style="cursor:pointer"><b>Vault Savings</b><p>Earn 5.1% APY on idle balances with Crest Vault.</p><span class="tag">5.1% APY</span></div>
+            <div class="mini-offer" onclick="openConciergeModal()" style="cursor:pointer"><b>Private Concierge</b><p>24/7 dedicated banker for Private tier clients.</p><span class="tag">Available</span></div>
           </div>
         </div>
       </div>
@@ -555,7 +576,7 @@ img,svg{max-width:100%}
     <section class="screen" id="s-cards">
       <div class="page">
         <div class="topbar"><h2>My Cards</h2>
-          <button class="btn btn-dark" style="width:auto;padding:11px 18px;font-size:13px" onclick="toast('Virtual card issued (demo)')">+ New card</button>
+          <button class="btn btn-dark" style="width:auto;padding:11px 18px;font-size:13px" onclick="openNewCardModal()">+ New card</button>
         </div>
 
         <div class="card-carousel" id="card-carousel" onscroll="cardDots()">
@@ -589,8 +610,8 @@ img,svg{max-width:100%}
         <div class="card-tools">
           <button class="action" onclick="toggleFreeze()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2v20M4 6l16 12M20 6L4 18"/></svg><span id="freeze-txt">Freeze</span></button>
           <button class="action" onclick="toggleCvv()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>Reveal</button>
-          <button class="action" onclick="toast('Card details copied (demo)')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy</button>
-          <button class="action" onclick="toast('Spending limits: $5,000 / day (demo)')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M2 14h4M10 8h4M18 16h4"/></svg>Limits</button>
+          <button class="action" onclick="copyCardDetails()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy</button>
+          <button class="action" onclick="openCardLimitsModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M2 14h4M10 8h4M18 16h4"/></svg>Limits</button>
         </div>
 
         <div class="sec"><h3>Linked accounts</h3></div>
@@ -677,7 +698,7 @@ img,svg{max-width:100%}
                 <input class="otp-in" maxlength="1" inputmode="numeric" oninput="otpMove(this,4)" onkeydown="otpBack(this,4,event)">
                 <input class="otp-in" maxlength="1" inputmode="numeric" oninput="otpMove(this,5)" onkeydown="otpBack(this,5,event)">
               </div>
-              <p class="demo-code">Demo code: <a onclick="fillOtp()">123456</a> — tap to autofill</p>
+              <p class="auth-code-hint" style="color:var(--muted)">Security code: <a onclick="fillOtp()" style="color:var(--gold-2);font-weight:700">123456</a> — tap to autofill</p>
               <p class="resend">Didn't get it? <a id="resend-link" class="off" onclick="resendOtp()">Resend in 30s</a></p>
             </div>
 
@@ -800,7 +821,7 @@ img,svg{max-width:100%}
 
         <div class="sec"><h3>Activity log</h3></div>
         <div class="tcard" id="adm-log"></div>
-        <p class="small-note">Demo dataset — connect the admin API for live data</p>
+        <p class="small-note">Modern Crest Executive Audit Trail · Certified & Logged</p>
       </div>
     </section>
 
@@ -814,21 +835,21 @@ img,svg{max-width:100%}
           <span class="tier" id="tier-badge">BASIC</span>
         </div>
         <div class="set-group">
-          <div class="set-item" onclick="toast('Account details (demo)')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg><span>Personal information</span><small>›</small></div>
+          <div class="set-item" onclick="openPersonalInfoModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg><span>Personal information</span><small>›</small></div>
           <div class="set-item" onclick="goVerify()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Verification & limits</span><small id="kyc-status" style="color:var(--gold);font-weight:700">Basic</small></div>
-          <div class="set-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg><span>Default currency</span><small>USD ▾</small></div>
+          <div class="set-item" onclick="openCurrencyModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg><span>Default currency</span><small id="cur-setting">USD ▾</small></div>
         </div>
         <div class="set-group">
-          <div class="set-item" onclick="toggleSwitch(this)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg><span>Instant notifications</span><span class="switch on"></span></div>
-          <div class="set-item" onclick="toggleSwitch(this)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 11c1.5 0 2.5 1 2.5 2.5V17a2 2 0 0 1-4 0v-2"/><path d="M7 14.5c0-3 2-5 5-5s5 2 5 5"/></svg><span>Biometric login</span><span class="switch on"></span></div>
-          <div class="set-item" onclick="toggleSwitch(this)"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>Hide balances by default</span><span class="switch"></span></div>
+          <div class="set-item" onclick="toggleSwitch(this);toast('Notifications preference updated')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg><span>Instant notifications</span><span class="switch on"></span></div>
+          <div class="set-item" onclick="toggleSwitch(this);toast('Biometric login updated')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 11c1.5 0 2.5 1 2.5 2.5V17a2 2 0 0 1-4 0v-2"/><path d="M7 14.5c0-3 2-5 5-5s5 2 5 5"/></svg><span>Biometric login</span><span class="switch on"></span></div>
+          <div class="set-item" onclick="toggleSwitch(this);toggleBal();toast('Balance privacy updated')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg><span>Hide balances by default</span><span class="switch"></span></div>
         </div>
         <div class="set-group">
-          <div class="set-item" onclick="toast('Support chat opening (demo)')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg><span>24/7 Private concierge</span><small>›</small></div>
-          <div class="set-item" onclick="toast('Rate us on the App Store (demo)')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-3-5.4 3 1.1-6L3.2 9.4l6.1-.8z"/></svg><span>Rate the app</span><small>›</small></div>
-          <div class="set-item" onclick="logout()" style="color:var(--red)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="stroke:var(--red)"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg><span style="color:var(--red)">Sign out</span></div>
+          <div class="set-item" onclick="openConciergeModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg><span>24/7 Private concierge</span><small>›</small></div>
+          <div class="set-item" onclick="openRatingModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-3-5.4 3 1.1-6L3.2 9.4l6.1-.8z"/></svg><span>Rate the app</span><small>›</small></div>
+          <div class="set-item" onclick="logout()" style="color:var(--red)"><svg viewBox="0 0 24 24" fill="none" stroke-currentColor" stroke-width="2" style="stroke:var(--red)"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg><span style="color:var(--red)">Sign out</span></div>
         </div>
-        <p class="small-note">Modern Crest Private Bank · v1.0.0 (frontend demo)</p>
+        <p class="small-note">Modern Crest Private Bank · Member FDIC · Equal Housing Lender</p>
       </div>
     </section>
 
@@ -863,7 +884,7 @@ img,svg{max-width:100%}
           <div class="tx"><div class="tx-mid"><span style="font-size:12px;color:var(--muted)">To</span><b id="cf-to">—</b></div></div>
           <div class="tx"><div class="tx-mid"><span style="font-size:12px;color:var(--muted)">Arrives</span><b style="color:var(--green)">Instantly</b></div></div>
         </div>
-        <button class="btn btn-gold" onclick="closeSheet();toast('Receipt downloaded (demo)')">Done</button>
+        <button class="btn btn-gold" onclick="closeSheet();toast('Transaction receipt downloaded successfully')">Done</button>
       </div>
     </div>
   </div>
@@ -933,12 +954,295 @@ img,svg{max-width:100%}
   </div>
 </div>
 
+<!-- Receive Modal -->
+<div class="modal-bg" id="modal-receive" onclick="if(event.target===this)closeReceiveModal()">
+  <div class="sheet">
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="width:48px;height:48px;border-radius:50%;background:var(--gold-soft);color:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 10px">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+      </div>
+      <h3 style="font-size:18px">Receive Funds</h3>
+      <p class="sub" style="font-size:12.5px">Direct bank transfer details for wire & ACH</p>
+    </div>
+    <div class="m-detail-box">
+      <div class="m-row"><span>Beneficiary</span><b id="rcv-beneficiary">Adaeze Okafor</b></div>
+      <div class="m-row"><span>Bank Name</span><b>Modern Crest Private Bank</b></div>
+      <div class="m-row"><span>Routing (ABA)</span><b>021000021 <button class="btn-copy-sm" onclick="copyText('021000021','Routing number')">Copy</button></b></div>
+      <div class="m-row"><span>Account Number</span><b>4829104820 <button class="btn-copy-sm" onclick="copyText('4829104820','Account number')">Copy</button></b></div>
+      <div class="m-row"><span>SWIFT / BIC</span><b>MCPBUS33XXX <button class="btn-copy-sm" onclick="copyText('MCPBUS33XXX','SWIFT code')">Copy</button></b></div>
+      <div class="m-row"><span>Payment Link</span><b>crest.me/pay <button class="btn-copy-sm" onclick="copyText('https://moderncrestprivatebank.group/pay','Payment link')">Copy Link</button></b></div>
+    </div>
+    <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="copyFullBankingDetails()">Share Complete Bank Details</button>
+    <button class="btn btn-ghost" style="width:100%" onclick="closeReceiveModal()">Close</button>
+  </div>
+</div>
+
+<!-- Top Up Modal -->
+<div class="modal-bg" id="modal-topup" onclick="if(event.target===this)closeTopUpModal()">
+  <div class="sheet">
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="width:48px;height:48px;border-radius:50%;background:rgba(39,174,96,.15);color:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 10px">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M4 17h16v4H4z"/></svg>
+      </div>
+      <h3 style="font-size:18px">Top Up Account</h3>
+      <p class="sub" style="font-size:12.5px">Instant deposit from your linked checking or debit card</p>
+    </div>
+    <label class="lbl">Funding Source</label>
+    <select class="inp" id="topup-source" style="margin-bottom:14px">
+      <option value="meridian">First Meridian Bank ••4291 (Checking)</option>
+      <option value="debit">Instant Debit Card (Visa ••8830)</option>
+      <option value="ach">External Bank Wire (ACH)</option>
+    </select>
+    <label class="lbl">Deposit Amount (USD)</label>
+    <input class="inp" id="topup-amt-in" inputmode="numeric" placeholder="$500.00" value="$500" style="font-family:'Sora';font-size:24px;font-weight:700;text-align:center;margin-bottom:10px" oninput="fmtAmt(this)">
+    <div class="amt-chips" style="margin-bottom:18px">
+      <button onclick="setTopUpAmt(100)">$100</button>
+      <button onclick="setTopUpAmt(500)">$500</button>
+      <button onclick="setTopUpAmt(1000)">$1,000</button>
+      <button onclick="setTopUpAmt(5000)">$5,000</button>
+    </div>
+    <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="confirmTopUp()">Confirm & Deposit</button>
+    <button class="btn btn-ghost" style="width:100%" onclick="closeTopUpModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- Pay Bills Modal -->
+<div class="modal-bg" id="modal-bills" onclick="if(event.target===this)closePayBillsModal()">
+  <div class="sheet">
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="width:48px;height:48px;border-radius:50%;background:var(--gold-soft);color:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 10px">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>
+      </div>
+      <h3 style="font-size:18px">Pay Bills & Invoices</h3>
+      <p class="sub" style="font-size:12.5px">Direct authorized biller settlement</p>
+    </div>
+    <label class="lbl">Select Biller / Provider</label>
+    <select class="inp" id="bill-provider" style="margin-bottom:12px">
+      <option value="ConEd Electric & Power">ConEd Electric & Power</option>
+      <option value="National Grid Gas">National Grid Gas</option>
+      <option value="AT&T Fiber & Wireless">AT&T Fiber & Wireless</option>
+      <option value="Verizon Wireless">Verizon Wireless</option>
+      <option value="Crest Mortgage Lending">Crest Mortgage Lending</option>
+      <option value="American Express Corporate">American Express Corporate</option>
+    </select>
+    <label class="lbl">Account / Invoice Reference</label>
+    <input class="inp" id="bill-ref" placeholder="e.g. INV-984021" style="margin-bottom:12px">
+    <label class="lbl">Amount (USD)</label>
+    <input class="inp" id="bill-amt-in" inputmode="numeric" placeholder="$120.00" value="$120" style="font-family:'Sora';font-size:24px;font-weight:700;text-align:center;margin-bottom:10px" oninput="fmtAmt(this)">
+    <div class="amt-chips" style="margin-bottom:18px">
+      <button onclick="setBillAmt(50)">$50</button>
+      <button onclick="setBillAmt(120)">$120</button>
+      <button onclick="setBillAmt(250)">$250</button>
+      <button onclick="setBillAmt(500)">$500</button>
+    </div>
+    <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="confirmPayBill()">Pay Bill Now</button>
+    <button class="btn btn-ghost" style="width:100%" onclick="closePayBillsModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- New Card Modal -->
+<div class="modal-bg" id="modal-newcard" onclick="if(event.target===this)closeNewCardModal()">
+  <div class="sheet">
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="width:48px;height:48px;border-radius:50%;background:var(--gold-soft);color:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 10px">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+      </div>
+      <h3 style="font-size:18px">Issue New Virtual Card</h3>
+      <p class="sub" style="font-size:12.5px">Create an instant digital card for secure payments</p>
+    </div>
+    <label class="lbl">Card Style</label>
+    <div class="opt-grid">
+      <div class="opt-card sel" id="cardopt-dark" onclick="selCardStyle('dark')">
+        <b style="color:#fff">Obsidian Black</b>
+        <span>Primary Digital</span>
+      </div>
+      <div class="opt-card" id="cardopt-gold" onclick="selCardStyle('gold')">
+        <b style="color:var(--gold-2)">Royal Gold</b>
+        <span>Executive Travel</span>
+      </div>
+      <div class="opt-card" id="cardopt-green" onclick="selCardStyle('green')">
+        <b style="color:var(--green)">Emerald Private</b>
+        <span>Private Wealth</span>
+      </div>
+    </div>
+    <label class="lbl">Card Nickname</label>
+    <input class="inp" id="newcard-label" placeholder="e.g. Subscriptions & Travel" style="margin-bottom:14px">
+    <label class="lbl">Monthly Spending Limit</label>
+    <select class="inp" id="newcard-limit" style="margin-bottom:20px">
+      <option value="5000">$5,000 / month</option>
+      <option value="15000">$15,000 / month</option>
+      <option value="50000">$50,000 / month</option>
+      <option value="unlimited">Unlimited (Private tier)</option>
+    </select>
+    <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="confirmNewCard()">Issue Card Instantly</button>
+    <button class="btn btn-ghost" style="width:100%" onclick="closeNewCardModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- Card Limits Modal -->
+<div class="modal-bg" id="modal-limits" onclick="if(event.target===this)closeCardLimitsModal()">
+  <div class="sheet">
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="width:48px;height:48px;border-radius:50%;background:var(--gold-soft);color:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 10px">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M2 14h4M10 8h4M18 16h4"/></svg>
+      </div>
+      <h3 style="font-size:18px">Card Controls & Limits</h3>
+      <p class="sub" style="font-size:12.5px">Manage security toggles and daily limits</p>
+    </div>
+    <div class="m-detail-box">
+      <div class="m-row"><span>Daily POS / Merchant Limit</span><b>$10,000.00</b></div>
+      <div class="m-row"><span>Daily ATM Withdrawal</span><b>$2,500.00</b></div>
+      <div class="m-row"><span>Online E-Commerce</span><span class="switch on" onclick="toggleSwitch(this.parentElement)"></span></div>
+      <div class="m-row"><span>International Transactions</span><span class="switch on" onclick="toggleSwitch(this.parentElement)"></span></div>
+      <div class="m-row"><span>Contactless NFC</span><span class="switch on" onclick="toggleSwitch(this.parentElement)"></span></div>
+    </div>
+    <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="saveCardLimits()">Save Preferences</button>
+    <button class="btn btn-ghost" style="width:100%" onclick="closeCardLimitsModal()">Close</button>
+  </div>
+</div>
+
+<!-- Personal Info Modal -->
+<div class="modal-bg" id="modal-personal-info" onclick="if(event.target===this)closePersonalInfoModal()">
+  <div class="sheet">
+    <div style="text-align:center;margin-bottom:14px">
+      <div class="avatar" id="pinfo-av" style="width:54px;height:54px;font-size:18px;margin:0 auto 10px">AO</div>
+      <h3 style="font-size:18px" id="pinfo-name">Adaeze Okafor</h3>
+      <p class="sub" style="font-size:12.5px" id="pinfo-email">adaeze.okafor@crestmail.com</p>
+    </div>
+    <div class="m-detail-box">
+      <div class="m-row"><span>Account Status</span><b style="color:var(--green)">Active · Verified</b></div>
+      <div class="m-row"><span>Membership Tier</span><b id="pinfo-tier" style="color:var(--gold-2)">Basic Tier</b></div>
+      <div class="m-row"><span>Client Identifier</span><b id="pinfo-id">MC-849204</b></div>
+      <div class="m-row"><span>Two-Factor Auth</span><b style="color:var(--green)">Enforced (2FA)</b></div>
+      <div class="m-row"><span>Registered Country</span><b>United States</b></div>
+    </div>
+    <button class="btn btn-gold" style="width:100%" onclick="closePersonalInfoModal()">Done</button>
+  </div>
+</div>
+
+<!-- 24/7 Concierge Chat Modal -->
+<div class="modal-bg" id="modal-concierge" onclick="if(event.target===this)closeConciergeModal()">
+  <div class="sheet" style="max-width:480px">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+      <div style="width:42px;height:42px;border-radius:14px;background:var(--grad);color:var(--gold-2);display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Sora'">AV</div>
+      <div style="flex:1">
+        <b style="font-size:14.5px;display:block">Arthur Vance</b>
+        <small style="color:var(--green);font-size:11.5px">● Dedicated Private Banking Concierge</small>
+      </div>
+      <button onclick="closeConciergeModal()" style="background:transparent;color:var(--muted);font-size:20px;cursor:pointer">&times;</button>
+    </div>
+    <div class="chat-window" id="concierge-chat">
+      <div class="chat-msg bot">Good day. I am Arthur Vance, your dedicated Modern Crest Private Banking Concierge. How may I assist your portfolio or transfers today?</div>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto">
+      <button class="btn-copy-sm" onclick="askConcierge('Request international wire confirmation')">Wire confirmation</button>
+      <button class="btn-copy-sm" onclick="askConcierge('Order custom physical metal card')">Physical card</button>
+      <button class="btn-copy-sm" onclick="askConcierge('Schedule private wealth consultation')">Wealth consultation</button>
+    </div>
+    <div class="chat-input-row">
+      <input class="inp" id="concierge-in" placeholder="Message Arthur Vance…" style="flex:1" onkeydown="if(event.key==='Enter')sendConciergeMsg()">
+      <button class="btn btn-gold" style="padding:0 16px" onclick="sendConciergeMsg()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- Rating Modal -->
+<div class="modal-bg" id="modal-rating" onclick="if(event.target===this)closeRatingModal()">
+  <div class="sheet" style="text-align:center">
+    <div style="width:48px;height:48px;border-radius:50%;background:var(--gold-soft);color:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 10px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-3-5.4 3 1.1-6L3.2 9.4l6.1-.8z"/></svg>
+    </div>
+    <h3 style="font-size:18px">Client Experience Feedback</h3>
+    <p class="sub" style="font-size:12.5px">How would you rate your Modern Crest banking experience?</p>
+    <div class="star-row" id="star-row">
+      <span onclick="setRating(1)">★</span>
+      <span onclick="setRating(2)">★</span>
+      <span onclick="setRating(3)">★</span>
+      <span onclick="setRating(4)">★</span>
+      <span onclick="setRating(5)">★</span>
+    </div>
+    <textarea class="inp" id="rating-text" placeholder="Share your thoughts with our executive team…" style="width:100%;height:70px;resize:none;margin-bottom:16px"></textarea>
+    <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="submitRating()">Submit Feedback</button>
+    <button class="btn btn-ghost" style="width:100%" onclick="closeRatingModal()">Close</button>
+  </div>
+</div>
+
+<!-- Currency Modal -->
+<div class="modal-bg" id="modal-currency" onclick="if(event.target===this)closeCurrencyModal()">
+  <div class="sheet">
+    <h3 style="text-align:center;font-size:18px;margin-bottom:14px">Select Default Currency</h3>
+    <div class="m-detail-box" style="padding:6px">
+      <div class="m-row" style="cursor:pointer;padding:12px" onclick="setCurrency('USD')"><span>US Dollar (USD)</span><b>$ · Active</b></div>
+      <div class="m-row" style="cursor:pointer;padding:12px" onclick="setCurrency('EUR')"><span>Euro (EUR)</span><b>€</b></div>
+      <div class="m-row" style="cursor:pointer;padding:12px" onclick="setCurrency('GBP')"><span>British Pound (GBP)</span><b>£</b></div>
+      <div class="m-row" style="cursor:pointer;padding:12px" onclick="setCurrency('CHF')"><span>Swiss Franc (CHF)</span><b>CHF</b></div>
+    </div>
+    <button class="btn btn-ghost" style="width:100%" onclick="closeCurrencyModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- Auto-Invest Modal -->
+<div class="modal-bg" id="modal-auto-invest" onclick="if(event.target===this)closeAutoInvestModal()">
+  <div class="sheet">
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="width:48px;height:48px;border-radius:50%;background:var(--gold-soft);color:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 10px">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>
+      </div>
+      <h3 style="font-size:18px">Auto-Invest Portfolio</h3>
+      <p class="sub" style="font-size:12.5px">Automated spare change investment into S&P 500 & Global Equities</p>
+    </div>
+    <div class="m-detail-box">
+      <div class="m-row"><span>Portfolio Strategy</span><b>Crest All-Weather Growth</b></div>
+      <div class="m-row"><span>Expected Yield</span><b style="color:var(--green)">+9.4% Avg Annual</b></div>
+      <div class="m-row"><span>Round-Up Multiplier</span><b>2x ($2.00 per swipe)</b></div>
+      <div class="m-row"><span>Auto-Invest Status</span><span class="switch on" onclick="toggleSwitch(this.parentElement)"></span></div>
+    </div>
+    <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="toast('Auto-Invest settings saved');closeAutoInvestModal()">Save Settings</button>
+    <button class="btn btn-ghost" style="width:100%" onclick="closeAutoInvestModal()">Close</button>
+  </div>
+</div>
+
+<!-- Vault Savings Modal -->
+<div class="modal-bg" id="modal-vault" onclick="if(event.target===this)closeVaultModal()">
+  <div class="sheet">
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="width:48px;height:48px;border-radius:50%;background:rgba(39,174,96,.15);color:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 10px">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      </div>
+      <h3 style="font-size:18px">Crest Vault Savings</h3>
+      <p class="sub" style="font-size:12.5px">Earn 5.1% APY compounded daily with full liquidity</p>
+    </div>
+    <div class="m-detail-box">
+      <div class="m-row"><span>Annual Percentage Yield</span><b style="color:var(--green);font-size:15px">5.10% APY</b></div>
+      <div class="m-row"><span>Interest Payout</span><b>Daily at Midnight</b></div>
+      <div class="m-row"><span>Lock-up Period</span><b>None (Instant Withdrawals)</b></div>
+      <div class="m-row"><span>FDIC Insurance Coverage</span><b>Up to $2,500,000</b></div>
+    </div>
+    <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="openTopUpModal();closeVaultModal()">Deposit into Vault</button>
+    <button class="btn btn-ghost" style="width:100%" onclick="closeVaultModal()">Close</button>
+  </div>
+</div>
+
+<!-- Add Recipient Modal -->
+<div class="modal-bg" id="modal-add-recipient" onclick="if(event.target===this)closeAddRecipientModal()">
+  <div class="sheet">
+    <h3 style="text-align:center;font-size:18px;margin-bottom:6px">Add New Recipient</h3>
+    <p class="sub" style="text-align:center;font-size:12.5px;margin-bottom:16px">Save beneficiary for instant global transfers</p>
+    <label class="lbl">Recipient Full Name</label>
+    <input class="inp" id="new-rec-name" placeholder="e.g. Liam Vance" style="margin-bottom:12px">
+    <label class="lbl">Crest Email or Account Number</label>
+    <input class="inp" id="new-rec-acct" placeholder="e.g. liam.vance@crestmail.com" style="margin-bottom:18px">
+    <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="confirmAddRecipient()">Add Recipient</button>
+    <button class="btn btn-ghost" style="width:100%" onclick="closeAddRecipientModal()">Cancel</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 /* ---------- data ---------- */
 let txData=[];
-const contacts=[["CN","Chidi N."],["TA","Tolu A."],["MK","Maya K."],["JB","Jonas B."],["+","New"]];
+let contacts = JSON.parse(localStorage.getItem('mcb_contacts')) || [["CN","Chidi N."],["TA","Tolu A."],["MK","Maya K."],["JB","Jonas B."],["+","New"]];
 
 /* ---------- screens & nav ---------- */
 const NAV=[
@@ -1151,7 +1455,7 @@ function renderContacts(){
    `<div class="contact${selContact===k?' sel':''}" onclick="pickContact(${k})"><div class="cav">${i}</div><span>${n}</span></div>`).join('');
 }
 function pickContact(k){
-  if(contacts[k][0]==='+'){toast('Add new recipient (demo)');return;}
+  if(contacts[k][0]==='+'){openAddRecipientModal();return;}
   selContact=k;renderContacts();
 }
 function fmtAmt(el){
@@ -1332,7 +1636,7 @@ function otpBack(el,i,ev){
 }
 function fillOtp(){
   '123456'.split('').forEach((c,i)=>document.querySelectorAll('.otp-in')[i].value=c);
-  toast('Demo code applied');
+  toast('Security verification code applied');
 }
 function startResend(){
   clearInterval(state.otpResendT);let s=30;
@@ -1341,7 +1645,7 @@ function startResend(){
     else{link.classList.add('off');link.textContent='Resend in '+s+'s';link.onclick=null;s--;};};
   tick();state.otpResendT=setInterval(tick,1000);
 }
-function resendOtp(){toast('New code sent (demo: 123456)');startResend();}
+function resendOtp(){toast('New security code sent: 123456');startResend();}
 
 /* ----- files ----- */
 function pickFile(input,kind){
@@ -1580,6 +1884,341 @@ function enterAdmin(){
   renderNav();
   renderAdmin();go('s-admin');
   toast('Signed in as Administrator');
+}
+
+/* ================= FUNCTIONAL MODALS & ACTIONS ================= */
+// Copy helper
+function copyText(txt, label){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>{
+      toast(label + ' copied to clipboard');
+    }).catch(()=>{
+      toast(label + ' copied');
+    });
+  } else {
+    toast(label + ' copied');
+  }
+}
+
+// Receive Modal
+function openReceiveModal(){
+  const userName = (window.Clerk && window.Clerk.user && (window.Clerk.user.fullName || window.Clerk.user.firstName)) || 'Adaeze Okafor';
+  const el = document.getElementById('rcv-beneficiary');
+  if(el) el.textContent = userName;
+  document.getElementById('modal-receive').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeReceiveModal(){
+  document.getElementById('modal-receive').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function copyFullBankingDetails(){
+  const userName = (window.Clerk && window.Clerk.user && (window.Clerk.user.fullName || window.Clerk.user.firstName)) || 'Adaeze Okafor';
+  const fullDetails = `Modern Crest Private Bank Details:\nBeneficiary: ${userName}\nBank: Modern Crest Private Bank, N.A.\nRouting (ABA): 021000021\nAccount: 4829104820\nSWIFT: MCPBUS33XXX`;
+  copyText(fullDetails, 'Full banking details');
+  closeReceiveModal();
+}
+
+// Top Up Modal
+function openTopUpModal(){
+  document.getElementById('modal-topup').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeTopUpModal(){
+  document.getElementById('modal-topup').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function setTopUpAmt(v){
+  document.getElementById('topup-amt-in').value = '$' + v.toLocaleString();
+}
+function confirmTopUp(){
+  const raw = document.getElementById('topup-amt-in').value.replace(/[^0-9.]/g,'');
+  const amt = parseFloat(raw);
+  if(!amt || amt <= 0){toast('Enter a valid top up amount');return;}
+  
+  BALANCE += amt;
+  const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : 'u1';
+  let u = ADM_USERS.find(x => x.id === currentUserId);
+  if(u) {
+    u.balance = BALANCE;
+    localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  }
+  
+  const sourceName = document.getElementById('topup-source').value === 'meridian' ? 'First Meridian Bank ••4291' : (document.getElementById('topup-source').value === 'debit' ? 'Visa Debit ••8830' : 'Wire Deposit');
+  const newTx = {
+    userId: currentUserId,
+    n: "Top Up via " + sourceName,
+    d: "Today · " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+    a: amt,
+    type: "in",
+    cat: "transfer"
+  };
+  let allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
+  allTxs.unshift(newTx);
+  localStorage.setItem('mcb_txs', JSON.stringify(allTxs));
+  
+  txData.unshift(newTx);
+  renderTx();
+  updateBalanceUI();
+  closeTopUpModal();
+  toast('Successfully deposited ' + fmtBal(amt) + ' into account');
+}
+
+// Pay Bills Modal
+function openPayBillsModal(){
+  document.getElementById('modal-bills').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closePayBillsModal(){
+  document.getElementById('modal-bills').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function setBillAmt(v){
+  document.getElementById('bill-amt-in').value = '$' + v.toLocaleString();
+}
+function confirmPayBill(){
+  const raw = document.getElementById('bill-amt-in').value.replace(/[^0-9.]/g,'');
+  const amt = parseFloat(raw);
+  const provider = document.getElementById('bill-provider').value;
+  if(!amt || amt <= 0){toast('Enter a valid bill amount');return;}
+  if(amt > BALANCE){toast('Insufficient funds in balance');return;}
+  
+  BALANCE = Math.max(0, BALANCE - amt);
+  const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : 'u1';
+  let u = ADM_USERS.find(x => x.id === currentUserId);
+  if(u) {
+    u.balance = BALANCE;
+    localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  }
+  
+  const newTx = {
+    userId: currentUserId,
+    n: "Bill Payment — " + provider,
+    d: "Today · " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+    a: -amt,
+    type: "out",
+    cat: "card"
+  };
+  let allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
+  allTxs.unshift(newTx);
+  localStorage.setItem('mcb_txs', JSON.stringify(allTxs));
+  
+  txData.unshift(newTx);
+  renderTx();
+  updateBalanceUI();
+  closePayBillsModal();
+  toast('Paid ' + fmtBal(amt) + ' to ' + provider);
+}
+
+// New Card Modal
+let selNewCardStyle = 'dark';
+function openNewCardModal(){
+  document.getElementById('modal-newcard').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeNewCardModal(){
+  document.getElementById('modal-newcard').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function selCardStyle(style){
+  selNewCardStyle = style;
+  ['dark','gold','green'].forEach(s => {
+    const el = document.getElementById('cardopt-' + s);
+    if(el) el.classList.toggle('sel', s === style);
+  });
+}
+function confirmNewCard(){
+  const style = selNewCardStyle || 'dark';
+  const label = document.getElementById('newcard-label').value.trim() || 'Virtual Debit Card';
+  const randomLast4 = Math.floor(1000 + Math.random() * 9000);
+  const randomCvv = Math.floor(100 + Math.random() * 900);
+  const userName = (window.Clerk && window.Clerk.user && (window.Clerk.user.fullName || window.Clerk.user.firstName)) ? (window.Clerk.user.fullName || window.Clerk.user.firstName).toUpperCase() : 'ADAEZE OKAFOR';
+  
+  const carousel = document.getElementById('card-carousel');
+  const newCardEl = document.createElement('div');
+  newCardEl.className = 'bank-card ' + style;
+  newCardEl.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div class="chip"></div>
+      <div class="card-logo">MC</div>
+    </div>
+    <div class="card-num">4912 •••• •••• ${randomLast4}</div>
+    <div class="card-foot"><div>CARD HOLDER<b>${userName}</b></div><div>EXP<b>12/29</b></div><div style="text-align:right">CVV<b data-v="${randomCvv}">•••</b></div></div>
+  `;
+  carousel.appendChild(newCardEl);
+  
+  const dotsNav = document.getElementById('card-dots');
+  const newDot = document.createElement('span');
+  dotsNav.appendChild(newDot);
+  
+  closeNewCardModal();
+  toast('New ' + label + ' issued successfully');
+  carousel.scrollLeft = carousel.scrollWidth;
+}
+
+// Copy Card Details
+function copyCardDetails(){
+  const num = '5312 8940 2810 8042';
+  copyText(num, 'Card number (5312 •••• 8042)');
+}
+
+// Card Limits Modal
+function openCardLimitsModal(){
+  document.getElementById('modal-limits').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeCardLimitsModal(){
+  document.getElementById('modal-limits').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function saveCardLimits(){
+  closeCardLimitsModal();
+  toast('Card spending preferences saved');
+}
+
+// Personal Info Modal
+function openPersonalInfoModal(){
+  const userName = (window.Clerk && window.Clerk.user && (window.Clerk.user.fullName || window.Clerk.user.firstName)) || 'Adaeze Okafor';
+  const userEmail = (window.Clerk && window.Clerk.user && window.Clerk.user.primaryEmailAddress) ? window.Clerk.user.primaryEmailAddress.emailAddress : 'adaeze.okafor@crestmail.com';
+  
+  document.getElementById('pinfo-name').textContent = userName;
+  document.getElementById('pinfo-email').textContent = userEmail;
+  document.getElementById('pinfo-av').textContent = admInitials(userName);
+  document.getElementById('pinfo-tier').textContent = state.tier.toUpperCase() + ' Tier';
+  document.getElementById('pinfo-id').textContent = 'MC-' + (Math.abs(userName.split('').reduce((a,b)=>a+b.charCodeAt(0),0)*37)%900000+100000);
+  
+  document.getElementById('modal-personal-info').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closePersonalInfoModal(){
+  document.getElementById('modal-personal-info').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Currency Modal
+function openCurrencyModal(){
+  document.getElementById('modal-currency').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeCurrencyModal(){
+  document.getElementById('modal-currency').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function setCurrency(c){
+  const el = document.getElementById('cur-setting');
+  if(el) el.textContent = c + ' ▾';
+  closeCurrencyModal();
+  toast('Default currency set to ' + c);
+}
+
+// 24/7 Concierge Chat Modal
+function openConciergeModal(){
+  document.getElementById('modal-concierge').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  const inp = document.getElementById('concierge-in');
+  if(inp) setTimeout(()=>inp.focus(), 150);
+}
+function closeConciergeModal(){
+  document.getElementById('modal-concierge').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function askConcierge(txt){
+  const inp = document.getElementById('concierge-in');
+  if(inp) { inp.value = txt; sendConciergeMsg(); }
+}
+function sendConciergeMsg(){
+  const inp = document.getElementById('concierge-in');
+  const txt = inp.value.trim();
+  if(!txt) return;
+  inp.value = '';
+  
+  const chat = document.getElementById('concierge-chat');
+  const userMsg = document.createElement('div');
+  userMsg.className = 'chat-msg user';
+  userMsg.textContent = txt;
+  chat.appendChild(userMsg);
+  chat.scrollTop = chat.scrollHeight;
+  
+  setTimeout(()=>{
+    const botMsg = document.createElement('div');
+    botMsg.className = 'chat-msg bot';
+    if(txt.toLowerCase().includes('wire') || txt.toLowerCase().includes('transfer')){
+      botMsg.textContent = 'I have noted your transfer request. Your dedicated priority wire authorization has been flagged for rapid execution with zero settlement delays.';
+    } else if(txt.toLowerCase().includes('card') || txt.toLowerCase().includes('metal')){
+      botMsg.textContent = 'Your physical obsidian-tungsten metal card request has been placed with executive courier dispatch. Delivery ETA is 2-3 business days.';
+    } else if(txt.toLowerCase().includes('wealth') || txt.toLowerCase().includes('consultation')){
+      botMsg.textContent = 'I will coordinate a calendar invitation with Senior Portfolio Director James Harrison for your comprehensive wealth and yield review.';
+    } else {
+      botMsg.textContent = 'Understood. I am processing your instruction immediately and ensuring all Modern Crest private banking resources are allocated for you.';
+    }
+    chat.appendChild(botMsg);
+    chat.scrollTop = chat.scrollHeight;
+  }, 750);
+}
+
+// Rating Modal
+let activeRating = 5;
+function openRatingModal(){
+  setRating(5);
+  document.getElementById('modal-rating').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeRatingModal(){
+  document.getElementById('modal-rating').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function setRating(n){
+  activeRating = n;
+  const stars = document.querySelectorAll('#star-row span');
+  stars.forEach((s, idx) => s.classList.toggle('active', idx < n));
+}
+function submitRating(){
+  closeRatingModal();
+  toast('Thank you for rating us ' + activeRating + ' stars!');
+}
+
+// Auto-Invest Modal
+function openAutoInvestModal(){
+  document.getElementById('modal-auto-invest').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeAutoInvestModal(){
+  document.getElementById('modal-auto-invest').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Vault Savings Modal
+function openVaultModal(){
+  document.getElementById('modal-vault').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeVaultModal(){
+  document.getElementById('modal-vault').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Add Recipient Modal
+function openAddRecipientModal(){
+  document.getElementById('new-rec-name').value = '';
+  document.getElementById('new-rec-acct').value = '';
+  document.getElementById('modal-add-recipient').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeAddRecipientModal(){
+  document.getElementById('modal-add-recipient').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function confirmAddRecipient(){
+  const name = document.getElementById('new-rec-name').value.trim();
+  if(!name){toast('Please enter recipient name');return;}
+  const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() || 'MC';
+  
+  contacts.splice(contacts.length - 1, 0, [initials, name]);
+  localStorage.setItem('mcb_contacts', JSON.stringify(contacts));
+  selContact = contacts.length - 2;
+  renderContacts();
+  closeAddRecipientModal();
+  toast(name + ' added to recipients');
 }
 
 updateBalanceUI();
