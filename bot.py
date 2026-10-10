@@ -399,6 +399,32 @@ def handle_status(msg):
     )
     send_telegram_message(chat_id, status_txt)
 
+def handle_pending(msg):
+    chat_id = msg["chat"]["id"]
+    with db_lock:
+        pending = [u for u in db.get("users", []) if u.get("kyc") == "pending"]
+    
+    if not pending:
+        send_telegram_message(chat_id, "✅ <b>No Pending KYC Requests:</b> All client submissions are verified.")
+        return
+        
+    out = [f"📋 <b>PENDING KYC VERIFICATION DOSSIERS ({len(pending)})</b>\n"]
+    for u in pending:
+        k = u.get("kycDetails", {})
+        name = k.get("name") or u.get("name")
+        target = (u.get("target") or "premium").upper()
+        out.append(
+            f"👤 <b>Client:</b> {name}\n"
+            f"<b>Acct #:</b> <code>{u.get('accountNumber', 'N/A')}</code>\n"
+            f"<b>Target Tier:</b> {target}\n"
+            f"<b>DOB:</b> {k.get('dob', '1990-01-01')} | <b>Nat:</b> {k.get('nat', 'United States')}\n"
+            f"<b>Gov ID:</b> {k.get('idType', 'Passport')} ({k.get('idFile', 'id_scan.pdf')})\n"
+            f"<b>SSN Last 4:</b> ••-{k.get('ssnLast4', '9999')}\n"
+            f"<b>Proof of Address:</b> {k.get('addrType', 'Utility Bill')} ({k.get('addrFile', 'addr.pdf')})\n"
+            f"👉 <i>Quick Approve:</i> <code>/approve {u.get('accountNumber', u['id'])}</code>\n"
+        )
+    send_telegram_message(chat_id, "\n".join(out))
+
 # ================= FLASK API FOR WEB FRONTEND =================
 app = Flask(__name__)
 # Suppress noisy Flask logs
@@ -557,6 +583,8 @@ def run_polling():
                     handle_user_dossier(msg)
                 elif cmd == "/status":
                     handle_status(msg)
+                elif cmd == "/pending":
+                    handle_pending(msg)
 
         except requests.exceptions.ReadTimeout:
             # Normal long-polling timeout, immediately resume

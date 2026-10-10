@@ -198,6 +198,49 @@ div[id*="netlify-badge"] {
 .dots-nav span.on{width:20px;background:var(--gold)}
 .card-tools{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:6px}
 
+/* Card Empty State & Dynamic Styles */
+.card-empty-state{background:#fff;border:1.5px dashed var(--line);border-radius:22px;padding:26px 20px;text-align:center;margin-bottom:14px;box-shadow:var(--shadow)}
+.ces-card-mockup{width:min(260px,80%);height:140px;border-radius:18px;margin:0 auto 16px;background:linear-gradient(135deg,rgba(10,22,40,0.85),rgba(26,44,76,0.9));border:1.5px dashed rgba(233,200,110,0.5);display:flex;flex-direction:column;justify-content:space-between;padding:16px;position:relative;box-shadow:0 12px 28px rgba(10,22,40,0.18)}
+.ces-chip{width:32px;height:22px;border-radius:5px;background:var(--grad-gold);opacity:0.7}
+.ces-brand{font-family:'Sora';font-weight:700;font-size:11px;letter-spacing:1.5px;color:var(--gold-2);text-align:right}
+.ces-placeholder-num{font-family:'Sora';font-size:13px;letter-spacing:2px;color:rgba(255,255,255,0.4);text-align:center;margin:10px 0}
+.ces-tag{align-self:flex-start;background:rgba(233,200,110,0.15);color:var(--gold-2);font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:99px;letter-spacing:0.5px}
+.ces-info h4{font-family:'Sora';font-size:16px;margin-bottom:6px;color:var(--ink)}
+.ces-info p{font-size:12.5px;color:var(--muted);line-height:1.55;max-width:380px;margin:0 auto 14px}
+.bank-card.frozen-card{filter:grayscale(0.35);opacity:0.88}
+.frozen-badge{position:absolute;top:14px;right:14px;background:rgba(14,35,70,0.88);border:1px solid #77A0E0;color:#A8CEFF;font-size:10px;font-weight:700;padding:4px 9px;border-radius:99px;backdrop-filter:blur(4px);letter-spacing:.4px}
+
+/* KYC Credential Dossier (Admin) */
+.kyc-cred-box{background:#F7F9FD;border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin:10px 0 12px;text-align:left}
+.kyc-cred-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line);flex-wrap:wrap;gap:6px}
+.kyc-target-tag{font-family:'Sora';font-size:12px;font-weight:700;color:var(--navy-900);background:var(--gold-soft);padding:3px 8px;border-radius:6px;display:inline-block}
+.kyc-date{font-size:11px;color:var(--muted);margin-left:6px}
+.kyc-status-chip{font-size:10.5px;font-weight:700;color:#B8860B;background:#FFF4DC;padding:2px 7px;border-radius:99px}
+.kyc-cred-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 14px}
+@media(max-width:520px){.kyc-cred-grid{grid-template-columns:1fr}}
+.kcg-item{min-width:0}
+.kcg-item small{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
+.kcg-item b{font-size:12.5px;color:var(--ink);display:flex;align-items:center;gap:6px;word-break:break-word}
+.tag-ok{font-size:9.5px;background:#E4F6EE;color:var(--green);padding:1px 5px;border-radius:4px;font-weight:700}
+.kcg-item.doc-item{grid-column:1 / -1}
+.doc-badge{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 11px;margin-top:3px;cursor:pointer;transition:.2s}
+.doc-badge:hover{border-color:var(--gold);background:var(--gold-soft)}
+.doc-badge svg{color:var(--navy-700);flex:none}
+.doc-badge span{flex:1;font-size:12px;font-weight:600;color:var(--navy-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-badge .doc-action{flex:none;font-size:11px;color:var(--gold);font-weight:700;background:var(--gold-soft);padding:3px 8px;border-radius:6px}
+.compliance-check-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:8px;border-top:1px dashed var(--line)}
+.c-check{font-size:11px;font-weight:600;color:var(--green);background:#E4F6EE;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px}
+
+/* Fintech Personal Profile */
+.pinfo-card-header{background:linear-gradient(135deg,#0A1628,#17294B);border-radius:18px;padding:18px;color:#fff;margin-bottom:16px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden}
+.pinfo-card-header::after{content:'';position:absolute;right:-20px;bottom:-20px;width:90px;height:90px;background:radial-gradient(circle,rgba(233,200,110,0.2) 0%,transparent 70%);border-radius:50%}
+.pinfo-fields-grid{display:grid;gap:12px}
+.pinfo-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:480px){.pinfo-grid-2{grid-template-columns:1fr}}
+.pinfo-group-title{font-family:'Sora';font-size:11.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;display:flex;align-items:center;gap:8px}
+.pinfo-group-title::after{content:'';flex:1;height:1px;background:var(--line)}
+
+
 /* ---------- Send flow ---------- */
 .amount-hero{text-align:center;padding:28px 0 10px}
 .amount-hero small{color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;font-size:11px}
@@ -896,47 +939,65 @@ img,svg{max-width:100%}
           <button class="btn btn-dark" style="width:auto;padding:11px 18px;font-size:13px" onclick="openNewCardModal()">+ New card</button>
         </div>
 
-        <div class="card-carousel" id="card-carousel" onscroll="cardDots()">
-          <div class="bank-card dark">
+        <div id="card-carousel-wrap">
+          <div class="card-carousel" id="card-carousel" onscroll="cardDots()"></div>
+          <div class="dots-nav" id="card-dots"></div>
+        </div>
+
+        <div id="card-empty-state" class="card-empty-state" style="display:none">
+          <div class="ces-card-mockup">
             <div style="display:flex;justify-content:space-between;align-items:flex-start">
-              <div class="chip"></div>
-              <div class="card-logo">MC</div>
+              <div class="ces-chip"></div>
+              <div class="ces-brand">SOVEREIGN</div>
             </div>
-            <div class="card-num">5312 •••• •••• 8042</div>
-            <div class="card-foot"><div>CARD HOLDER<b>ADAEZE OKAFOR</b></div><div>EXP<b>09/29</b></div><div style="text-align:right">CVV<b id="cvv1" data-v="314">•••</b></div></div>
+            <div class="ces-placeholder-num">•••• •••• •••• ••••</div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-end">
+              <span class="ces-tag">No Card Issued</span>
+              <span style="font-size:10px;color:rgba(255,255,255,0.4)">DEBIT / METAL</span>
+            </div>
           </div>
-          <div class="bank-card gold">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start">
-              <div class="chip"></div>
-              <div class="card-logo">MC</div>
-            </div>
-            <div class="card-num">4756 •••• •••• 2210</div>
-            <div class="card-foot"><div>CARD HOLDER<b>ADAEZE OKAFOR</b></div><div>EXP<b>02/28</b></div><div style="text-align:right">CVV<b id="cvv2" data-v="880">•••</b></div></div>
-          </div>
-          <div class="bank-card green">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start">
-              <div class="chip"></div>
-              <div class="card-logo">MC</div>
-            </div>
-            <div class="card-num">4285 •••• •••• 9931</div>
-            <div class="card-foot"><div>CARD HOLDER<b>ADAEZE OKAFOR</b></div><div>EXP<b>11/27</b></div><div style="text-align:right">CVV<b id="cvv3" data-v="552">•••</b></div></div>
+          <div class="ces-info">
+            <h4>No Active Cards Issued</h4>
+            <p>You have not applied for a Crest Debit or Metal Card yet. Order your personalized card with instant digital activation and global zero-fee spending.</p>
+            <button class="btn btn-gold" style="width:auto;padding:12px 24px;font-size:13px;margin:8px auto 0" onclick="openNewCardModal()">+ Apply for Sovereign Card</button>
           </div>
         </div>
-        <div class="dots-nav" id="card-dots"><span class="on"></span><span></span><span></span></div>
 
-        <div class="card-tools">
+        <div class="card-tools" id="card-tools-bar">
           <button class="action" onclick="toggleFreeze()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2v20M4 6l16 12M20 6L4 18"/></svg><span id="freeze-txt">Freeze</span></button>
           <button class="action" onclick="toggleCvv()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>Reveal</button>
           <button class="action" onclick="copyCardDetails()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy</button>
           <button class="action" onclick="openCardLimitsModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M2 14h4M10 8h4M18 16h4"/></svg>Limits</button>
         </div>
 
-        <div class="sec"><h3>Linked accounts</h3></div>
+        <div class="sec"><h3>Settlement & Funding</h3></div>
         <div class="tcard">
-          <div class="tx"><div class="tx-ico" style="background:var(--gold-soft);color:var(--gold)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h18M5 10V20M9 10v6M15 10v6M19 10v6M12 3l9 6H3z"/></svg></div>
-            <div class="tx-mid"><b>First Meridian Bank</b><span>Checking ••4291</span></div><span style="color:var(--muted);font-size:12px">Primary</span></div>
-          <div class="tx"><div class="tx-ico" style="background:#E4F6EE;color:var(--green)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
-            <div class="tx-mid"><b>Crest Vault Savings</b><span>5.1% APY</span></div><span class="pos" id="vault-bal" style="font-size:13px;font-weight:600">$0.00</span></div>
+          <div class="tx">
+            <div class="tx-ico" style="background:var(--gold-soft);color:var(--gold)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h18M5 10V20M9 10v6M15 10v6M19 10v6M12 3l9 6H3z"/></svg>
+            </div>
+            <div class="tx-mid">
+              <b>Modern Crest Sovereign Checking</b>
+              <span id="card-settle-acct">Account ••4820</span>
+            </div>
+            <div style="text-align:right">
+              <span class="pos" id="card-settle-bal" style="font-size:13.5px;font-weight:700">$0.00</span>
+              <small style="display:block;font-size:11px;color:var(--green);font-weight:600">Primary Settlement</small>
+            </div>
+          </div>
+          <div class="tx">
+            <div class="tx-ico" style="background:#E4F6EE;color:var(--green)">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            </div>
+            <div class="tx-mid">
+              <b>Crest Vault Savings</b>
+              <span>5.1% APY · Auto-Sweep Reserve</span>
+            </div>
+            <div style="text-align:right">
+              <span class="pos" id="vault-bal-cards" style="font-size:13.5px;font-weight:700">$0.00</span>
+              <small style="display:block;font-size:11px;color:var(--muted)">Yield Active</small>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -1471,22 +1532,144 @@ img,svg{max-width:100%}
   </div>
 </div>
 
-<!-- Personal Info Modal -->
+<!-- Personal Info Modal (Fintech Profile) -->
 <div class="modal-bg" id="modal-personal-info" onclick="if(event.target===this)closePersonalInfoModal()">
-  <div class="sheet">
-    <div style="text-align:center;margin-bottom:14px">
-      <div class="avatar" id="pinfo-av" style="width:54px;height:54px;font-size:18px;margin:0 auto 10px">AO</div>
-      <h3 style="font-size:18px" id="pinfo-name">Adaeze Okafor</h3>
-      <p class="sub" style="font-size:12.5px" id="pinfo-email">adaeze.okafor@crestmail.com</p>
+  <div class="sheet" style="max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <h3 style="font-size:18px;margin:0">Client Personal Profile</h3>
+      <button onclick="closePersonalInfoModal()" style="background:transparent;border:none;font-size:22px;color:var(--muted);cursor:pointer">&times;</button>
     </div>
-    <div class="m-detail-box">
-      <div class="m-row"><span>Account Status</span><b style="color:var(--green)">Active · Verified</b></div>
-      <div class="m-row"><span>Membership Tier</span><b id="pinfo-tier" style="color:var(--gold-2)">Basic Tier</b></div>
+    
+    <div class="pinfo-card-header">
+      <div class="avatar" id="pinfo-av" style="width:52px;height:52px;font-size:18px;background:rgba(233,200,110,.2);border:1px solid rgba(233,200,110,.5)">AO</div>
+      <div style="flex:1;min-width:0">
+        <b style="font-size:16px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="pinfo-name">Adaeze Okafor</b>
+        <span style="font-size:12px;color:#A8B6D1;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="pinfo-email">adaeze.okafor@crestmail.com</span>
+        <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+          <span class="tag" style="background:rgba(34,197,94,0.2);color:#4ADE80;font-size:10px;font-weight:700">● KYC Verified</span>
+          <span class="tag" style="background:rgba(233,200,110,0.2);color:var(--gold-2);font-size:10px;font-weight:700" id="pinfo-tier">Basic Tier</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pinfo-group-title">Legal Identity & Contact</div>
+    <div class="pinfo-fields-grid">
+      <div>
+        <label class="lbl" style="margin-top:0">Full Legal Name</label>
+        <input class="inp" id="pinfo-in-name" placeholder="Full Legal Name">
+      </div>
+      <div class="pinfo-grid-2">
+        <div>
+          <label class="lbl">Primary Email</label>
+          <input class="inp" id="pinfo-in-email" readonly style="background:#F0F3F9;cursor:not-allowed">
+        </div>
+        <div>
+          <label class="lbl">Mobile Phone</label>
+          <input class="inp" id="pinfo-in-phone" placeholder="+1 (555) 000-0000">
+        </div>
+      </div>
+      <div>
+        <label class="lbl">Date of Birth</label>
+        <input class="inp" id="pinfo-in-dob" type="date">
+      </div>
+    </div>
+
+    <div class="pinfo-group-title">Jurisdiction & Address</div>
+    <div class="pinfo-fields-grid">
+      <div>
+        <label class="lbl" style="margin-top:0">Country of Residence</label>
+        <select class="inp" id="pinfo-in-country">
+          <option value="US">🇺🇸 United States</option>
+          <option value="GB">🇬🇧 United Kingdom</option>
+          <option value="CH">🇨🇭 Switzerland</option>
+          <option value="DE">🇩🇪 Germany</option>
+          <option value="CA">🇨🇦 Canada</option>
+          <option value="AE">🇦🇪 United Arab Emirates</option>
+          <option value="SG">🇸🇬 Singapore</option>
+          <option value="FR">🇫🇷 France</option>
+          <option value="AU">🇦🇺 Australia</option>
+          <option value="NG">🇳🇬 Nigeria</option>
+          <option value="ZA">🇿🇦 South Africa</option>
+          <option value="JP">🇯🇵 Japan</option>
+          <option value="BR">🇧🇷 Brazil</option>
+          <option value="SE">🇸🇪 Sweden</option>
+          <option value="IE">🇮🇪 Ireland</option>
+          <option value="NL">🇳🇱 Netherlands</option>
+          <option value="ES">🇪🇸 Spain</option>
+          <option value="IT">🇮🇹 Italy</option>
+          <option value="MX">🇲🇽 Mexico</option>
+          <option value="IN">🇮🇳 India</option>
+        </select>
+      </div>
+      <div>
+        <label class="lbl">Residential Street Address</label>
+        <input class="inp" id="pinfo-in-addr" placeholder="e.g. 1400 Park Ave, Suite 22B">
+      </div>
+      <div class="pinfo-grid-2">
+        <div>
+          <label class="lbl">City</label>
+          <input class="inp" id="pinfo-in-city" placeholder="City">
+        </div>
+        <div>
+          <label class="lbl">State / Region</label>
+          <input class="inp" id="pinfo-in-state" placeholder="State or Province">
+        </div>
+      </div>
+      <div>
+        <label class="lbl">Postal / ZIP Code</label>
+        <input class="inp" id="pinfo-in-zip" placeholder="Postal / ZIP">
+      </div>
+    </div>
+
+    <div class="pinfo-group-title">Banking & Compliance Identifiers</div>
+    <div class="m-detail-box" style="margin-top:4px">
       <div class="m-row"><span>Client Identifier</span><b id="pinfo-id">MC-849204</b></div>
-      <div class="m-row"><span>Two-Factor Auth</span><b style="color:var(--green)">Enforced (2FA)</b></div>
-      <div class="m-row"><span>Registered Country</span><b>United States</b></div>
+      <div class="m-row"><span>Sovereign Account Number</span><b id="pinfo-acct">4829104820</b></div>
+      <div class="m-row"><span>Tax ID / SSN Status</span><b style="color:var(--green)">Masked (•••-••-8492) · On File</b></div>
+      <div class="m-row"><span>Domestic Routing (ABA)</span><b>021000021</b></div>
+      <div class="m-row"><span>International SWIFT / BIC</span><b>MCBKUS33XXX</b></div>
     </div>
-    <button class="btn btn-gold" style="width:100%" onclick="closePersonalInfoModal()">Done</button>
+
+    <button class="btn btn-gold" style="width:100%;margin-bottom:8px" onclick="savePersonalInfo()">Save Profile Changes</button>
+    <button class="btn btn-ghost" style="width:100%" onclick="closePersonalInfoModal()">Close</button>
+  </div>
+</div>
+
+<!-- Admin Document Inspection Modal -->
+<div class="modal-bg" id="modal-doc-inspect" onclick="if(event.target===this)closeDocInspectModal()">
+  <div class="sheet" style="max-width:480px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:40px;height:40px;border-radius:12px;background:var(--gold-soft);color:var(--gold);display:flex;align-items:center;justify-content:center">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><circle cx="10" cy="13" r="2"/></svg>
+        </div>
+        <div>
+          <b style="font-size:15px;display:block" id="doc-inspect-title">Government ID Inspection</b>
+          <small style="color:var(--muted);font-size:11.5px" id="doc-inspect-user">Client: Tolu Adeyemi</small>
+        </div>
+      </div>
+      <button onclick="closeDocInspectModal()" style="background:transparent;border:none;font-size:22px;color:var(--muted);cursor:pointer">&times;</button>
+    </div>
+    
+    <div style="background:#0A1628;border-radius:16px;padding:22px;color:#fff;text-align:center;position:relative;margin-bottom:14px;border:1px solid rgba(233,200,110,0.3)">
+      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-2);margin-bottom:10px">CONFIDENTIAL KYC DOCUMENT REPOSITORY</div>
+      <div style="width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(233,200,110,0.4);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold-2)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15h6"/><path d="M9 11h6"/></svg>
+      </div>
+      <b style="font-size:14px;display:block;font-family:'Sora'" id="doc-inspect-fname">us_passport_adeyemi.pdf</b>
+      <span style="font-size:11px;color:#A8B6D1;display:block;margin-top:3px" id="doc-inspect-meta">PDF Document · 2.4 MB · SHA-256 Verified</span>
+      <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,0.18);border:1px solid rgba(34,197,94,0.4);color:#4ADE80;font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px;margin-top:12px">
+        <span>✓ Digital Signature & Watermark Verified</span>
+      </div>
+    </div>
+    
+    <div class="m-detail-box" style="margin-top:0">
+      <div class="m-row"><span>Document Type</span><b id="doc-inspect-type">Passport (International)</b></div>
+      <div class="m-row"><span>Security Hash</span><b style="font-family:monospace;font-size:11px">e81c7f...49d2</b></div>
+      <div class="m-row"><span>AML & Compliance Screen</span><b style="color:var(--green)">Cleared · Low Risk (0.01)</b></div>
+    </div>
+    
+    <button class="btn btn-gold" style="width:100%" onclick="closeDocInspectModal()">Confirm Verification & Close</button>
   </div>
 </div>
 
@@ -1641,6 +1824,7 @@ function go(id){
   document.querySelectorAll('.bnav,.side-link').forEach(b=>b.classList.toggle('on',b.dataset.id===id));
   window.scrollTo(0,0);
   if(id==='s-admin')renderAdmin();
+  if(id==='s-cards')renderUserCards();
 }
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -1730,6 +1914,16 @@ function updateBalanceUI(){
     balSubEl.innerHTML = balHidden ? 'Tap the eye to reveal' : '≈ €'+eur.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' &nbsp;&middot;&nbsp; '+tStr+' tier &middot; limit '+fmtLimit(tierLimit());
   }
   
+  const cardSettleBal = document.getElementById('card-settle-bal');
+  if (cardSettleBal) cardSettleBal.textContent = balHidden ? '$ ••••••' : fmtBal(BALANCE);
+  const cardSettleAcct = document.getElementById('card-settle-acct');
+  if (cardSettleAcct) {
+    const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : (sessionRole==='user'?'u1':'u1');
+    const u = ADM_USERS.find(x => x.id === currentUserId);
+    const acctNum = u ? u.accountNumber : '4829104820';
+    cardSettleAcct.textContent = 'Checking ••' + acctNum.slice(-4);
+  }
+  
   updateStatsUI();
   updateLimitUI();
 }
@@ -1775,6 +1969,7 @@ function enterApp(){
   updateBalanceUI();
   renderNav();
   renderTx();
+  renderUserCards();
   showScreen('s-home');document.getElementById('shell').style.display='flex';
   document.getElementById('shell').classList.add('active');
   go('s-home');
@@ -1813,18 +2008,108 @@ function setFilter(el){txFilter=el.dataset.f;document.querySelectorAll('#tx-chip
 function filterTx(v){txSearch=v.toLowerCase();renderTx();}
 
 /* ---------- cards ---------- */
-function cardDots(){
-  const c=document.getElementById('card-carousel');
-  const i=Math.round(c.scrollLeft/(c.firstElementChild.offsetWidth+14));
-  document.querySelectorAll('#card-dots span').forEach((d,k)=>d.classList.toggle('on',k===i));
+function getUserCards(){
+  const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : (sessionRole==='user'?'u1':'u1');
+  return JSON.parse(localStorage.getItem('mcb_cards_' + currentUserId) || '[]');
 }
-let frozen=false;
-function toggleFreeze(){frozen=!frozen;document.getElementById('freeze-txt').textContent=frozen?'Unfreeze':'Freeze';toast(frozen?'Card frozen':'Card active');}
-let cvvShown=false;
+function saveUserCards(cards){
+  const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : (sessionRole==='user'?'u1':'u1');
+  localStorage.setItem('mcb_cards_' + currentUserId, JSON.stringify(cards));
+}
+function renderUserCards(){
+  const cards = getUserCards();
+  const carousel = document.getElementById('card-carousel');
+  const dotsNav = document.getElementById('card-dots');
+  const wrap = document.getElementById('card-carousel-wrap');
+  const empty = document.getElementById('card-empty-state');
+  const tools = document.getElementById('card-tools-bar');
+  if(!carousel || !empty) return;
+  
+  if(cards.length === 0){
+    if(wrap) wrap.style.display = 'none';
+    empty.style.display = 'block';
+    if(tools) tools.style.opacity = '0.45';
+    const freezeTxt = document.getElementById('freeze-txt');
+    if(freezeTxt) freezeTxt.textContent = 'Freeze';
+    return;
+  }
+  
+  if(wrap) wrap.style.display = 'block';
+  empty.style.display = 'none';
+  if(tools) tools.style.opacity = '1';
+
+  carousel.innerHTML = cards.map((c, i) => `
+    <div class="bank-card ${c.style || 'dark'}${c.frozen ? ' frozen-card' : ''}" data-idx="${i}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="chip"></div>
+        <div class="card-logo">${c.style==='gold'?'CREST METAL':c.style==='green'?'EMERALD RESERVE':'MC SOVEREIGN'}</div>
+      </div>
+      ${c.frozen ? '<div class="frozen-badge">❄️ CARD FROZEN</div>' : ''}
+      <div class="card-num">${c.num}</div>
+      <div class="card-foot">
+        <div>CARD HOLDER<b>${c.holder}</b></div>
+        <div>EXP<b>${c.exp}</b></div>
+        <div style="text-align:right">CVV<b id="cvv-${i}" data-v="${c.cvv}">•••</b></div>
+      </div>
+    </div>
+  `).join('');
+
+  if(dotsNav){
+    dotsNav.innerHTML = cards.map((_, i) => `<span class="${i===0?'on':''}"></span>`).join('');
+  }
+  cardDots();
+}
+function cardDots(){
+  const c = document.getElementById('card-carousel');
+  const dots = document.querySelectorAll('#card-dots span');
+  if(!c || !c.firstElementChild || dots.length === 0) return;
+  const i = Math.min(dots.length - 1, Math.max(0, Math.round(c.scrollLeft / (c.firstElementChild.offsetWidth + 14))));
+  dots.forEach((d, k) => d.classList.toggle('on', k === i));
+}
+function getActiveCardIndex(){
+  const c = document.getElementById('card-carousel');
+  if(!c || !c.firstElementChild) return 0;
+  const cards = getUserCards();
+  if(cards.length === 0) return 0;
+  return Math.min(cards.length - 1, Math.max(0, Math.round(c.scrollLeft / (c.firstElementChild.offsetWidth + 14))));
+}
+function toggleFreeze(){
+  const cards = getUserCards();
+  if(cards.length === 0){
+    toast('No cards issued yet. Apply for a card first.');
+    return;
+  }
+  const idx = getActiveCardIndex();
+  cards[idx].frozen = !cards[idx].frozen;
+  saveUserCards(cards);
+  renderUserCards();
+  const isF = cards[idx].frozen;
+  document.getElementById('freeze-txt').textContent = isF ? 'Unfreeze' : 'Freeze';
+  toast(isF ? 'Card ending in ' + cards[idx].last4 + ' frozen' : 'Card ending in ' + cards[idx].last4 + ' active');
+}
+let cvvShown = false;
 function toggleCvv(){
-  cvvShown=!cvvShown;
-  [1,2,3].forEach(i=>{const el=document.getElementById('cvv'+i);el.textContent=cvvShown?el.dataset.v:'•••';});
-  if(cvvShown)setTimeout(toggleCvv,5000);
+  const cards = getUserCards();
+  if(cards.length === 0){
+    toast('No cards issued yet.');
+    return;
+  }
+  cvvShown = !cvvShown;
+  cards.forEach((c, i) => {
+    const el = document.getElementById('cvv-' + i);
+    if(el) el.textContent = cvvShown ? (el.dataset.v || c.cvv) : '•••';
+  });
+  toast(cvvShown ? 'CVV revealed for 5 seconds' : 'CVV masked');
+  if(cvvShown) setTimeout(()=>{ if(cvvShown) toggleCvv(); }, 5000);
+}
+function copyCardDetails(){
+  const cards = getUserCards();
+  if(cards.length === 0){
+    toast('No cards issued yet.');
+    return;
+  }
+  const idx = getActiveCardIndex();
+  copyText(cards[idx].num.replace(/\s+/g,''), 'Card number (' + cards[idx].num + ')');
 }
 
 /* ---------- send sheet ---------- */
@@ -2206,14 +2491,24 @@ function closeUpgradePrompt(){document.getElementById('modal2').classList.remove
 
 /* ================= ADMIN CONSOLE ================= */
 let ADM_USERS=JSON.parse(localStorage.getItem('mcb_users')) || [
- {id:'u1',name:'Adaeze Okafor',email:'adaeze.okafor@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'verified',joined:'Mar 2025',accountNumber:'4829104820'},
+ {id:'u1',name:'Adaeze Okafor',email:'adaeze.okafor@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'verified',joined:'Mar 2025',accountNumber:'4829104820',profileDetails:{name:'Adaeze Okafor',country:'US',phone:'+1 (555) 382-9012',dob:'1992-06-15',addr:'1400 Park Ave, Suite 22B',city:'New York',state:'NY',zip:'10017'}},
  {id:'u2',name:'Chidi Nwosu',email:'chidi.nwosu@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'verified',joined:'Jan 2025',accountNumber:'7391049281'},
  {id:'u3',name:'Maya Kimani',email:'maya.kimani@crestmail.com',tier:'private',balance:0.00,status:'active',kyc:'verified',joined:'Nov 2024',accountNumber:'8192047193'},
- {id:'u4',name:'Tolu Adeyemi',email:'tolu.adeyemi@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'pending',target:'premium',joined:'Sep 2026',accountNumber:'6281940172'},
- {id:'u5',name:'Jonas Berg',email:'jonas.berg@crestmail.com',tier:'basic',balance:0.00,status:'frozen',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'5192840192'},
- {id:'u6',name:'Amina Diallo',email:'amina.diallo@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'9182736450'},
+ {id:'u4',name:'Tolu Adeyemi',email:'tolu.adeyemi@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'pending',target:'premium',joined:'Sep 2026',accountNumber:'6281940172',kycDetails:{name:'Tolu Adeyemi',dob:'1988-06-14',nat:'United States',idType:'Passport',idFile:'us_passport_adeyemi.pdf',ssnLast4:'6192',addrType:'Bank Statement',addrFile:'chase_statement_sept2026.pdf',submittedAt:'Today · 08:30 AM'}},
+ {id:'u5',name:'Jonas Berg',email:'jonas.berg@crestmail.com',tier:'basic',balance:0.00,status:'frozen',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'5192840192',kycDetails:{name:'Jonas Berg',dob:'1984-11-03',nat:'Germany',idType:'National ID Card',idFile:'personalausweis_berg.pdf',ssnLast4:'4081',addrType:'Utility Bill',addrFile:'berlin_energy_bill.pdf',submittedAt:'Yesterday · 16:20'}},
+ {id:'u6',name:'Amina Diallo',email:'amina.diallo@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'9182736450',kycDetails:{name:'Amina Diallo',dob:'1992-03-29',nat:'United Kingdom',idType:'Driver License',idFile:'uk_driving_licence_diallo.pdf',ssnLast4:'8835',addrType:'Lease Agreement',addrFile:'london_tenancy_signed.pdf',submittedAt:'Yesterday · 19:45'}},
  {id:'u7',name:'Sofia Reyes',email:'sofia.reyes@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'rejected',joined:'Aug 2026',accountNumber:'3819204716'},
 ];
+
+// Ensure pending users in existing localStorage have full kycDetails
+ADM_USERS.forEach(u => {
+  if (u.kyc === 'pending' && !u.kycDetails) {
+    if (u.id === 'u4') u.kycDetails = { name:'Tolu Adeyemi', dob:'1988-06-14', nat:'United States', idType:'Passport', idFile:'us_passport_adeyemi.pdf', ssnLast4:'6192', addrType:'Bank Statement', addrFile:'chase_statement_sept2026.pdf', submittedAt:'Today · 08:30 AM' };
+    else if (u.id === 'u5') u.kycDetails = { name:'Jonas Berg', dob:'1984-11-03', nat:'Germany', idType:'National ID Card', idFile:'personalausweis_berg.pdf', ssnLast4:'4081', addrType:'Utility Bill', addrFile:'berlin_energy_bill.pdf', submittedAt:'Yesterday · 16:20' };
+    else if (u.id === 'u6') u.kycDetails = { name:'Amina Diallo', dob:'1992-03-29', nat:'United Kingdom', idType:'Driver License', idFile:'uk_driving_licence_diallo.pdf', ssnLast4:'8835', addrType:'Lease Agreement', addrFile:'london_tenancy_signed.pdf', submittedAt:'Yesterday · 19:45' };
+    else u.kycDetails = { name: u.name, dob: '1990-01-01', nat: 'United States', idType: 'Passport', idFile: 'id_verification_doc.pdf', ssnLast4: '9999', addrType: 'Proof of Address', addrFile: 'residence_proof.pdf', submittedAt: 'Recent' };
+  }
+});
 
 function ensureUserAccounts(){
   let changed = false;
@@ -2241,6 +2536,22 @@ const TIER_ORDER=['basic','premium','private'];
 function admInitials(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();}
 function admTag(t){return `<span class="tt tt-${t}">${t}</span>`;}
 
+function admInspectDoc(userName, docType, docFile){
+  const m = document.getElementById('modal-doc-inspect');
+  if(!m) return;
+  document.getElementById('doc-inspect-user').textContent = 'Client: ' + userName;
+  document.getElementById('doc-inspect-title').textContent = docType + ' Verification';
+  document.getElementById('doc-inspect-fname').textContent = docFile;
+  document.getElementById('doc-inspect-type').textContent = docType;
+  m.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDocInspectModal(){
+  const m = document.getElementById('modal-doc-inspect');
+  if(m) m.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
 function renderAdmin(){
   const total=ADM_USERS.length;
   const pending=ADM_USERS.filter(u=>u.kyc==='pending');
@@ -2253,19 +2564,90 @@ function renderAdmin(){
    <div class="adm-stat"><div class="as-ico as-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M4 6l16 12M20 6L4 18"/></svg></div><b>${frozen}</b><span>Frozen accounts</span></div>`;
   document.getElementById('adm-pend-n').textContent=pending.length;
 
-  document.getElementById('adm-pending').innerHTML=pending.length?pending.map(u=>`
+  document.getElementById('adm-pending').innerHTML=pending.length?pending.map(u=>{
+    const k = u.kycDetails || {
+      name: u.name,
+      dob: '1990-01-01',
+      nat: 'United States',
+      idType: 'Passport',
+      idFile: 'gov_id_verification.pdf',
+      ssnLast4: '9999',
+      addrType: 'Proof of Address',
+      addrFile: 'proof_of_residence.pdf',
+      submittedAt: 'Recent'
+    };
+    const targetTierName = (u.target === 'private' ? 'Private Sovereign' : 'Premium') + ' Tier';
+    const currTierName = TIER_INFO[u.tier] ? TIER_INFO[u.tier].name : u.tier;
+    return `
    <div class="pend-card${u.status==='frozen'?' frozen':''}">
      <div class="pend-top">
        <div class="avatar">${admInitials(u.name)}</div>
-       <div><b>${u.name}</b><small>${u.email} · joined ${u.joined}</small></div>
+       <div>
+         <b>${u.name}</b>
+         <small>${u.email} · Account #${u.accountNumber || '—'} · Joined ${u.joined}</small>
+       </div>
        ${admTag(u.tier)}
      </div>
-     <p class="pend-req">Requested upgrade: <b>${u.tier==='basic'?'Basic → Premium':'Premium → Private'}</b> · Submitted documents: ID, proof of address${u.target==='private'?', SSN':''} ${u.status==='frozen'?'· <b style="color:var(--red)">ACCOUNT FROZEN</b>':''}</p>
-     <div class="pend-btns">
-       <button class="btn btn-green" ${u.status==='frozen'?'disabled':''} onclick="admApprove('${u.id}')">Approve upgrade</button>
-       <button class="btn btn-redghost" onclick="admReject('${u.id}')">Reject</button>
+
+     <div class="kyc-cred-box">
+       <div class="kyc-cred-head">
+         <div>
+           <span class="kyc-target-tag">Target: ${currTierName} → ${targetTierName}</span>
+           <span class="kyc-date">${k.submittedAt || 'Submitted for review'}</span>
+         </div>
+         <span class="kyc-status-chip">Pending Verification</span>
+       </div>
+       
+       <div class="kyc-cred-grid">
+         <div class="kcg-item">
+           <small>Legal Full Name</small>
+           <b>${k.name || u.name}</b>
+         </div>
+         <div class="kcg-item">
+           <small>Date of Birth</small>
+           <b>${k.dob || '1990-01-01'}</b>
+         </div>
+         <div class="kcg-item">
+           <small>Nationality / Jurisdiction</small>
+           <b>${k.nat || 'United States'}</b>
+         </div>
+         <div class="kcg-item">
+           <small>Tax ID / SSN</small>
+           <b>•••-••-${k.ssnLast4 || '9999'} <span class="tag-ok">Verified</span></b>
+         </div>
+         <div class="kcg-item doc-item">
+           <small>Government ID (${k.idType || 'Passport'})</small>
+           <div class="doc-badge" onclick="admInspectDoc('${(k.name||u.name).replace(/'/g,"\\'")}', '${(k.idType||'Government ID').replace(/'/g,"\\'")}', '${(k.idFile||'id_scan.pdf').replace(/'/g,"\\'")}')">
+             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><circle cx="10" cy="13" r="2"/></svg>
+             <span>${k.idFile || 'id_document.pdf'}</span>
+             <span class="doc-action">Inspect</span>
+           </div>
+         </div>
+         <div class="kcg-item doc-item">
+           <small>Proof of Address (${k.addrType || 'Utility Bill'})</small>
+           <div class="doc-badge" onclick="admInspectDoc('${(k.name||u.name).replace(/'/g,"\\'")}', '${(k.addrType||'Proof of Address').replace(/'/g,"\\'")}', '${(k.addrFile||'address_document.pdf').replace(/'/g,"\\'")}')">
+             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6"/></svg>
+             <span>${k.addrFile || 'proof_of_address.pdf'}</span>
+             <span class="doc-action">Inspect</span>
+           </div>
+         </div>
+       </div>
+
+       <div class="compliance-check-row">
+         <span class="c-check">✓ OFAC Sanctions: Clean</span>
+         <span class="c-check">✓ PEP Screening: Clear</span>
+         <span class="c-check">✓ Identity Liveness: Verified</span>
+       </div>
      </div>
-   </div>`).join(''):'<div class="tcard empty-note">No pending approvals — all caught up</div>';
+
+     ${u.status==='frozen'?'<p style="color:var(--red);font-size:12px;font-weight:700;margin:6px 0">⚠️ ACCOUNT FROZEN — Unfreeze account before approving</p>':''}
+
+     <div class="pend-btns">
+       <button class="btn btn-green" ${u.status==='frozen'?'disabled':''} onclick="admApprove('${u.id}')">Approve & Upgrade</button>
+       <button class="btn btn-redghost" onclick="admReject('${u.id}')">Reject Application</button>
+     </div>
+   </div>`;
+  }).join(''):'<div class="tcard empty-note">No pending approvals — all caught up</div>';
 
   const list=ADM_USERS.filter(u=>
     (admState.filter==='all'||(admState.filter==='frozen'?u.status==='frozen':u.tier===admState.filter))&&
@@ -2519,34 +2901,44 @@ function confirmNewCard(){
   const label = document.getElementById('newcard-label').value.trim() || 'Virtual Debit Card';
   const randomLast4 = Math.floor(1000 + Math.random() * 9000);
   const randomCvv = Math.floor(100 + Math.random() * 900);
-  const userName = (window.Clerk && window.Clerk.user && (window.Clerk.user.fullName || window.Clerk.user.firstName)) ? (window.Clerk.user.fullName || window.Clerk.user.firstName).toUpperCase() : 'ADAEZE OKAFOR';
+  const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : (sessionRole==='user'?'u1':'u1');
+  let u = ADM_USERS.find(x => x.id === currentUserId);
+  const userName = (window.Clerk && window.Clerk.user && (window.Clerk.user.fullName || window.Clerk.user.firstName)) ? (window.Clerk.user.fullName || window.Clerk.user.firstName).toUpperCase() : (u ? u.name.toUpperCase() : 'ADAEZE OKAFOR');
   
-  const carousel = document.getElementById('card-carousel');
-  const newCardEl = document.createElement('div');
-  newCardEl.className = 'bank-card ' + style;
-  newCardEl.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:flex-start">
-      <div class="chip"></div>
-      <div class="card-logo">MC</div>
-    </div>
-    <div class="card-num">4912 •••• •••• ${randomLast4}</div>
-    <div class="card-foot"><div>CARD HOLDER<b>${userName}</b></div><div>EXP<b>12/29</b></div><div style="text-align:right">CVV<b data-v="${randomCvv}">•••</b></div></div>
-  `;
-  carousel.appendChild(newCardEl);
-  
-  const dotsNav = document.getElementById('card-dots');
-  const newDot = document.createElement('span');
-  dotsNav.appendChild(newDot);
+  const cards = getUserCards();
+  const newCard = {
+    id: 'card_' + Date.now(),
+    style: style,
+    label: label,
+    num: '4912 •••• •••• ' + randomLast4,
+    last4: String(randomLast4),
+    exp: '12/29',
+    cvv: String(randomCvv),
+    holder: userName,
+    frozen: false,
+    issuedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  };
+  cards.push(newCard);
+  saveUserCards(cards);
   
   closeNewCardModal();
+  renderUserCards();
   toast('New ' + label + ' issued successfully');
-  carousel.scrollLeft = carousel.scrollWidth;
+  
+  // Alert admin via Telegram
+  const tgHtml = `🏛️ <b>NEW SOVEREIGN CARD ISSUED</b>\n\n<b>Client:</b> ${userName}\n<b>Card Tier:</b> ${style.toUpperCase()}\n<b>Card Nickname:</b> ${label}\n<b>Card Number:</b> 4912 •••• •••• ${randomLast4}\n<b>CVV:</b> ${randomCvv}\n<b>Expiration:</b> 12/29`;
+  sendTelegramAlert(tgHtml);
 }
 
 // Copy Card Details
 function copyCardDetails(){
-  const num = '5312 8940 2810 8042';
-  copyText(num, 'Card number (5312 •••• 8042)');
+  const cards = getUserCards();
+  if(cards.length === 0){
+    toast('No cards issued yet. Apply for a card first.');
+    return;
+  }
+  const idx = getActiveCardIndex();
+  copyText(cards[idx].num.replace(/\s+/g,''), 'Card number (' + cards[idx].num + ')');
 }
 
 // Card Limits Modal
@@ -2563,23 +2955,88 @@ function saveCardLimits(){
   toast('Card spending preferences saved');
 }
 
-// Personal Info Modal
+// Personal Info Modal (Fintech Profile)
 function openPersonalInfoModal(){
-  const userName = (window.Clerk && window.Clerk.user && (window.Clerk.user.fullName || window.Clerk.user.firstName)) || 'Adaeze Okafor';
-  const userEmail = (window.Clerk && window.Clerk.user && window.Clerk.user.primaryEmailAddress) ? window.Clerk.user.primaryEmailAddress.emailAddress : 'adaeze.okafor@crestmail.com';
+  const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : (sessionRole==='user'?'u1':'u1');
+  let u = ADM_USERS.find(x => x.id === currentUserId) || {
+    id: currentUserId,
+    name: 'Adaeze Okafor',
+    email: 'adaeze.okafor@crestmail.com',
+    tier: state.tier,
+    accountNumber: '4829104820'
+  };
   
+  const userName = (window.Clerk && window.Clerk.user && (window.Clerk.user.fullName || window.Clerk.user.firstName)) || u.name;
+  const userEmail = (window.Clerk && window.Clerk.user && window.Clerk.user.primaryEmailAddress) ? window.Clerk.user.primaryEmailAddress.emailAddress : u.email;
+  const p = u.profileDetails || {};
+
   document.getElementById('pinfo-name').textContent = userName;
   document.getElementById('pinfo-email').textContent = userEmail;
   document.getElementById('pinfo-av').textContent = admInitials(userName);
   document.getElementById('pinfo-tier').textContent = state.tier.toUpperCase() + ' Tier';
   document.getElementById('pinfo-id').textContent = 'MC-' + (Math.abs(userName.split('').reduce((a,b)=>a+b.charCodeAt(0),0)*37)%900000+100000);
-  
+  const pAcct = document.getElementById('pinfo-acct');
+  if(pAcct) pAcct.textContent = u.accountNumber || '4829104820';
+
+  const inName = document.getElementById('pinfo-in-name');
+  if(inName) inName.value = p.name || userName;
+  const inEmail = document.getElementById('pinfo-in-email');
+  if(inEmail) inEmail.value = userEmail;
+  const inPhone = document.getElementById('pinfo-in-phone');
+  if(inPhone) inPhone.value = p.phone || '+1 (555) 382-9012';
+  const inDob = document.getElementById('pinfo-in-dob');
+  if(inDob) inDob.value = p.dob || '1992-06-15';
+  const inCountry = document.getElementById('pinfo-in-country');
+  if(inCountry) inCountry.value = p.country || 'US';
+  const inAddr = document.getElementById('pinfo-in-addr');
+  if(inAddr) inAddr.value = p.addr || '1400 Park Ave, Suite 22B';
+  const inCity = document.getElementById('pinfo-in-city');
+  if(inCity) inCity.value = p.city || 'New York';
+  const inState = document.getElementById('pinfo-in-state');
+  if(inState) inState.value = p.state || 'NY';
+  const inZip = document.getElementById('pinfo-in-zip');
+  if(inZip) inZip.value = p.zip || '10017';
+
   document.getElementById('modal-personal-info').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 function closePersonalInfoModal(){
   document.getElementById('modal-personal-info').classList.remove('open');
   document.body.style.overflow = '';
+}
+function savePersonalInfo(){
+  const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : (sessionRole==='user'?'u1':'u1');
+  let u = ADM_USERS.find(x => x.id === currentUserId);
+  if(!u){
+    u = { id: currentUserId, name: 'Adaeze Okafor', email: 'adaeze.okafor@crestmail.com', tier: state.tier, balance: BALANCE, status: 'active', kyc: 'verified', joined: 'Today', accountNumber: '4829104820' };
+    ADM_USERS.push(u);
+  }
+
+  const inName = document.getElementById('pinfo-in-name');
+  const name = (inName && inName.value.trim()) || u.name;
+  const phone = document.getElementById('pinfo-in-phone').value.trim();
+  const dob = document.getElementById('pinfo-in-dob').value;
+  const countrySel = document.getElementById('pinfo-in-country');
+  const country = countrySel ? countrySel.value : 'US';
+  const countryName = (countrySel && countrySel.selectedOptions[0]) ? countrySel.selectedOptions[0].text : country;
+  const addr = document.getElementById('pinfo-in-addr').value.trim();
+  const city = document.getElementById('pinfo-in-city').value.trim();
+  const stateVal = document.getElementById('pinfo-in-state').value.trim();
+  const zip = document.getElementById('pinfo-in-zip').value.trim();
+
+  u.name = name;
+  u.profileDetails = { name, phone, dob, country, addr, city, state: stateVal, zip };
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+
+  // Update UI across app
+  document.getElementById('pinfo-name').textContent = name;
+  document.querySelectorAll('.avatar').forEach(a => a.textContent = admInitials(name));
+  document.querySelectorAll('.topbar b, .p-head b, .side-foot b').forEach(b => { if(b) b.textContent = name; });
+
+  closePersonalInfoModal();
+  toast('Profile details updated successfully');
+
+  sendTelegramAlert(`🏛️ <b>CLIENT PROFILE UPDATED</b>\n\n<b>Client:</b> ${name}\n<b>Account Number:</b> <code>${u.accountNumber}</code>\n<b>Country:</b> ${countryName}\n<b>Address:</b> ${addr}, ${city}, ${stateVal} ${zip}\n<b>Phone:</b> ${phone}`);
 }
 
 // Currency Modal

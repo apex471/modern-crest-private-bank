@@ -201,6 +201,27 @@ a{text-decoration:none;color:inherit}
 .pend-req{font-size:12.5px;color:var(--muted);background:rgba(255,255,255,.03);padding:10px 12px;border-radius:10px;line-height:1.4}
 .pend-req b{color:#fff}
 .pend-actions{display:flex;gap:10px}
+
+/* KYC Credential Dossier (Admin) */
+.kyc-cred-box{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:14px;padding:14px;margin:4px 0}
+.kyc-cred-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:6px}
+.kyc-target-tag{font-family:'Sora';font-size:12px;font-weight:700;color:var(--gold-2);background:rgba(233,200,110,.12);padding:3px 8px;border-radius:6px;border:1px solid rgba(233,200,110,.25)}
+.kyc-date{font-size:11px;color:var(--muted)}
+.kyc-status-chip{font-size:10.5px;font-weight:700;color:#FBBF24;background:rgba(251,191,36,.12);padding:2px 8px;border-radius:99px}
+.kyc-cred-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 14px}
+@media(max-width:560px){.kyc-cred-grid{grid-template-columns:1fr}}
+.kcg-item small{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
+.kcg-item b{font-size:12.5px;color:#fff;display:flex;align-items:center;gap:6px;word-break:break-word}
+.tag-ok{font-size:9.5px;background:rgba(34,197,94,.18);color:#4ADE80;padding:1px 5px;border-radius:4px;font-weight:700}
+.kcg-item.doc-item{grid-column:1 / -1}
+.doc-badge{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:8px 11px;margin-top:4px;cursor:pointer;transition:.2s}
+.doc-badge:hover{border-color:var(--gold-2);background:rgba(233,200,110,.06)}
+.doc-badge svg{color:var(--gold-2);flex:none}
+.doc-badge span{flex:1;font-size:12px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-badge .doc-action{flex:none;font-size:11px;color:var(--gold-2);font-weight:700;background:rgba(233,200,110,.15);padding:3px 8px;border-radius:6px}
+.compliance-check-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding-top:8px;border-top:1px dashed var(--border)}
+.c-check{font-size:11px;font-weight:600;color:#4ADE80;background:rgba(34,197,94,.12);padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px}
+
 .btn{
   padding:10px 16px;
   border-radius:12px;
@@ -561,19 +582,76 @@ div[id*="netlify-badge"] {
   </div>
 </div>
 
+<!-- Modal: Document Inspection -->
+<div class="modal-bg" id="modal-doc-inspect" onclick="if(event.target===this)closeDocInspectModal()">
+  <div class="sheet" style="max-width:480px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(233,200,110,.12);color:var(--gold-2);display:flex;align-items:center;justify-content:center;border:1px solid rgba(233,200,110,.3)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><circle cx="10" cy="13" r="2"/></svg>
+        </div>
+        <div>
+          <b style="font-size:15px;display:block;color:#fff" id="doc-inspect-title">Government ID Inspection</b>
+          <small style="color:var(--muted);font-size:11.5px" id="doc-inspect-user">Client: Tolu Adeyemi</small>
+        </div>
+      </div>
+      <button onclick="closeDocInspectModal()" style="background:transparent;border:none;font-size:22px;color:var(--muted);cursor:pointer">&times;</button>
+    </div>
+    
+    <div style="background:var(--surface-2);border-radius:16px;padding:22px;color:#fff;text-align:center;position:relative;margin-bottom:14px;border:1px solid rgba(233,200,110,0.3)">
+      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-2);margin-bottom:10px">CONFIDENTIAL KYC DOCUMENT REPOSITORY</div>
+      <div style="width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(233,200,110,0.4);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--gold-2)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15h6"/><path d="M9 11h6"/></svg>
+      </div>
+      <b style="font-size:14px;display:block;font-family:'Sora'" id="doc-inspect-fname">us_passport_adeyemi.pdf</b>
+      <span style="font-size:11px;color:var(--muted);display:block;margin-top:3px" id="doc-inspect-meta">PDF Document · 2.4 MB · SHA-256 Verified</span>
+      <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(34,197,94,0.18);border:1px solid rgba(34,197,94,0.4);color:#4ADE80;font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px;margin-top:12px">
+        <span>✓ Digital Signature & Security Watermark Intact</span>
+      </div>
+    </div>
+    
+    <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:12.5px;border-bottom:1px solid var(--border)">
+        <span style="color:var(--muted)">Document Format</span>
+        <b style="color:#fff" id="doc-inspect-type">Passport (International)</b>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:12.5px;border-bottom:1px solid var(--border)">
+        <span style="color:var(--muted)">Verification Checksum</span>
+        <b style="color:#fff;font-family:monospace;font-size:11px">a9f82c...7e41</b>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:12.5px">
+        <span style="color:var(--muted)">Compliance Screening</span>
+        <b style="color:var(--green)">Passed · High Fidelity</b>
+      </div>
+    </div>
+    
+    <button class="btn btn-gold" style="width:100%" onclick="closeDocInspectModal()">Confirm Verification & Close</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 /* ================= STATE & STORAGE ================= */
 let ADM_USERS = JSON.parse(localStorage.getItem('mcb_users')) || [
- {id:'u1',name:'Adaeze Okafor',email:'adaeze.okafor@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'verified',joined:'Mar 2025',accountNumber:'4829104820'},
+ {id:'u1',name:'Adaeze Okafor',email:'adaeze.okafor@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'verified',joined:'Mar 2025',accountNumber:'4829104820',profileDetails:{name:'Adaeze Okafor',country:'US',phone:'+1 (555) 382-9012',dob:'1992-06-15',addr:'1400 Park Ave, Suite 22B',city:'New York',state:'NY',zip:'10017'}},
  {id:'u2',name:'Chidi Nwosu',email:'chidi.nwosu@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'verified',joined:'Jan 2025',accountNumber:'7391049281'},
  {id:'u3',name:'Maya Kimani',email:'maya.kimani@crestmail.com',tier:'private',balance:0.00,status:'active',kyc:'verified',joined:'Nov 2024',accountNumber:'8192047193'},
- {id:'u4',name:'Tolu Adeyemi',email:'tolu.adeyemi@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'pending',target:'premium',joined:'Sep 2026',accountNumber:'6281940172'},
- {id:'u5',name:'Jonas Berg',email:'jonas.berg@crestmail.com',tier:'basic',balance:0.00,status:'frozen',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'5192840192'},
- {id:'u6',name:'Amina Diallo',email:'amina.diallo@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'9182736450'},
+ {id:'u4',name:'Tolu Adeyemi',email:'tolu.adeyemi@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'pending',target:'premium',joined:'Sep 2026',accountNumber:'6281940172',kycDetails:{name:'Tolu Adeyemi',dob:'1988-06-14',nat:'United States',idType:'Passport',idFile:'us_passport_adeyemi.pdf',ssnLast4:'6192',addrType:'Bank Statement',addrFile:'chase_statement_sept2026.pdf',submittedAt:'Today · 08:30 AM'}},
+ {id:'u5',name:'Jonas Berg',email:'jonas.berg@crestmail.com',tier:'basic',balance:0.00,status:'frozen',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'5192840192',kycDetails:{name:'Jonas Berg',dob:'1984-11-03',nat:'Germany',idType:'National ID Card',idFile:'personalausweis_berg.pdf',ssnLast4:'4081',addrType:'Utility Bill',addrFile:'berlin_energy_bill.pdf',submittedAt:'Yesterday · 16:20'}},
+ {id:'u6',name:'Amina Diallo',email:'amina.diallo@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'9182736450',kycDetails:{name:'Amina Diallo',dob:'1992-03-29',nat:'United Kingdom',idType:'Driver License',idFile:'uk_driving_licence_diallo.pdf',ssnLast4:'8835',addrType:'Lease Agreement',addrFile:'london_tenancy_signed.pdf',submittedAt:'Yesterday · 19:45'}},
  {id:'u7',name:'Sofia Reyes',email:'sofia.reyes@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'rejected',joined:'Aug 2026',accountNumber:'3819204716'},
 ];
+
+// Ensure pending users in existing localStorage have rich kycDetails
+ADM_USERS.forEach(u => {
+  if (u.kyc === 'pending' && !u.kycDetails) {
+    if (u.id === 'u4') u.kycDetails = { name:'Tolu Adeyemi', dob:'1988-06-14', nat:'United States', idType:'Passport', idFile:'us_passport_adeyemi.pdf', ssnLast4:'6192', addrType:'Bank Statement', addrFile:'chase_statement_sept2026.pdf', submittedAt:'Today · 08:30 AM' };
+    else if (u.id === 'u5') u.kycDetails = { name:'Jonas Berg', dob:'1984-11-03', nat:'Germany', idType:'National ID Card', idFile:'personalausweis_berg.pdf', ssnLast4:'4081', addrType:'Utility Bill', addrFile:'berlin_energy_bill.pdf', submittedAt:'Yesterday · 16:20' };
+    else if (u.id === 'u6') u.kycDetails = { name:'Amina Diallo', dob:'1992-03-29', nat:'United Kingdom', idType:'Driver License', idFile:'uk_driving_licence_diallo.pdf', ssnLast4:'8835', addrType:'Lease Agreement', addrFile:'london_tenancy_signed.pdf', submittedAt:'Yesterday · 19:45' };
+    else u.kycDetails = { name: u.name, dob: '1990-01-01', nat: 'United States', idType: 'Passport', idFile: 'id_verification_doc.pdf', ssnLast4: '9999', addrType: 'Proof of Address', addrFile: 'residence_proof.pdf', submittedAt: 'Recent' };
+  }
+});
 
 function ensureUserAccounts(){
   let changed = false;
@@ -638,6 +716,22 @@ function logoutAdmin(){
 }
 
 /* ================= ADMIN ACTIONS ================= */
+function admInspectDoc(userName, docType, docFile){
+  const m = document.getElementById('modal-doc-inspect');
+  if(!m) return;
+  document.getElementById('doc-inspect-user').textContent = 'Client: ' + userName;
+  document.getElementById('doc-inspect-title').textContent = docType + ' Verification';
+  document.getElementById('doc-inspect-fname').textContent = docFile;
+  document.getElementById('doc-inspect-type').textContent = docType;
+  m.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDocInspectModal(){
+  const m = document.getElementById('modal-doc-inspect');
+  if(m) m.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
 function renderAdmin(){
   // Ensure we have fresh storage data
   const storedUsers = localStorage.getItem('mcb_users');
@@ -655,19 +749,90 @@ function renderAdmin(){
     <div class="adm-stat"><div class="as-ico as-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M4 6l16 12M20 6L4 18"/></svg></div><b>${frozen}</b><span>Frozen accounts</span></div>`;
 
   document.getElementById('adm-pend-n').textContent = pending.length;
-  document.getElementById('adm-pending').innerHTML = pending.length ? pending.map(u=>`
+  document.getElementById('adm-pending').innerHTML = pending.length ? pending.map(u=>{
+    const k = u.kycDetails || {
+      name: u.name,
+      dob: '1990-01-01',
+      nat: 'United States',
+      idType: 'Passport',
+      idFile: 'gov_id_verification.pdf',
+      ssnLast4: '9999',
+      addrType: 'Proof of Address',
+      addrFile: 'proof_of_residence.pdf',
+      submittedAt: 'Recent'
+    };
+    const targetTierName = (u.target === 'private' ? 'Private Sovereign' : 'Premium') + ' Tier';
+    const currTierName = TIER_INFO[u.tier] ? TIER_INFO[u.tier].name : u.tier;
+    return `
     <div class="pend-card${u.status==='frozen'?' frozen':''}">
       <div class="pend-user">
         <div class="avatar">${admInitials(u.name)}</div>
-        <div style="flex:1"><b>${u.name}</b><small>${u.email} · joined ${u.joined||'Recently'}</small></div>
+        <div style="flex:1">
+          <b>${u.name}</b>
+          <small>${u.email} · Acct #${u.accountNumber || '—'} · Joined ${u.joined||'Recently'}</small>
+        </div>
         ${admTag(u.tier)}
       </div>
-      <p class="pend-req">Requested upgrade: <b>${u.tier==='basic'?'Basic → Premium':'Premium → Private'}</b> · Submitted ID & documents ${u.status==='frozen'?'· <b style="color:var(--red)">ACCOUNT FROZEN</b>':''}</p>
-      <div class="pend-actions">
-        <button class="btn btn-green" ${u.status==='frozen'?'disabled':''} onclick="admApprove('${u.id}')">Approve</button>
-        <button class="btn btn-redghost" onclick="admReject('${u.id}')">Reject</button>
+
+      <div class="kyc-cred-box">
+        <div class="kyc-cred-head">
+          <div>
+            <span class="kyc-target-tag">Target: ${currTierName} → ${targetTierName}</span>
+            <span class="kyc-date">${k.submittedAt || 'Submitted for review'}</span>
+          </div>
+          <span class="kyc-status-chip">Pending Verification</span>
+        </div>
+        
+        <div class="kyc-cred-grid">
+          <div class="kcg-item">
+            <small>Legal Full Name</small>
+            <b>${k.name || u.name}</b>
+          </div>
+          <div class="kcg-item">
+            <small>Date of Birth</small>
+            <b>${k.dob || '1990-01-01'}</b>
+          </div>
+          <div class="kcg-item">
+            <small>Nationality / Jurisdiction</small>
+            <b>${k.nat || 'United States'}</b>
+          </div>
+          <div class="kcg-item">
+            <small>Tax ID / SSN</small>
+            <b>•••-••-${k.ssnLast4 || '9999'} <span class="tag-ok">Verified</span></b>
+          </div>
+          <div class="kcg-item doc-item">
+            <small>Government ID (${k.idType || 'Passport'})</small>
+            <div class="doc-badge" onclick="admInspectDoc('${(k.name||u.name).replace(/'/g,"\\'")}', '${(k.idType||'Government ID').replace(/'/g,"\\'")}', '${(k.idFile||'id_scan.pdf').replace(/'/g,"\\'")}')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><circle cx="10" cy="13" r="2"/></svg>
+              <span>${k.idFile || 'id_document.pdf'}</span>
+              <span class="doc-action">Inspect</span>
+            </div>
+          </div>
+          <div class="kcg-item doc-item">
+            <small>Proof of Address (${k.addrType || 'Utility Bill'})</small>
+            <div class="doc-badge" onclick="admInspectDoc('${(k.name||u.name).replace(/'/g,"\\'")}', '${(k.addrType||'Proof of Address').replace(/'/g,"\\'")}', '${(k.addrFile||'address_document.pdf').replace(/'/g,"\\'")}')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15h6"/></svg>
+              <span>${k.addrFile || 'proof_of_address.pdf'}</span>
+              <span class="doc-action">Inspect</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="compliance-check-row">
+          <span class="c-check">✓ OFAC Sanctions: Clean</span>
+          <span class="c-check">✓ PEP Screening: Clear</span>
+          <span class="c-check">✓ Identity Liveness: Verified</span>
+        </div>
       </div>
-    </div>`).join('') : '<p style="color:var(--muted);font-size:13.5px;padding:12px 0">No pending tier approval requests.</p>';
+
+      ${u.status==='frozen'?'<p style="color:var(--red);font-size:12px;font-weight:700;margin:4px 0">⚠️ ACCOUNT FROZEN — Unfreeze account prior to tier upgrade</p>':''}
+
+      <div class="pend-actions">
+        <button class="btn btn-green" ${u.status==='frozen'?'disabled':''} onclick="admApprove('${u.id}')">Approve & Upgrade</button>
+        <button class="btn btn-redghost" onclick="admReject('${u.id}')">Reject Application</button>
+      </div>
+    </div>`;
+  }).join('') : '<p style="color:var(--muted);font-size:13.5px;padding:12px 0">No pending tier approval requests.</p>';
 
   const list = ADM_USERS.filter(u=>
     (admState.filter==='all' || u.tier===admState.filter || (admState.filter==='frozen'&&u.status==='frozen')) &&
