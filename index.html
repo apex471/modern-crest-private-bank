@@ -156,11 +156,72 @@ div[id*="netlify-badge"] {
 .eye{color:var(--gold-2);cursor:pointer}
 
 /* ---------- Quick actions ---------- */
-.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0 6px}
-.action{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--navy-800);transition:.2s}
-.action:active{transform:scale(.95)}
-.action svg{width:22px;height:22px;stroke:var(--gold)}
-@media(hover:hover){.action:hover{box-shadow:var(--shadow);border-color:transparent}}
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0 8px}
+.action{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:12px 4px 10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  font-weight:600;
+  color:var(--navy-800);
+  transition:all .2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow:0 2px 8px rgba(10,22,40,.03);
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+}
+.action-ico{
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  background:rgba(15,34,66,0.04);
+  border:1px solid rgba(15,34,66,0.07);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:all .2s ease;
+}
+.action-ico svg{
+  width:20px;
+  height:20px;
+  stroke:var(--gold);
+}
+.action:hover .action-ico{
+  transform:translateY(-2px);
+  background:var(--gold-soft);
+  border-color:rgba(214,169,60,.35);
+}
+.action:active{
+  transform:scale(.95);
+}
+.action.action-send{
+  background:linear-gradient(180deg, #FFFFFF 0%, #FAF6EE 100%);
+  border-color:rgba(214,169,60,.32);
+}
+.action.action-send .action-ico{
+  background:var(--grad-gold);
+  border-color:transparent;
+  box-shadow:0 4px 12px rgba(214,169,60,.28);
+}
+.action.action-send .action-ico svg{
+  stroke:#231A05;
+  stroke-width:2.4;
+}
+.action.action-send span{
+  color:var(--navy-900);
+  font-weight:700;
+}
+@media(hover:hover){
+  .action:hover{
+    box-shadow:0 8px 20px rgba(10,22,40,.08);
+    border-color:rgba(214,169,60,.35);
+  }
+}
 
 /* ---------- Section titles ---------- */
 .sec{display:flex;align-items:center;justify-content:space-between;margin:22px 0 12px}
@@ -318,12 +379,76 @@ div[id*="netlify-badge"] {
 @media(min-width:1200px){.sidebar{width:268px}.page{max-width:1100px}}
 
 /* ---------- Bottom bar ---------- */
-.bottombar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 6px calc(10px + env(safe-area-inset-bottom));z-index:50}
-.bnav{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--muted);padding:6px 12px;border-radius:12px;cursor:pointer}
-.bnav svg{width:22px;height:22px;stroke:currentColor}
+.bottombar{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  background:rgba(255,255,255,0.96);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-top:1px solid rgba(10,22,40,0.08);
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  padding:6px 6px calc(8px + env(safe-area-inset-bottom));
+  z-index:50;
+  box-shadow:0 -4px 20px rgba(10,22,40,0.04);
+}
+.bnav{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  font-size:10px;
+  font-weight:600;
+  color:var(--muted);
+  padding:6px 12px;
+  border-radius:12px;
+  cursor:pointer;
+  transition:all .18s ease;
+  background:transparent;
+  border:none;
+}
+.bnav svg{width:22px;height:22px;stroke:currentColor;transition:transform .18s}
 .bnav.on{color:var(--gold)}
-.bnav.center{background:var(--navy-900);color:#fff!important;border-radius:16px;padding:10px 14px;margin-top:-22px;box-shadow:0 8px 20px rgba(10,22,40,.3)}
-.bnav.center svg{stroke:var(--gold-2)}
+.bnav.on svg{stroke:var(--gold)}
+.bnav.center{
+  position:relative;
+  background:linear-gradient(135deg,#1E3A6D 0%,#0A1628 100%);
+  color:#fff!important;
+  border-radius:50%;
+  width:52px;
+  height:52px;
+  padding:0;
+  margin-top:-24px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  border:3px solid #fff;
+  box-shadow:0 8px 22px rgba(10,22,40,.3),0 0 0 1px rgba(233,200,110,.25);
+  transition:all .2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.bnav.center:active{
+  transform:scale(.92);
+}
+.bnav.center svg{
+  stroke:var(--gold-2);
+  width:20px;
+  height:20px;
+  stroke-width:2.4;
+  margin-bottom:1px;
+}
+.bnav.center span{
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.4px;
+  text-transform:uppercase;
+  color:var(--gold-2);
+  line-height:1;
+}
 @media(min-width:900px){.bottombar{display:none}}
 
 /* misc */
@@ -578,17 +703,21 @@ img,svg{max-width:100%}
 .opt-card span{font-size:11px;color:var(--muted)}
 /* ============ LUXURY FINTECH LANDING PAGE ============ */
 .landing-wrap{min-height:100vh;background:radial-gradient(ellipse 90% 60% at 50% -10%,rgba(233,200,110,0.14),transparent 70%),#070B12;color:#fff;overflow-x:hidden}
-.l-nav{position:sticky;top:0;z-index:100;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);background:rgba(7,11,18,0.85);border-bottom:1px solid rgba(255,255,255,0.08);padding:14px 24px}
-.l-nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
-.l-brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:18px;letter-spacing:-.3px}
+.l-nav{position:sticky;top:0;z-index:100;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);background:rgba(7,11,18,0.92);border-bottom:1px solid rgba(255,255,255,0.08);padding:14px 24px}
+.l-nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.l-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;font-family:'Sora',sans-serif;font-weight:700;font-size:17px;letter-spacing:-.3px;flex-shrink:0;min-width:0}
+.l-brand .crest{width:32px;height:32px;flex-shrink:0}
 .l-brand span{color:var(--gold-2)}
+.l-brand small{font-size:10px;display:block;color:var(--gold-2);letter-spacing:1px;text-transform:uppercase}
 .l-nav-links{display:flex;gap:24px;align-items:center}
 .l-nav-links a{color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:500;transition:.15s}
 .l-nav-links a:hover{color:var(--gold-2)}
-.l-nav-actions{display:flex;gap:10px;align-items:center}
+.l-nav-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.l-nav-actions .l-btn-secondary{padding:8px 16px;font-size:13px;border-radius:10px;white-space:nowrap}
+.l-nav-actions .l-btn-primary{padding:8px 18px;font-size:13px;border-radius:10px;white-space:nowrap}
 .l-hero{max-width:1140px;margin:0 auto;padding:80px 20px 60px;text-align:center}
 .l-badge{display:inline-flex;align-items:center;gap:8px;padding:7px 16px;border-radius:99px;background:rgba(233,200,110,0.08);border:1px solid rgba(233,200,110,0.25);color:var(--gold-2);font-size:12.5px;font-weight:600;margin-bottom:28px}
-.l-title{font-family:'Sora',sans-serif;font-size:clamp(32px, 5.5vw, 58px);font-weight:700;line-height:1.15;letter-spacing:-1.5px;margin-bottom:22px}
+.l-title{font-family:'Sora',sans-serif;font-size:clamp(30px, 5.5vw, 58px);font-weight:700;line-height:1.15;letter-spacing:-1.5px;margin-bottom:22px}
 .l-title span{background:linear-gradient(135deg,#F7E5B5 0%,#D4AF37 50%,#AA7C11 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .l-sub{font-size:clamp(15px, 2vw, 18px);line-height:1.65;color:var(--muted);max-width:780px;margin:0 auto 36px}
 .l-cta-row{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:56px}
@@ -615,10 +744,28 @@ img,svg{max-width:100%}
 .l-step h4{font-size:16px;font-weight:700;margin-bottom:6px;font-family:'Sora',sans-serif}
 .l-step p{font-size:13px;line-height:1.5;color:var(--muted)}
 .l-footer{border-top:1px solid rgba(255,255,255,0.08);padding:50px 20px 40px;text-align:center;color:var(--muted);font-size:12.5px;max-width:1140px;margin:0 auto}
+
 @media(max-width:800px){
+  .l-nav{padding:10px 14px}
+  .l-nav-inner{gap:8px;width:100%}
   .l-nav-links{display:none}
-  .l-hero{padding:50px 16px 40px}
-  .l-mockup-wrap{padding:20px}
+  .l-brand{font-size:15px;gap:8px}
+  .l-brand .crest{width:28px;height:28px}
+  .l-brand small{display:none}
+  .l-nav-actions{gap:6px}
+  .l-nav-actions .l-btn-secondary{padding:7px 11px;font-size:12px;border-radius:9px}
+  .l-nav-actions .l-btn-primary{padding:7px 13px;font-size:12px;border-radius:9px;font-weight:700}
+  .l-hero{padding:46px 14px 36px}
+  .l-mockup-wrap{padding:18px}
+}
+
+@media(max-width:380px){
+  .l-nav{padding:8px 10px}
+  .l-brand{font-size:13.5px;gap:6px}
+  .l-brand .crest{width:24px;height:24px}
+  .l-nav-actions{gap:4px}
+  .l-nav-actions .l-btn-secondary{padding:6px 8px;font-size:11px}
+  .l-nav-actions .l-btn-primary{padding:6px 10px;font-size:11px}
 }
 </style>
 <script>
@@ -909,11 +1056,23 @@ img,svg{max-width:100%}
       </div>
 
       <div class="actions">
-            <button class="action" onclick="openSheet('send')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>Send</button>
-            <button class="action" onclick="openReceiveModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>Receive</button>
-            <button class="action" onclick="openPayBillsModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>Pay bills</button>
-            <button class="action" onclick="openVaultModal()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Vaults</button>
-          </div>
+        <button class="action action-send" onclick="openSheet('send')">
+          <div class="action-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div>
+          <span>Send</span>
+        </button>
+        <button class="action" onclick="openReceiveModal()">
+          <div class="action-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg></div>
+          <span>Receive</span>
+        </button>
+        <button class="action" onclick="openPayBillsModal()">
+          <div class="action-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg></div>
+          <span>Pay bills</span>
+        </button>
+        <button class="action" onclick="openVaultModal()">
+          <div class="action-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <span>Vaults</span>
+        </button>
+      </div>
         </div>
 
         <div class="col right">
@@ -1814,9 +1973,9 @@ let sessionRole = null;
 function renderNav(){
   let navItems = NAV.filter(n => n.id !== 's-admin');
   document.getElementById('bottombar').innerHTML=navItems.filter(n=>!n.desk).map(n=>
-    `<button class="bnav${n.center?' center':''}" data-id="${n.id}" onclick="navTap('${n.id}')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2">${n.ic}</svg>${n.label}</button>`).join('');
+    `<button class="bnav${n.center?' center':''}" data-id="${n.id}" onclick="navTap('${n.id}')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2">${n.ic}</svg><span>${n.label}</span></button>`).join('');
   document.getElementById('side-nav').innerHTML=navItems.map(n=>
-    `<a class="side-link" data-id="${n.id}" onclick="navTap('${n.id}')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2">${n.ic}</svg>${n.label}</a>`).join('');
+    `<a class="side-link" data-id="${n.id}" onclick="navTap('${n.id}')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2">${n.ic}</svg><span>${n.label}</span></a>`).join('');
 }
 function navTap(id){const n=NAV.find(x=>x.id===id);if(n&&n.fn){n.fn();return;}go(id);}
 function go(id){

@@ -6,78 +6,122 @@
       "email": "adaeze.okafor@crestmail.com",
       "accountNumber": "4829104820",
       "tier": "basic",
-      "balance": 0.0,
+      "balance": 0,
       "status": "active",
       "kyc": "verified",
-      "joined": "12 Jan 2024"
+      "joined": "Mar 2025",
+      "profileDetails": {
+        "name": "Adaeze Okafor",
+        "country": "US",
+        "phone": "+1 (555) 382-9012",
+        "dob": "1992-06-15",
+        "addr": "1400 Park Ave, Suite 22B",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10017"
+      }
     },
     {
       "id": "u2",
       "name": "Chidi Nwosu",
-      "email": "chidi.nwosu@apexcap.ng",
-      "accountNumber": "6281940172",
-      "tier": "basic",
-      "balance": 0.0,
+      "email": "chidi.nwosu@crestmail.com",
+      "accountNumber": "7391049281",
+      "tier": "premium",
+      "balance": 0,
       "status": "active",
       "kyc": "verified",
-      "joined": "03 Feb 2024"
+      "joined": "Jan 2025"
     },
     {
       "id": "u3",
       "name": "Maya Kimani",
-      "email": "maya.kimani@safari.ke",
-      "accountNumber": "7192840183",
-      "tier": "premium",
-      "balance": 0.0,
+      "email": "maya.kimani@crestmail.com",
+      "accountNumber": "8192047193",
+      "tier": "private",
+      "balance": 0,
       "status": "active",
       "kyc": "verified",
-      "joined": "18 Feb 2024"
+      "joined": "Nov 2024"
     },
     {
       "id": "u4",
       "name": "Tolu Adeyemi",
-      "email": "tolu.a@horizonholdings.com",
+      "email": "tolu.adeyemi@crestmail.com",
       "tier": "basic",
-      "balance": 0.0,
+      "balance": 0,
       "status": "active",
       "kyc": "pending",
       "target": "premium",
-      "joined": "02 Mar 2024",
-      "accountNumber": "8392019482"
+      "joined": "Sep 2026",
+      "accountNumber": "6281940172",
+      "kycDetails": {
+        "name": "Tolu Adeyemi",
+        "dob": "1988-06-14",
+        "nat": "United States",
+        "idType": "Passport",
+        "idFile": "us_passport_adeyemi.pdf",
+        "ssnLast4": "6192",
+        "addrType": "Bank Statement",
+        "addrFile": "chase_statement_sept2026.pdf",
+        "submittedAt": "Today · 08:30 AM"
+      }
     },
     {
       "id": "u5",
       "name": "Jonas Berg",
-      "email": "j.berg@nordicfunds.se",
-      "tier": "premium",
-      "balance": 0.0,
-      "status": "active",
+      "email": "jonas.berg@crestmail.com",
+      "tier": "basic",
+      "balance": 0,
+      "status": "frozen",
       "kyc": "pending",
       "target": "private",
-      "joined": "15 Mar 2024",
-      "accountNumber": "9028173645"
+      "joined": "Oct 2026",
+      "accountNumber": "5192840192",
+      "kycDetails": {
+        "name": "Jonas Berg",
+        "dob": "1984-11-03",
+        "nat": "Germany",
+        "idType": "National ID Card",
+        "idFile": "personalausweis_berg.pdf",
+        "ssnLast4": "4081",
+        "addrType": "Utility Bill",
+        "addrFile": "berlin_energy_bill.pdf",
+        "submittedAt": "Yesterday · 16:20"
+      }
     },
     {
       "id": "u6",
       "name": "Amina Diallo",
-      "email": "a.diallo@sahelvent.sn",
-      "tier": "basic",
-      "balance": 0.0,
-      "status": "frozen",
-      "kyc": "verified",
-      "joined": "29 Mar 2024",
-      "accountNumber": "5192837461"
+      "email": "amina.diallo@crestmail.com",
+      "tier": "premium",
+      "balance": 0,
+      "status": "active",
+      "kyc": "pending",
+      "joined": "Oct 2026",
+      "accountNumber": "9182736450",
+      "target": "private",
+      "kycDetails": {
+        "name": "Amina Diallo",
+        "dob": "1992-03-29",
+        "nat": "United Kingdom",
+        "idType": "Driver License",
+        "idFile": "uk_driving_licence_diallo.pdf",
+        "ssnLast4": "8835",
+        "addrType": "Lease Agreement",
+        "addrFile": "london_tenancy_signed.pdf",
+        "submittedAt": "Yesterday · 19:45"
+      }
     },
     {
       "id": "u7",
       "name": "Sofia Reyes",
-      "email": "sofia.reyes@andalus.es",
-      "tier": "private",
-      "balance": 0.0,
+      "email": "sofia.reyes@crestmail.com",
+      "tier": "basic",
+      "balance": 0,
       "status": "active",
-      "kyc": "verified",
-      "joined": "10 Apr 2024",
-      "accountNumber": "3910284756"
+      "kyc": "rejected",
+      "joined": "Aug 2026",
+      "accountNumber": "3819204716"
     }
   ],
   "txs": [],
@@ -85,6 +129,6 @@
     8828015300,
     5038100074
   ],
-  "last_update_id": 834002085,
+  "last_update_id": 834002087,
   "deleted_user_ids": []
 }
