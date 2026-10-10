@@ -561,6 +561,7 @@ div[id*="netlify-badge"] {
         <button class="btn btn-ghost" onclick="admFund('add')" style="color:var(--green);border-color:rgba(39,174,96,.3)">＋ Add funds (Deposit)</button>
         <button class="btn btn-ghost" onclick="admFund('deduct')" style="color:var(--red);border-color:rgba(235,87,87,.3)">－ Deduct funds (Debit)</button>
         <button class="btn btn-dark" id="am-freeze" onclick="admFreeze()">Freeze account</button>
+        <button class="btn btn-ghost" id="am-delete" onclick="admDeleteUser()" style="color:#ff5252;border-color:rgba(255,82,82,0.45);background:rgba(255,82,82,0.06);margin-top:4px;font-weight:600">🗑️ Delete Account Permanently</button>
         <button class="btn btn-ghost" onclick="admClose()" style="margin-top:4px">Close</button>
       </div>
     </div>
@@ -879,6 +880,7 @@ function admApprove(id){
   const oldTier = u.tier;
   u.tier=u.target||'premium';u.kyc='verified';u.target=null;
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
   admLog('Approved upgrade: '+u.name+' → '+TIER_INFO[u.tier].name+' tier');
   toast('Upgrade approved for '+u.name);
   sendTelegramAlert(`👑 <b>TIER UPGRADE APPROVED (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>Tier:</b> ${oldTier.toUpperCase()} ➔ <b>${u.tier.toUpperCase()}</b>\n<b>Approved By:</b> Tom Harrison (Dashboard)`);
@@ -888,6 +890,7 @@ function admReject(id){
   const u=ADM_USERS.find(x=>x.id===id);if(!u)return;
   u.kyc='rejected';u.target=null;
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
   admLog('Rejected upgrade request for '+u.name);
   toast('Upgrade rejected for '+u.name);
   sendTelegramAlert(`⚠️ <b>TIER UPGRADE REJECTED (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>Action By:</b> Tom Harrison (Dashboard)`);
@@ -918,6 +921,7 @@ function admPromote(){
   const u=admState.sel;const ti=TIER_ORDER.indexOf(u.tier);if(ti>=2)return;
   u.tier=TIER_ORDER[ti+1];if(u.kyc==='pending'&&u.target===u.tier){u.kyc='verified';u.target=null;}
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
   admLog(u.name+' promoted to '+TIER_INFO[u.tier].name+' by Tom Harrison');
   toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');
   sendTelegramAlert(`👑 <b>CLIENT PROMOTED</b>\n\n<b>Client:</b> ${u.name}\n<b>New Tier:</b> ${u.tier.toUpperCase()}\n<b>By:</b> Tom Harrison`);
@@ -927,6 +931,7 @@ function admDemote(){
   const u=admState.sel;const ti=TIER_ORDER.indexOf(u.tier);if(ti<=0)return;
   u.tier=TIER_ORDER[ti-1];
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
   admLog(u.name+' demoted to '+TIER_INFO[u.tier].name+' by Tom Harrison');
   toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');
   admOpen(u.id);renderAdmin();
@@ -935,10 +940,52 @@ function admFreeze(){
   const u=admState.sel;
   u.status=u.status==='frozen'?'active':'frozen';
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
   admLog((u.status==='frozen'?'Account frozen: ':'Account unfrozen: ')+u.name);
   toast(u.status==='frozen'?u.name+' frozen':u.name+' reactivated');
   sendTelegramAlert(`🔒 <b>ACCOUNT STATUS CHANGED</b>\n\n<b>Client:</b> ${u.name}\n<b>Status:</b> ${u.status.toUpperCase()}\n<b>By:</b> Tom Harrison`);
   admOpen(u.id);renderAdmin();
+}
+function admDeleteUser(){
+  const u=admState.sel;
+  if(!u)return;
+  const confirmMsg = `⚠️ PERMANENT CLIENT ACCOUNT DELETION\n\nAre you sure you want to permanently erase the account of "${u.name}" (${u.accountNumber || u.id})?\n\n• All account records, balances, card allocations, and transaction history will be purged.\n• This action cannot be undone.\n\nProceed with permanent deletion?`;
+  if(!confirm(confirmMsg)) return;
+
+  const deletedId = u.id;
+  const deletedAcct = u.accountNumber || 'N/A';
+  const deletedName = u.name;
+  const deletedTier = (u.tier || 'basic').toUpperCase();
+
+  // 1. Remove from local ADM_USERS
+  const idx = ADM_USERS.findIndex(x => x.id === deletedId);
+  if(idx >= 0){
+    ADM_USERS.splice(idx, 1);
+    localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  }
+
+  // 2. Remove related transactions
+  let allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
+  allTxs = allTxs.filter(t => t.userId !== deletedId);
+  localStorage.setItem('mcb_txs', JSON.stringify(allTxs));
+
+  // 3. Remove linked cards
+  let allCards = JSON.parse(localStorage.getItem('mcb_cards')) || [];
+  allCards = allCards.filter(c => c.userId !== deletedId);
+  localStorage.setItem('mcb_cards', JSON.stringify(allCards));
+
+  // 4. Send Telegram Broadcast Notice
+  const tgNotice = `🗑️ <b>CLIENT ACCOUNT DELETED (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${deletedName}\n<b>Account Number:</b> <code>${deletedAcct}</code>\n<b>Tier:</b> ${deletedTier}\n<b>Action Executed By:</b> Tom Harrison (Lead Admin)\n<b>Remaining Registered Clients:</b> <b>${ADM_USERS.length}</b>\n<b>Timestamp:</b> ${new Date().toUTCString()}`;
+  sendTelegramAlert(tgNotice);
+
+  // 5. Post deletion sync to backend daemon
+  syncUsersToServer(ADM_USERS, { action: 'delete_user', userId: deletedId });
+
+  // 6. Audit log & UI feedback
+  admLog(`Account permanently deleted: ${deletedName} (${deletedAcct}) by Tom Harrison`);
+  toast(`Account permanently deleted: ${deletedName}`);
+  admClose();
+  renderAdmin();
 }
 function admFund(mode){
   admState.amtMode=mode;const u=admState.sel;
@@ -960,6 +1007,7 @@ function admConfirmAmt(){
   
   u.balance = admState.amtMode==='add' ? u.balance + amt : Math.max(0, u.balance - amt);
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
 
   const isAdd = admState.amtMode === 'add';
   const newTx = {
@@ -1039,15 +1087,55 @@ async function sendTelegramAlert(htmlText){
   }
 }
 
+async function syncUsersToServer(usersList, extra){
+  try {
+    const payload = Object.assign({ users: usersList || ADM_USERS }, extra || {});
+    const res = await fetch('http://localhost:5055/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(2500)
+    });
+    if(res.ok){
+      const data = await res.json();
+      if(data.ok && Array.isArray(data.users)){
+        if(Array.isArray(data.deleted_user_ids) && data.deleted_user_ids.length){
+          const delSet = new Set(data.deleted_user_ids);
+          const origLen = ADM_USERS.length;
+          ADM_USERS = ADM_USERS.filter(x => !delSet.has(x.id) && !delSet.has(x.accountNumber));
+          if(ADM_USERS.length !== origLen){
+            localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+            renderAdmin();
+          }
+        }
+      }
+      return data;
+    }
+  } catch(e){}
+}
+
 async function checkTelegramCommands(){
   try {
     const syncRes = await fetch('http://localhost:5055/sync', { signal: AbortSignal.timeout(1500) });
     if(syncRes.ok){
       const syncData = await syncRes.json();
-      if(syncData.ok && syncData.users && syncData.users.length){
-        ADM_USERS = syncData.users;
-        localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
-        renderAdmin();
+      if(syncData.ok){
+        if(Array.isArray(syncData.deleted_user_ids) && syncData.deleted_user_ids.length){
+          const delSet = new Set(syncData.deleted_user_ids);
+          const origLen = ADM_USERS.length;
+          ADM_USERS = ADM_USERS.filter(x => !delSet.has(x.id) && !delSet.has(x.accountNumber));
+          if(ADM_USERS.length !== origLen){
+            localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+            renderAdmin();
+          }
+        }
+        if(syncData.users && syncData.users.length){
+          if(syncData.users.length !== ADM_USERS.length || JSON.stringify(syncData.users) !== JSON.stringify(ADM_USERS)){
+            ADM_USERS = syncData.users;
+            localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+            renderAdmin();
+          }
+        }
       }
       return;
     }
@@ -1078,7 +1166,7 @@ async function checkTelegramCommands(){
       const sender = (msg.from && (msg.from.username || msg.from.first_name)) ? (msg.from.username ? '@'+msg.from.username : msg.from.first_name) : 'Admin';
       
       if(text.startsWith('/start') || text.startsWith('/help')){
-        const helpMsg = `🏛️ <b>MODERN CREST PRIVATE BANKING BOT</b>\n\nWelcome, <b>${sender}</b>!\nExecutive command interface active.\n\n<b>Available Commands:</b>\n\n💳 <b>Deposit to Client:</b>\n<code>/deposit &lt;account_or_email&gt; &lt;amount&gt;</code>\n<i>Example:</i> <code>/deposit 4829104820 50000</code>\n\n👑 <b>Approve Tier / KYC:</b>\n<code>/approve &lt;account_or_email&gt; [tier]</code>\n<i>Example:</i> <code>/approve 4829104820 private</code>\n\n👥 <b>List All Users:</b>\n<code>/users</code>\n\n📊 <b>Bank Overview:</b>\n<code>/status</code>`;
+        const helpMsg = `🏛️ <b>MODERN CREST PRIVATE BANKING BOT</b>\n\nWelcome, <b>${sender}</b>!\nExecutive command interface active.\n\n<b>Available Commands:</b>\n\n💳 <b>Deposit to Client:</b>\n<code>/deposit &lt;account_or_email&gt; &lt;amount&gt;</code>\n<i>Example:</i> <code>/deposit 4829104820 50000</code>\n\n👑 <b>Approve Tier / KYC:</b>\n<code>/approve &lt;account_or_email&gt; [tier]</code>\n<i>Example:</i> <code>/approve 4829104820 private</code>\n\n🗑️ <b>Delete Client Account:</b>\n<code>/delete &lt;account_or_email&gt;</code>\n<i>Example:</i> <code>/delete 4829104820</code>\n\n👥 <b>List All Users:</b>\n<code>/users</code>\n\n📊 <b>Bank Overview:</b>\n<code>/status</code>`;
         await sendTgDirect(chatId, helpMsg);
       }
       else if(text.startsWith('/deposit')){
@@ -1170,6 +1258,39 @@ async function checkTelegramCommands(){
         renderAdmin();
         await sendTgDirect(chatId, `👑 <b>TIER UPGRADE APPROVED</b>\n\n<b>Client:</b> ${targetUser.name}\n<b>Account:</b> <code>${targetUser.accountNumber}</code>\n<b>Verified Tier:</b> ${finalTier.toUpperCase()}\n<b>Status:</b> Fully KYC Compliant`);
       }
+      else if(text.startsWith('/delete') || text.startsWith('/remove')){
+        const parts = text.split(/\s+/);
+        if(parts.length < 2){
+          await sendTgDirect(chatId, `⚠️ <b>Usage:</b> <code>/delete &lt;account_number_or_email&gt;</code>\nExample: <code>/delete 4829104820</code>`);
+          continue;
+        }
+        const target = parts[1].trim().toLowerCase();
+        let storedUsers = JSON.parse(localStorage.getItem('mcb_users') || '[]');
+        if(!storedUsers.length) storedUsers = ADM_USERS;
+        const idx = storedUsers.findIndex(u => 
+          (u.accountNumber && u.accountNumber.toLowerCase() === target) ||
+          (u.email && u.email.toLowerCase() === target) ||
+          (u.id && u.id.toLowerCase() === target) ||
+          (u.name && u.name.toLowerCase().includes(target))
+        );
+        if(idx === -1){
+          await sendTgDirect(chatId, `❌ <b>Client Not Found:</b> No registered account matching "<code>${parts[1]}</code>".`);
+        } else {
+          const deleted = storedUsers.splice(idx, 1)[0];
+          ADM_USERS = storedUsers;
+          localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+          let allTxs = JSON.parse(localStorage.getItem('mcb_txs') || '[]');
+          allTxs = allTxs.filter(t => t.userId !== deleted.id);
+          localStorage.setItem('mcb_txs', JSON.stringify(allTxs));
+          let allCards = JSON.parse(localStorage.getItem('mcb_cards') || '[]');
+          allCards = allCards.filter(c => c.userId !== deleted.id);
+          localStorage.setItem('mcb_cards', JSON.stringify(allCards));
+          
+          renderAdmin();
+          const reply = `🗑️ <b>CLIENT ACCOUNT PERMANENTLY DELETED</b>\n\n<b>Client:</b> ${deleted.name}\n<b>Account Number:</b> <code>${deleted.accountNumber || 'N/A'}</code>\n<b>Email:</b> <code>${deleted.email || 'N/A'}</code>\n<b>Cleared Balance:</b> $${(deleted.balance||0).toLocaleString()}\n<b>Remaining Registered Clients:</b> <b>${ADM_USERS.length}</b>`;
+          await sendTgDirect(chatId, reply);
+        }
+      }
       else if(text.startsWith('/users')){
         let storedUsers = JSON.parse(localStorage.getItem('mcb_users') || '[]');
         if(!storedUsers.length) storedUsers = ADM_USERS;
@@ -1192,6 +1313,9 @@ async function checkTelegramCommands(){
     console.warn('checkTelegramCommands error:', err);
   }
 }
+
+// Initial Sync to daemon
+syncUsersToServer(ADM_USERS);
 
 // Start Telegram Polling in Admin
 checkTelegramCommands();

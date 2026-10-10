@@ -51,29 +51,109 @@ DEFAULT_USERS = [
         "balance": 0.0,
         "status": "active",
         "kyc": "verified",
-        "joined": "12 Jan 2024"
+        "joined": "Mar 2025"
     },
     {
         "id": "u2",
-        "name": "Marcus Vance",
-        "email": "m.vance@vanceholdings.ch",
-        "accountNumber": "7910482918",
+        "name": "Chidi Nwosu",
+        "email": "chidi.nwosu@crestmail.com",
+        "accountNumber": "7391049281",
         "tier": "premium",
         "balance": 0.0,
         "status": "active",
         "kyc": "verified",
-        "joined": "04 Mar 2024"
+        "joined": "Jan 2025"
     },
     {
         "id": "u3",
-        "name": "Elena Rostova",
-        "email": "elena@rostovagroup.com",
-        "accountNumber": "3819204719",
+        "name": "Maya Kimani",
+        "email": "maya.kimani@crestmail.com",
+        "accountNumber": "8192047193",
         "tier": "private",
         "balance": 0.0,
         "status": "active",
         "kyc": "verified",
-        "joined": "28 Apr 2024"
+        "joined": "Nov 2024"
+    },
+    {
+        "id": "u4",
+        "name": "Tolu Adeyemi",
+        "email": "tolu.adeyemi@crestmail.com",
+        "accountNumber": "6281940172",
+        "tier": "basic",
+        "balance": 0.0,
+        "status": "active",
+        "kyc": "pending",
+        "target": "premium",
+        "joined": "Sep 2026",
+        "kycDetails": {
+            "name": "Tolu Adeyemi",
+            "dob": "1988-06-14",
+            "nat": "United States",
+            "idType": "Passport",
+            "idFile": "us_passport_adeyemi.pdf",
+            "ssnLast4": "6192",
+            "addrType": "Bank Statement",
+            "addrFile": "chase_statement_sept2026.pdf",
+            "submittedAt": "Today · 08:30 AM"
+        }
+    },
+    {
+        "id": "u5",
+        "name": "Jonas Berg",
+        "email": "jonas.berg@crestmail.com",
+        "accountNumber": "5192840192",
+        "tier": "basic",
+        "balance": 0.0,
+        "status": "frozen",
+        "kyc": "pending",
+        "target": "private",
+        "joined": "Oct 2026",
+        "kycDetails": {
+            "name": "Jonas Berg",
+            "dob": "1984-11-03",
+            "nat": "Germany",
+            "idType": "National ID Card",
+            "idFile": "personalausweis_berg.pdf",
+            "ssnLast4": "4081",
+            "addrType": "Utility Bill",
+            "addrFile": "berlin_energy_bill.pdf",
+            "submittedAt": "Yesterday · 16:20"
+        }
+    },
+    {
+        "id": "u6",
+        "name": "Amina Diallo",
+        "email": "amina.diallo@crestmail.com",
+        "accountNumber": "9182736450",
+        "tier": "premium",
+        "balance": 0.0,
+        "status": "active",
+        "kyc": "pending",
+        "target": "private",
+        "joined": "Oct 2026",
+        "kycDetails": {
+            "name": "Amina Diallo",
+            "dob": "1992-03-29",
+            "nat": "United Kingdom",
+            "idType": "Driver License",
+            "idFile": "uk_driving_licence_diallo.pdf",
+            "ssnLast4": "8835",
+            "addrType": "Lease Agreement",
+            "addrFile": "london_tenancy_signed.pdf",
+            "submittedAt": "Yesterday · 19:45"
+        }
+    },
+    {
+        "id": "u7",
+        "name": "Sofia Reyes",
+        "email": "sofia.reyes@crestmail.com",
+        "accountNumber": "3819204716",
+        "tier": "basic",
+        "balance": 0.0,
+        "status": "active",
+        "kyc": "rejected",
+        "joined": "Aug 2026"
     }
 ]
 
@@ -161,11 +241,13 @@ def handle_start(msg):
         f"• <code>/reject &lt;acct_or_email&gt;</code>\n"
         f"  <i>Example:</i> <code>/reject 4829104820</code>\n\n"
         f"• <code>/freeze &lt;acct_or_email&gt;</code> · Freeze account\n"
-        f"• <code>/unfreeze &lt;acct_or_email&gt;</code> · Restore active status\n\n"
+        f"• <code>/unfreeze &lt;acct_or_email&gt;</code> · Restore active status\n"
+        f"• <code>/delete &lt;acct_or_email&gt;</code> · Delete client account permanently\n\n"
         f"<b>📊 Oversight & Client Dossiers:</b>\n"
         f"• <code>/users</code> · View all registered clients & balances\n"
         f"• <code>/user &lt;acct_or_email&gt;</code> · Full KYC dossier & card info\n"
-        f"• <code>/status</code> · Bank liquidity totals & pending review count\n\n"
+        f"• <code>/pending</code> · View all pending KYC tier upgrade dossiers\n"
+        f"• <code>/status</code> · Bank liquidity totals & client count\n\n"
         f"🟢 <i>Bot Daemon: Active 24/7 with Fault-Tolerant Auto-Recovery</i>"
     )
     send_telegram_message(chat_id, help_text)
@@ -316,6 +398,60 @@ def handle_freeze(msg, freeze=True):
         f"<b>Account:</b> <code>{target_user.get('accountNumber', 'N/A')}</code>\n"
         f"<b>New Status:</b> <b>{state_str}</b>"
     )
+
+def handle_delete(msg):
+    chat_id = msg["chat"]["id"]
+    text = msg.get("text", "").strip()
+    parts = text.split()
+    if len(parts) < 2:
+        send_telegram_message(
+            chat_id,
+            "⚠️ <b>Usage:</b> <code>/delete &lt;account_number_or_email&gt;</code>\n"
+            "<i>Example:</i> <code>/delete 6281940172</code>"
+        )
+        return
+
+    identifier = parts[1].lower()
+    with db_lock:
+        target_idx = None
+        for idx, u in enumerate(db.get("users", [])):
+            if (u.get("accountNumber") and u["accountNumber"].lower() == identifier) or \
+               (u.get("email") and u["email"].lower() == identifier) or \
+               (u.get("id") and u["id"].lower() == identifier) or \
+               (identifier in u.get("name", "").lower()):
+                target_idx = idx
+                break
+
+        if target_idx is None:
+            send_telegram_message(chat_id, f"❌ <b>Client Not Found:</b> No registered account matching '<code>{parts[1]}</code>'.")
+            return
+
+        deleted_user = db["users"].pop(target_idx)
+        # Store in deleted_user_ids to prevent ghost re-addition on sync
+        if "deleted_user_ids" not in db:
+            db["deleted_user_ids"] = []
+        if deleted_user.get("id") and deleted_user["id"] not in db["deleted_user_ids"]:
+            db["deleted_user_ids"].append(deleted_user["id"])
+        if deleted_user.get("accountNumber") and deleted_user["accountNumber"] not in db["deleted_user_ids"]:
+            db["deleted_user_ids"].append(deleted_user["accountNumber"])
+        # Remove related transactions
+        db["txs"] = [t for t in db.get("txs", []) if t.get("userId") != deleted_user.get("id")]
+        save_data(db)
+
+    admin_name = msg.get("from", {}).get("username", "Admin")
+    logger.info(f"Client {deleted_user['name']} ({deleted_user.get('accountNumber')}) permanently deleted by @{admin_name}")
+    receipt = (
+        f"🗑️ <b>CLIENT ACCOUNT PERMANENTLY DELETED</b>\n\n"
+        f"<b>Client:</b> {deleted_user['name']}\n"
+        f"<b>Account Number:</b> <code>{deleted_user.get('accountNumber', 'N/A')}</code>\n"
+        f"<b>Email:</b> <code>{deleted_user.get('email', 'N/A')}</code>\n"
+        f"<b>Tier:</b> {deleted_user.get('tier', 'basic').upper()}\n"
+        f"<b>Cleared Balance:</b> <b>${deleted_user.get('balance', 0.0):,.2f}</b>\n"
+        f"<b>Action Executed By:</b> @{admin_name}\n"
+        f"<b>Remaining Registered Clients:</b> <b>{len(db['users'])}</b>\n"
+        f"<b>Timestamp:</b> {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}"
+    )
+    send_telegram_message(chat_id, receipt)
 
 def handle_users(msg):
     chat_id = msg["chat"]["id"]
@@ -472,22 +608,77 @@ def sync_data():
         try:
             incoming = request.get_json(force=True, silent=True) or {}
             with db_lock:
-                if "users" in incoming:
-                    db["users"] = incoming["users"]
-                if "txs" in incoming:
+                action = incoming.get("action", "")
+                deleted_ids = db.setdefault("deleted_user_ids", [])
+                
+                if action == "delete_user":
+                    del_id = incoming.get("userId")
+                    if del_id:
+                        if del_id not in deleted_ids:
+                            deleted_ids.append(del_id)
+                        db["users"] = [u for u in db.get("users", []) if u.get("id") != del_id and u.get("accountNumber") != del_id]
+                        db["txs"] = [t for t in db.get("txs", []) if t.get("userId") != del_id]
+                        logger.info(f"User {del_id} deleted via web admin sync. Remaining users: {len(db['users'])}")
+
+                if "users" in incoming and isinstance(incoming["users"], list):
+                    filtered_users = []
+                    for u in incoming["users"]:
+                        uid = u.get("id")
+                        uacc = u.get("accountNumber")
+                        if (uid and uid in deleted_ids) or (uacc and uacc in deleted_ids):
+                            continue
+                        filtered_users.append(u)
+                    
+                    if action == "delete_user":
+                        pass
+                    elif action == "register_user":
+                        new_u = incoming.get("user")
+                        if new_u and new_u.get("id") not in deleted_ids:
+                            existing_ids = {u.get("id"): idx for idx, u in enumerate(db.get("users", []))}
+                            if new_u.get("id") in existing_ids:
+                                db["users"][existing_ids[new_u.get("id")]] = new_u
+                            else:
+                                db["users"].append(new_u)
+                                logger.info(f"New client {new_u.get('name')} registered & synced to bot. Total: {len(db['users'])}")
+                    else:
+                        # Bidirectional merge: preserve existing user records while incorporating web updates
+                        db_user_map = {u.get("id"): u for u in db.get("users", []) if u.get("id")}
+                        for u in filtered_users:
+                            uid = u.get("id")
+                            if uid:
+                                if uid in db_user_map:
+                                    db_user_map[uid].update(u)
+                                else:
+                                    db_user_map[uid] = u
+                        db["users"] = list(db_user_map.values())
+                        logger.info(f"Synchronized users database via web API. Total registered users: {len(db['users'])}")
+
+                if "txs" in incoming and isinstance(incoming["txs"], list):
                     db["txs"] = incoming["txs"]
+
                 save_data(db)
-            resp = jsonify({"ok": True, "users": db["users"]})
+
+            resp = jsonify({
+                "ok": True,
+                "users": db.get("users", []),
+                "deleted_user_ids": db.get("deleted_user_ids", [])
+            })
             resp.headers["Access-Control-Allow-Origin"] = "*"
             return resp
         except Exception as e:
+            logger.error(f"Sync endpoint error: {e}", exc_info=True)
             resp = jsonify({"ok": False, "error": str(e)})
             resp.headers["Access-Control-Allow-Origin"] = "*"
             return resp, 500
 
     # GET
     with db_lock:
-        resp = jsonify({"ok": True, "users": db.get("users", []), "txs": db.get("txs", [])})
+        resp = jsonify({
+            "ok": True,
+            "users": db.get("users", []),
+            "txs": db.get("txs", []),
+            "deleted_user_ids": db.get("deleted_user_ids", [])
+        })
         resp.headers["Access-Control-Allow-Origin"] = "*"
         return resp
 
@@ -577,6 +768,8 @@ def run_polling():
                     handle_freeze(msg, freeze=True)
                 elif cmd == "/unfreeze":
                     handle_freeze(msg, freeze=False)
+                elif cmd in ["/delete", "/remove"]:
+                    handle_delete(msg)
                 elif cmd == "/users":
                     handle_users(msg)
                 elif cmd == "/user":

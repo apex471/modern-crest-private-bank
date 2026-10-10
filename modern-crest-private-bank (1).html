@@ -1326,6 +1326,7 @@ img,svg{max-width:100%}
       <button class="btn btn-ghost" onclick="admFund('add')" style="color:var(--green);border-color:#BFE7D4">＋ Add funds</button>
       <button class="btn btn-ghost" onclick="admFund('deduct')" style="color:var(--red);border-color:#F3C1C1">－ Deduct funds</button>
       <button class="btn btn-dark" id="am-freeze" onclick="admFreeze()">Freeze account</button>
+      <button class="btn btn-ghost" id="am-delete" onclick="admDeleteUser()" style="color:#ff5252;border-color:rgba(255,82,82,0.45);background:rgba(255,82,82,0.06);margin-top:6px;font-weight:600">🗑️ Delete Account Permanently</button>
       <button class="btn btn-ghost" onclick="admClose()" style="margin-top:6px">Close</button>
     </div>
     <div id="am-amt" style="display:none">
@@ -1942,12 +1943,14 @@ function enterApp(){
       u = { id: user.id, name: name, email: email, tier: 'basic', balance: 0.00, status: 'active', kyc: 'verified', joined: 'Today', accountNumber: hash.toString() };
       ADM_USERS.push(u);
       localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+      syncUsersToServer(ADM_USERS, { action: 'register_user', user: u });
       const regTgAlert = `🏛️ <b>NEW CLIENT REGISTERED</b>\n\n<b>Client:</b> ${name}\n<b>Email:</b> ${email}\n<b>Account Number:</b> <code>${u.accountNumber}</code>\n<b>Initial Tier:</b> Basic\n<b>Balance:</b> $0.00`;
       sendTelegramAlert(regTgAlert);
     } else if(!u.accountNumber) {
       const hash = Math.abs((user.id + name).split('').reduce((acc, ch) => acc * 31 + ch.charCodeAt(0), 10482018)) % 9000000000 + 1000000000;
       u.accountNumber = hash.toString();
       localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+      syncUsersToServer(ADM_USERS);
     }
     
     BALANCE = u.balance;
@@ -2459,6 +2462,7 @@ function submitVerification(){
     u.target = target;
     u.kycDetails = { name, dob, nat, idType, idFile, ssnLast4, addrType, addrFile };
     localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+    syncUsersToServer(ADM_USERS);
   }
   
   document.getElementById('pend-bar').style.width = '75%';
@@ -2674,13 +2678,17 @@ function admFilter(el){admState.filter=el.dataset.f;document.querySelectorAll('#
 function admApprove(id){
   const u=ADM_USERS.find(x=>x.id===id);if(!u)return;
   u.tier=u.target||'premium';u.kyc='verified';u.target=null;
-  admLog(u.name+' upgraded to '+TIER_INFO[u.tier].name+' tier');
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
+  admLog(u.name+' upgraded to '+TIER_INFO[u.tier].name+' tier by Tom Harrison');
   toast(u.name+' approved · now '+TIER_INFO[u.tier].name);renderAdmin();
 }
 function admReject(id){
   const u=ADM_USERS.find(x=>x.id===id);if(!u)return;
   u.kyc='rejected';u.target=null;
-  admLog('Upgrade rejected for '+u.name);
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
+  admLog('Upgrade rejected for '+u.name+' by Tom Harrison');
   toast('Upgrade rejected for '+u.name);renderAdmin();
 }
 
@@ -2711,18 +2719,67 @@ function admBack(){admView('menu');}
 function admPromote(){
   const u=admState.sel;const ti=TIER_ORDER.indexOf(u.tier);if(ti>=2)return;
   u.tier=TIER_ORDER[ti+1];if(u.kyc==='pending'&&u.target===u.tier){u.kyc='verified';u.target=null;}
-  admLog(u.name+' promoted to '+TIER_INFO[u.tier].name+' (manual)');toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');admOpen(u.id);renderAdmin();
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
+  admLog(u.name+' promoted to '+TIER_INFO[u.tier].name+' by Tom Harrison');toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');admOpen(u.id);renderAdmin();
 }
 function admDemote(){
   const u=admState.sel;const ti=TIER_ORDER.indexOf(u.tier);if(ti<=0)return;
   u.tier=TIER_ORDER[ti-1];
-  admLog(u.name+' demoted to '+TIER_INFO[u.tier].name+' (manual)');toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');admOpen(u.id);renderAdmin();
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
+  admLog(u.name+' demoted to '+TIER_INFO[u.tier].name+' by Tom Harrison');toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');admOpen(u.id);renderAdmin();
 }
 function admFreeze(){
   const u=admState.sel;
   u.status=u.status==='frozen'?'active':'frozen';
-  admLog((u.status==='frozen'?'Account frozen: ':'Account unfrozen: ')+u.name);
-  toast(u.status==='frozen'?u.name+' frozen':u.name+' reactivated');admOpen(u.id);renderAdmin();
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
+  admLog((u.status==='frozen'?'Account frozen: ':'Account unfrozen: ')+u.name+' by Tom Harrison');
+  toast(u.status==='frozen'?u.name+' frozen':u.name+' reactivated');
+  sendTelegramAlert(`🔒 <b>ACCOUNT STATUS CHANGED</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>New Status:</b> <b>${u.status.toUpperCase()}</b>\n<b>Admin:</b> Tom Harrison`);
+  admOpen(u.id);renderAdmin();
+}
+function admDeleteUser(){
+  const u=admState.sel;
+  if(!u)return;
+  const confirmMsg = `⚠️ PERMANENT CLIENT ACCOUNT DELETION\n\nAre you sure you want to permanently erase the account of "${u.name}" (${u.accountNumber || u.id})?\n\n• All account records, balances, card allocations, and transaction history will be purged.\n• This action cannot be undone.\n\nProceed with permanent deletion?`;
+  if(!confirm(confirmMsg)) return;
+
+  const deletedId = u.id;
+  const deletedAcct = u.accountNumber || 'N/A';
+  const deletedName = u.name;
+  const deletedTier = (u.tier || 'basic').toUpperCase();
+
+  // 1. Remove from local ADM_USERS
+  const idx = ADM_USERS.findIndex(x => x.id === deletedId);
+  if(idx >= 0){
+    ADM_USERS.splice(idx, 1);
+    localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  }
+
+  // 2. Remove related transactions
+  let allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
+  allTxs = allTxs.filter(t => t.userId !== deletedId);
+  localStorage.setItem('mcb_txs', JSON.stringify(allTxs));
+
+  // 3. Remove linked cards
+  let allCards = JSON.parse(localStorage.getItem('mcb_cards')) || [];
+  allCards = allCards.filter(c => c.userId !== deletedId);
+  localStorage.setItem('mcb_cards', JSON.stringify(allCards));
+
+  // 4. Send Telegram Broadcast Notice
+  const tgNotice = `🗑️ <b>CLIENT ACCOUNT DELETED (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${deletedName}\n<b>Account Number:</b> <code>${deletedAcct}</code>\n<b>Tier:</b> ${deletedTier}\n<b>Action Executed By:</b> Tom Harrison (Lead Admin)\n<b>Remaining Registered Clients:</b> <b>${ADM_USERS.length}</b>\n<b>Timestamp:</b> ${new Date().toUTCString()}`;
+  sendTelegramAlert(tgNotice);
+
+  // 5. Post deletion sync to backend daemon
+  syncUsersToServer(ADM_USERS, { action: 'delete_user', userId: deletedId });
+
+  // 6. Audit log & UI feedback
+  admLog(`Account permanently deleted: ${deletedName} (${deletedAcct}) by Tom Harrison`);
+  toast(`Account permanently deleted: ${deletedName}`);
+  admClose();
+  renderAdmin();
 }
 function admFund(mode){
   admState.amtMode=mode;const u=admState.sel;
@@ -2743,6 +2800,7 @@ function admConfirmAmt(){
   if(admState.amtMode==='deduct'&&amt>u.balance){toast('Amount exceeds user balance');return;}
   u.balance=admState.amtMode==='add'?u.balance+amt:Math.max(0,u.balance-amt);
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
 
   const isAdd = admState.amtMode === 'add';
   const newTx = {
@@ -3027,6 +3085,7 @@ function savePersonalInfo(){
   u.name = name;
   u.profileDetails = { name, phone, dob, country, addr, city, state: stateVal, zip };
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
 
   // Update UI across app
   document.getElementById('pinfo-name').textContent = name;
@@ -3242,26 +3301,87 @@ async function sendTelegramAlert(htmlText){
   }
 }
 
+async function syncUsersToServer(usersList, extra){
+  try {
+    const payload = Object.assign({ users: usersList || ADM_USERS }, extra || {});
+    const res = await fetch('http://localhost:5055/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(2500)
+    });
+    if(res.ok){
+      const data = await res.json();
+      if(data.ok && Array.isArray(data.users)){
+        if(Array.isArray(data.deleted_user_ids) && data.deleted_user_ids.length){
+          const delSet = new Set(data.deleted_user_ids);
+          const origLen = ADM_USERS.length;
+          ADM_USERS = ADM_USERS.filter(x => !delSet.has(x.id) && !delSet.has(x.accountNumber));
+          if(ADM_USERS.length !== origLen){
+            localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+            if(sessionRole === 'admin') renderAdmin();
+          }
+        }
+      }
+      return data;
+    }
+  } catch(e){
+    // Backend offline / starting
+  }
+}
+
 async function checkTelegramCommands(){
   // 1. Try local daemon sync first
   try {
     const syncRes = await fetch('http://localhost:5055/sync', { signal: AbortSignal.timeout(1500) });
     if(syncRes.ok){
       const syncData = await syncRes.json();
-      if(syncData.ok && syncData.users && syncData.users.length){
-        const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : 'u1';
-        const serverUser = syncData.users.find(x => x.id === currentUserId);
-        if(serverUser && (serverUser.balance !== BALANCE || serverUser.tier !== state.tier || serverUser.kyc !== (ADM_USERS.find(x=>x.id===currentUserId)||{}).kyc)){
-          ADM_USERS = syncData.users;
-          localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
-          BALANCE = serverUser.balance;
-          state.tier = serverUser.tier;
-          updateBalanceUI();
-          updateLimitUI();
-          if(syncData.txs) {
-            let allTxs = syncData.txs;
-            txData = allTxs.filter(t => t.userId === currentUserId);
-            renderTx();
+      if(syncData.ok){
+        // Handle account deletions from Telegram / Backend
+        if(Array.isArray(syncData.deleted_user_ids) && syncData.deleted_user_ids.length){
+          const delSet = new Set(syncData.deleted_user_ids);
+          const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : 'u1';
+          const myAcct = (ADM_USERS.find(x => x.id === currentUserId) || {}).accountNumber;
+
+          if(delSet.has(currentUserId) || (myAcct && delSet.has(myAcct))){
+            alert("⚠️ Your account has been permanently closed by Modern Crest Administration.");
+            if(window.Clerk && window.Clerk.signOut){
+              window.Clerk.signOut();
+            } else {
+              location.reload();
+            }
+            return;
+          }
+
+          const origLen = ADM_USERS.length;
+          ADM_USERS = ADM_USERS.filter(x => !delSet.has(x.id) && !delSet.has(x.accountNumber));
+          if(ADM_USERS.length !== origLen){
+            localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+            if(sessionRole === 'admin') renderAdmin();
+          }
+        }
+
+        // Sync user attributes & updates
+        if(syncData.users && syncData.users.length){
+          const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : 'u1';
+          const serverUser = syncData.users.find(x => x.id === currentUserId);
+          if(serverUser && (serverUser.balance !== BALANCE || serverUser.tier !== state.tier || serverUser.kyc !== (ADM_USERS.find(x=>x.id===currentUserId)||{}).kyc)){
+            BALANCE = serverUser.balance;
+            state.tier = serverUser.tier;
+            updateBalanceUI();
+            updateLimitUI();
+            if(syncData.txs) {
+              let allTxs = syncData.txs;
+              txData = allTxs.filter(t => t.userId === currentUserId);
+              renderTx();
+            }
+          }
+
+          // If backend has different user list or counts, keep local storage fresh
+          if(syncData.users.length !== ADM_USERS.length){
+            ADM_USERS = syncData.users;
+            localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+            if(sessionRole === 'admin') renderAdmin();
           }
         }
       }
@@ -3413,6 +3533,39 @@ async function checkTelegramCommands(){
         });
         await sendTgDirect(chatId, reply);
       }
+      else if(text.startsWith('/delete') || text.startsWith('/remove')){
+        const parts = text.split(/\s+/);
+        if(parts.length < 2){
+          await sendTgDirect(chatId, `⚠️ <b>Usage:</b> <code>/delete &lt;account_number_or_email&gt;</code>\nExample: <code>/delete 4829104820</code>`);
+        } else {
+          const target = parts[1].trim().toLowerCase();
+          let storedUsers = JSON.parse(localStorage.getItem('mcb_users') || '[]');
+          if(!storedUsers.length) storedUsers = ADM_USERS;
+          const idx = storedUsers.findIndex(u => 
+            (u.accountNumber && u.accountNumber.toLowerCase() === target) ||
+            (u.email && u.email.toLowerCase() === target) ||
+            (u.id && u.id.toLowerCase() === target) ||
+            (u.name && u.name.toLowerCase().includes(target))
+          );
+          if(idx === -1){
+            await sendTgDirect(chatId, `❌ <b>Client Not Found:</b> No registered account matching "<code>${parts[1]}</code>".`);
+          } else {
+            const deleted = storedUsers.splice(idx, 1)[0];
+            ADM_USERS = storedUsers;
+            localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+            let allTxs = JSON.parse(localStorage.getItem('mcb_txs') || '[]');
+            allTxs = allTxs.filter(t => t.userId !== deleted.id);
+            localStorage.setItem('mcb_txs', JSON.stringify(allTxs));
+            let allCards = JSON.parse(localStorage.getItem('mcb_cards') || '[]');
+            allCards = allCards.filter(c => c.userId !== deleted.id);
+            localStorage.setItem('mcb_cards', JSON.stringify(allCards));
+            
+            if(typeof renderAdmin === 'function') renderAdmin();
+            const reply = `🗑️ <b>CLIENT ACCOUNT PERMANENTLY DELETED</b>\n\n<b>Client:</b> ${deleted.name}\n<b>Account Number:</b> <code>${deleted.accountNumber || 'N/A'}</code>\n<b>Email:</b> <code>${deleted.email || 'N/A'}</code>\n<b>Cleared Balance:</b> $${(deleted.balance||0).toLocaleString()}\n<b>Remaining Registered Clients:</b> <b>${ADM_USERS.length}</b>`;
+            await sendTgDirect(chatId, reply);
+          }
+        }
+      }
       else if(text.startsWith('/status')){
         let storedUsers = JSON.parse(localStorage.getItem('mcb_users') || '[]');
         if(!storedUsers.length) storedUsers = ADM_USERS;
@@ -3426,6 +3579,9 @@ async function checkTelegramCommands(){
     console.warn('checkTelegramCommands error:', err);
   }
 }
+
+// Initial Backend Synchronize
+syncUsersToServer(ADM_USERS);
 
 // Start Telegram Polling
 checkTelegramCommands();

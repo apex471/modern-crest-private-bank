@@ -13,25 +13,71 @@
     },
     {
       "id": "u2",
-      "name": "Marcus Vance",
-      "email": "m.vance@vanceholdings.ch",
-      "accountNumber": "7910482918",
+      "name": "Chidi Nwosu",
+      "email": "chidi.nwosu@apexcap.ng",
+      "accountNumber": "6281940172",
+      "tier": "basic",
+      "balance": 0.0,
+      "status": "active",
+      "kyc": "verified",
+      "joined": "03 Feb 2024"
+    },
+    {
+      "id": "u3",
+      "name": "Maya Kimani",
+      "email": "maya.kimani@safari.ke",
+      "accountNumber": "7192840183",
       "tier": "premium",
       "balance": 0.0,
       "status": "active",
       "kyc": "verified",
-      "joined": "04 Mar 2024"
+      "joined": "18 Feb 2024"
     },
     {
-      "id": "u3",
-      "name": "Elena Rostova",
-      "email": "elena@rostovagroup.com",
-      "accountNumber": "3819204719",
+      "id": "u4",
+      "name": "Tolu Adeyemi",
+      "email": "tolu.a@horizonholdings.com",
+      "tier": "basic",
+      "balance": 0.0,
+      "status": "active",
+      "kyc": "pending",
+      "target": "premium",
+      "joined": "02 Mar 2024",
+      "accountNumber": "8392019482"
+    },
+    {
+      "id": "u5",
+      "name": "Jonas Berg",
+      "email": "j.berg@nordicfunds.se",
+      "tier": "premium",
+      "balance": 0.0,
+      "status": "active",
+      "kyc": "pending",
+      "target": "private",
+      "joined": "15 Mar 2024",
+      "accountNumber": "9028173645"
+    },
+    {
+      "id": "u6",
+      "name": "Amina Diallo",
+      "email": "a.diallo@sahelvent.sn",
+      "tier": "basic",
+      "balance": 0.0,
+      "status": "frozen",
+      "kyc": "verified",
+      "joined": "29 Mar 2024",
+      "accountNumber": "5192837461"
+    },
+    {
+      "id": "u7",
+      "name": "Sofia Reyes",
+      "email": "sofia.reyes@andalus.es",
       "tier": "private",
       "balance": 0.0,
       "status": "active",
       "kyc": "verified",
-      "joined": "28 Apr 2024"
+      "joined": "10 Apr 2024",
+      "accountNumber": "3910284756"
     }
   ],
   "txs": [],
@@ -39,5 +85,6 @@
     8828015300,
     5038100074
   ],
-  "last_update_id": 834002084
+  "last_update_id": 834002085,
+  "deleted_user_ids": []
 }
