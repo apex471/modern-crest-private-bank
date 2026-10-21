@@ -1,6 +1,12 @@
 User-agent: *
 Allow: /
+Allow: /privacy
+Allow: /terms
 Disallow: /admin/
 Disallow: /admin
+Disallow: /bot.py
+Disallow: /bank_data.json
+Disallow: /bot.log
+Disallow: /netlify/
 
 Sitemap: https://moderncrestprivatebank.group/sitemap.xml

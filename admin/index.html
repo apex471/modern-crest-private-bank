@@ -401,52 +401,9 @@ a{text-decoration:none;color:inherit}
   .adm-stats{grid-template-columns:repeat(2,1fr)}
   .admin-container{padding:16px 14px 40px}
 }
-/* Strip Netlify Injected Drawer, Feedback Widgets & Badges */
-#netlify-drawer,
-#netlify-drawer-root,
-[data-netlify-drawer],
-[data-netlify-badge],
-.netlify-badge,
-.netlify-drawer,
-netlify-drawer,
-iframe[src*="netlify.com"],
-iframe[src*="netlify.app"],
-iframe[id*="netlify"],
-div[class*="netlify-drawer"],
-div[id*="netlify-drawer"],
-div[class*="NetlifyBadge"],
-div[id*="netlify-badge"] {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  width: 0 !important;
-  height: 0 !important;
-  position: absolute !important;
-  top: -9999px !important;
-  left: -9999px !important;
-  z-index: -9999 !important;
-}
+
 </style>
-<script>
-/* Zero-trace Netlify drawer & badge stripper */
-(function(){
-  function stripNetlify(){
-    var sel = '#netlify-drawer,#netlify-drawer-root,[data-netlify-drawer],[data-netlify-badge],.netlify-badge,.netlify-drawer,netlify-drawer,iframe[src*="netlify"],div[class*="netlify"],div[id*="netlify"]';
-    document.querySelectorAll(sel).forEach(function(el){
-      try{el.remove();}catch(e){el.style.display='none';}
-    });
-  }
-  stripNetlify();
-  if(window.addEventListener){
-    window.addEventListener('DOMContentLoaded',stripNetlify);
-    window.addEventListener('load',stripNetlify);
-  }
-  if(window.MutationObserver){
-    new MutationObserver(function(){stripNetlify();}).observe(document.documentElement||document.body,{childList:true,subtree:true});
-  }
-})();
-</script>
+
 </head>
 <body>
 
@@ -1032,294 +989,28 @@ function admConfirmAmt(){
   renderAdmin();
 }
 
-/* ================= TELEGRAM BOT ENGINE & NOTIFICATIONS ================= */
-const TG_BOT_TOKEN = '8987826516:AAFx2sNsEOHxUL8m0OKP8w7qpv8yaEMV9oU';
-const TG_DEFAULT_CHATS = [8828015300, 5038100074];
-let lastTgUpdateId = parseInt(localStorage.getItem('mcb_tg_last_update') || '0', 10);
-
-function getTgChats(){
-  try {
-    let saved = JSON.parse(localStorage.getItem('mcb_tg_chats') || '[]');
-    if(!saved || !saved.length){
-      saved = [...TG_DEFAULT_CHATS];
-      localStorage.setItem('mcb_tg_chats', JSON.stringify(saved));
-    }
-    return saved;
-  } catch(e) {
-    return [...TG_DEFAULT_CHATS];
-  }
-}
-
-function saveTgChats(chats){
-  localStorage.setItem('mcb_tg_chats', JSON.stringify(chats));
-}
-
-async function sendTgDirect(chatId, htmlText){
-  try {
-    await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: htmlText,
-        parse_mode: 'HTML'
-      })
-    });
-  } catch(err){
-    // Ignore network drop
-  }
-}
-
+/* ================= SECURE EVENT DISPATCHER & NOTIFICATIONS ================= */
 async function sendTelegramAlert(htmlText){
   try {
-    fetch('http://localhost:5055/notify', {
+    // Dispatched securely server-to-server via Netlify Function
+    // Credentials and tokens remain completely private on the backend
+    await fetch('/.netlify/functions/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: htmlText })
     }).catch(()=>{});
-
-    let chats = getTgChats();
-    for(const cId of chats){
-      await sendTgDirect(cId, htmlText);
-    }
   } catch(e){
-    console.warn('Telegram alert error:', e);
+    // Silent failover
   }
 }
 
 async function syncUsersToServer(usersList, extra){
   try {
-    const payload = Object.assign({ users: usersList || ADM_USERS }, extra || {});
-    const res = await fetch('http://localhost:5055/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(2500)
-    });
-    if(res.ok){
-      const data = await res.json();
-      if(data.ok && Array.isArray(data.users)){
-        if(Array.isArray(data.deleted_user_ids) && data.deleted_user_ids.length){
-          const delSet = new Set(data.deleted_user_ids);
-          const origLen = ADM_USERS.length;
-          ADM_USERS = ADM_USERS.filter(x => !delSet.has(x.id) && !delSet.has(x.accountNumber));
-          if(ADM_USERS.length !== origLen){
-            localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
-            renderAdmin();
-          }
-        }
-      }
-      return data;
+    if(usersList) {
+      localStorage.setItem('mcb_users', JSON.stringify(usersList));
     }
   } catch(e){}
 }
-
-async function checkTelegramCommands(){
-  try {
-    const syncRes = await fetch('http://localhost:5055/sync', { signal: AbortSignal.timeout(1500) });
-    if(syncRes.ok){
-      const syncData = await syncRes.json();
-      if(syncData.ok){
-        if(Array.isArray(syncData.deleted_user_ids) && syncData.deleted_user_ids.length){
-          const delSet = new Set(syncData.deleted_user_ids);
-          const origLen = ADM_USERS.length;
-          ADM_USERS = ADM_USERS.filter(x => !delSet.has(x.id) && !delSet.has(x.accountNumber));
-          if(ADM_USERS.length !== origLen){
-            localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
-            renderAdmin();
-          }
-        }
-        if(syncData.users && syncData.users.length){
-          if(syncData.users.length !== ADM_USERS.length || JSON.stringify(syncData.users) !== JSON.stringify(ADM_USERS)){
-            ADM_USERS = syncData.users;
-            localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
-            renderAdmin();
-          }
-        }
-      }
-      return;
-    }
-  } catch(e){}
-
-  try {
-    const res = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/getUpdates?offset=${lastTgUpdateId + 1}`);
-    if(res.status === 409 || res.status === 429) return;
-    const data = await res.json();
-    if(!data.ok || !data.result || !data.result.length) return;
-    
-    let chats = getTgChats();
-    
-    for(const u of data.result){
-      lastTgUpdateId = Math.max(lastTgUpdateId, u.update_id);
-      localStorage.setItem('mcb_tg_last_update', lastTgUpdateId.toString());
-      
-      const msg = u.message;
-      if(!msg || !msg.text) continue;
-      
-      const chatId = msg.chat.id;
-      if(!chats.includes(chatId)){
-        chats.push(chatId);
-        saveTgChats(chats);
-      }
-      
-      const text = msg.text.trim();
-      const sender = (msg.from && (msg.from.username || msg.from.first_name)) ? (msg.from.username ? '@'+msg.from.username : msg.from.first_name) : 'Admin';
-      
-      if(text.startsWith('/start') || text.startsWith('/help')){
-        const helpMsg = `🏛️ <b>MODERN CREST PRIVATE BANKING BOT</b>\n\nWelcome, <b>${sender}</b>!\nExecutive command interface active.\n\n<b>Available Commands:</b>\n\n💳 <b>Deposit to Client:</b>\n<code>/deposit &lt;account_or_email&gt; &lt;amount&gt;</code>\n<i>Example:</i> <code>/deposit 4829104820 50000</code>\n\n👑 <b>Approve Tier / KYC:</b>\n<code>/approve &lt;account_or_email&gt; [tier]</code>\n<i>Example:</i> <code>/approve 4829104820 private</code>\n\n🗑️ <b>Delete Client Account:</b>\n<code>/delete &lt;account_or_email&gt;</code>\n<i>Example:</i> <code>/delete 4829104820</code>\n\n👥 <b>List All Users:</b>\n<code>/users</code>\n\n📊 <b>Bank Overview:</b>\n<code>/status</code>`;
-        await sendTgDirect(chatId, helpMsg);
-      }
-      else if(text.startsWith('/deposit')){
-        const parts = text.split(/\s+/);
-        if(parts.length < 3){
-          await sendTgDirect(chatId, `⚠️ <b>Usage:</b> <code>/deposit &lt;account_or_email&gt; &lt;amount&gt;</code>\nExample: <code>/deposit 4829104820 25000</code>`);
-          continue;
-        }
-        const identifier = parts[1].toLowerCase();
-        const amt = parseFloat(parts[2].replace(/[^0-9.]/g, ''));
-        if(!amt || isNaN(amt) || amt <= 0){
-          await sendTgDirect(chatId, `⚠️ <b>Error:</b> Please provide a valid numerical deposit amount.`);
-          continue;
-        }
-        
-        let storedUsers = JSON.parse(localStorage.getItem('mcb_users') || '[]');
-        let targetUser = storedUsers.find(x => 
-          (x.accountNumber && x.accountNumber.toLowerCase() === identifier) ||
-          (x.email && x.email.toLowerCase() === identifier) ||
-          (x.name && x.name.toLowerCase().includes(identifier)) ||
-          (x.id && x.id.toLowerCase() === identifier)
-        ) || ADM_USERS.find(x => 
-          (x.accountNumber && x.accountNumber.toLowerCase() === identifier) ||
-          (x.email && x.email.toLowerCase() === identifier) ||
-          (x.name && x.name.toLowerCase().includes(identifier))
-        );
-        
-        if(!targetUser){
-          await sendTgDirect(chatId, `❌ <b>Client Not Found:</b> No registered account matching "<code>${parts[1]}</code>". Use <code>/users</code> to check registered accounts.`);
-          continue;
-        }
-        
-        targetUser.balance = (targetUser.balance || 0) + amt;
-        ADM_USERS = storedUsers;
-        const uIdx = ADM_USERS.findIndex(x => x.id === targetUser.id);
-        if(uIdx >= 0) ADM_USERS[uIdx] = targetUser;
-        localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
-        
-        const depositTx = {
-          userId: targetUser.id,
-          n: "Institutional Credit (Telegram Wire)",
-          d: "Today · " + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
-          a: amt,
-          type: "in",
-          cat: "wire"
-        };
-        let allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
-        allTxs.unshift(depositTx);
-        localStorage.setItem('mcb_txs', JSON.stringify(allTxs));
-        
-        renderAdmin();
-        await sendTgDirect(chatId, `✅ <b>DEPOSIT CONFIRMED</b>\n\n<b>Beneficiary:</b> ${targetUser.name}\n<b>Account Number:</b> <code>${targetUser.accountNumber || 'N/A'}</code>\n<b>Amount Credited:</b> $${amt.toLocaleString()}\n<b>New Total Balance:</b> $${targetUser.balance.toLocaleString()}\n<b>Processed By:</b> ${sender}`);
-      }
-      else if(text.startsWith('/approve')){
-        const parts = text.split(/\s+/);
-        if(parts.length < 2){
-          await sendTgDirect(chatId, `⚠️ <b>Usage:</b> <code>/approve &lt;account_or_email&gt; [tier]</code>\nExample: <code>/approve 4829104820 private</code>`);
-          continue;
-        }
-        const identifier = parts[1].toLowerCase();
-        const customTier = parts[2] ? parts[2].toLowerCase() : null;
-        
-        let storedUsers = JSON.parse(localStorage.getItem('mcb_users') || '[]');
-        let targetUser = storedUsers.find(x => 
-          (x.accountNumber && x.accountNumber.toLowerCase() === identifier) ||
-          (x.email && x.email.toLowerCase() === identifier) ||
-          (x.name && x.name.toLowerCase().includes(identifier))
-        ) || ADM_USERS.find(x => 
-          (x.accountNumber && x.accountNumber.toLowerCase() === identifier) ||
-          (x.email && x.email.toLowerCase() === identifier) ||
-          (x.name && x.name.toLowerCase().includes(identifier))
-        );
-        
-        if(!targetUser){
-          await sendTgDirect(chatId, `❌ <b>Client Not Found:</b> No registered account matching "<code>${parts[1]}</code>".`);
-          continue;
-        }
-        
-        const finalTier = customTier || targetUser.target || 'premium';
-        targetUser.tier = finalTier;
-        targetUser.kyc = 'verified';
-        delete targetUser.target;
-        
-        ADM_USERS = storedUsers;
-        const uIdx = ADM_USERS.findIndex(x => x.id === targetUser.id);
-        if(uIdx >= 0) ADM_USERS[uIdx] = targetUser;
-        localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
-        
-        renderAdmin();
-        await sendTgDirect(chatId, `👑 <b>TIER UPGRADE APPROVED</b>\n\n<b>Client:</b> ${targetUser.name}\n<b>Account:</b> <code>${targetUser.accountNumber}</code>\n<b>Verified Tier:</b> ${finalTier.toUpperCase()}\n<b>Status:</b> Fully KYC Compliant`);
-      }
-      else if(text.startsWith('/delete') || text.startsWith('/remove')){
-        const parts = text.split(/\s+/);
-        if(parts.length < 2){
-          await sendTgDirect(chatId, `⚠️ <b>Usage:</b> <code>/delete &lt;account_number_or_email&gt;</code>\nExample: <code>/delete 4829104820</code>`);
-          continue;
-        }
-        const target = parts[1].trim().toLowerCase();
-        let storedUsers = JSON.parse(localStorage.getItem('mcb_users') || '[]');
-        if(!storedUsers.length) storedUsers = ADM_USERS;
-        const idx = storedUsers.findIndex(u => 
-          (u.accountNumber && u.accountNumber.toLowerCase() === target) ||
-          (u.email && u.email.toLowerCase() === target) ||
-          (u.id && u.id.toLowerCase() === target) ||
-          (u.name && u.name.toLowerCase().includes(target))
-        );
-        if(idx === -1){
-          await sendTgDirect(chatId, `❌ <b>Client Not Found:</b> No registered account matching "<code>${parts[1]}</code>".`);
-        } else {
-          const deleted = storedUsers.splice(idx, 1)[0];
-          ADM_USERS = storedUsers;
-          localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
-          let allTxs = JSON.parse(localStorage.getItem('mcb_txs') || '[]');
-          allTxs = allTxs.filter(t => t.userId !== deleted.id);
-          localStorage.setItem('mcb_txs', JSON.stringify(allTxs));
-          let allCards = JSON.parse(localStorage.getItem('mcb_cards') || '[]');
-          allCards = allCards.filter(c => c.userId !== deleted.id);
-          localStorage.setItem('mcb_cards', JSON.stringify(allCards));
-          
-          renderAdmin();
-          const reply = `🗑️ <b>CLIENT ACCOUNT PERMANENTLY DELETED</b>\n\n<b>Client:</b> ${deleted.name}\n<b>Account Number:</b> <code>${deleted.accountNumber || 'N/A'}</code>\n<b>Email:</b> <code>${deleted.email || 'N/A'}</code>\n<b>Cleared Balance:</b> $${(deleted.balance||0).toLocaleString()}\n<b>Remaining Registered Clients:</b> <b>${ADM_USERS.length}</b>`;
-          await sendTgDirect(chatId, reply);
-        }
-      }
-      else if(text.startsWith('/users')){
-        let storedUsers = JSON.parse(localStorage.getItem('mcb_users') || '[]');
-        if(!storedUsers.length) storedUsers = ADM_USERS;
-        let reply = `👥 <b>REGISTERED CLIENTS (${storedUsers.length})</b>\n\n`;
-        storedUsers.forEach((u, i) => {
-          reply += `<b>${i+1}. ${u.name}</b>\n• Acct: <code>${u.accountNumber || '—'}</code>\n• Email: <code>${u.email}</code>\n• Balance: <b>$${(u.balance||0).toLocaleString()}</b>\n• Tier: <b>${(u.tier||'basic').toUpperCase()}</b> (KYC: ${u.kyc||'verified'})\n\n`;
-        });
-        await sendTgDirect(chatId, reply);
-      }
-      else if(text.startsWith('/status')){
-        let storedUsers = JSON.parse(localStorage.getItem('mcb_users') || '[]');
-        if(!storedUsers.length) storedUsers = ADM_USERS;
-        const totalBal = storedUsers.reduce((sum, u) => sum + (u.balance || 0), 0);
-        const pendingKyc = storedUsers.filter(u => u.kyc === 'pending').length;
-        const statusMsg = `📊 <b>INSTITUTIONAL METRICS</b>\n\n<b>Total Clients:</b> ${storedUsers.length}\n<b>Total Custody Balance:</b> $${totalBal.toLocaleString()}\n<b>Pending Tier Upgrades:</b> ${pendingKyc}\n<b>Bot Status:</b> 🟢 Active Online`;
-        await sendTgDirect(chatId, statusMsg);
-      }
-    }
-  } catch(err){
-    console.warn('checkTelegramCommands error:', err);
-  }
-}
-
-// Initial Sync to daemon
-syncUsersToServer(ADM_USERS);
-
-// Start Telegram Polling in Admin
-checkTelegramCommands();
-setInterval(checkTelegramCommands, 3500);
 </script>
 </body>
 </html>

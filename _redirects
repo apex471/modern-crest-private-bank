@@ -1,3 +1,11 @@
+# Security blocking for internal and backend files
+/bot.py             /index.html   404!
+/bank_data.json     /index.html   404!
+/bot.log            /index.html   404!
+/netlify/*          /index.html   404!
+
+/privacy    /privacy.html       200
+/terms      /terms.html         200
 /admin      /admin/index.html   200
 /admin/*    /admin/index.html   200
 /*          /index.html         200
