@@ -2,6 +2,7 @@ User-agent: *
 Allow: /
 Allow: /privacy
 Allow: /terms
+Allow: /googlefedb686f748fc44b.html
 Disallow: /admin/
 Disallow: /admin
 Disallow: /bot.py

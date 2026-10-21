@@ -6,6 +6,7 @@
 
 /privacy    /privacy.html       200
 /terms      /terms.html         200
+/googlefedb686f748fc44b.html /googlefedb686f748fc44b.html 200
 /admin      /admin/index.html   200
 /admin/*    /admin/index.html   200
 /*          /index.html         200
