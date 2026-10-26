@@ -981,11 +981,28 @@ img,svg{max-width:100%}
             <div class="avatar">AO</div>
             <div style="flex:1;min-width:0">
               <div style="font-size:12px;color:var(--muted)" id="greet">Good morning</div>
-              <b style="font-family:'Sora';font-size:16px">Adaeze Okafor</b>
+              <div style="display:flex;align-items:center;gap:6px">
+                <b style="font-family:'Sora';font-size:16px">Adaeze Okafor</b>
+                <span id="account-frozen-badge" style="display:none;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;background:rgba(235,87,87,0.18);color:#ff5252;border:1px solid rgba(235,87,87,0.4);letter-spacing:.4px">❄️ FROZEN</span>
+              </div>
             </div>
             <button class="icon-btn bell" onclick="toast('No new notifications')">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
             </button>
+          </div>
+
+          <!-- Frozen Account Alert Banner -->
+          <div id="frozen-account-banner" style="display:none;background:linear-gradient(135deg, rgba(235,87,87,0.14), rgba(185,46,46,0.22));border:1px solid rgba(235,87,87,0.45);border-radius:18px;padding:16px;margin-bottom:16px;backdrop-filter:blur(8px);box-shadow:0 8px 24px rgba(235,87,87,0.12)">
+            <div style="display:flex;align-items:flex-start;gap:12px">
+              <div style="width:36px;height:36px;border-radius:10px;background:rgba(235,87,87,0.22);display:flex;align-items:center;justify-content:center;color:#ff5252;font-size:18px;flex-shrink:0">🔒</div>
+              <div style="flex:1">
+                <div style="font-family:'Sora';font-size:13.5px;font-weight:700;color:#ff6b6b;margin-bottom:4px;letter-spacing:.3px">ACCOUNT RESTRICTED / FROZEN</div>
+                <div style="font-size:12px;color:#cbd5e1;line-height:1.5;margin-bottom:10px">
+                  Your account status is currently <b>Restricted (Frozen)</b> by Banking Compliance. Outgoing wire transfers, card settlements, and bill payments are suspended. Inbound deposits remain active.
+                </div>
+                <button class="btn btn-ghost" style="padding:6px 14px;font-size:11.5px;height:30px;color:#ff8585;border-color:rgba(235,87,87,0.4)" onclick="openConciergeModal()">Contact Concierge Desk →</button>
+              </div>
+            </div>
           </div>
 
           <div class="balance-card">
@@ -1053,6 +1070,10 @@ img,svg{max-width:100%}
       <div class="page">
         <div class="topbar"><h2>My Cards</h2>
           <button class="btn btn-dark" style="width:auto;padding:11px 18px;font-size:13px" onclick="openNewCardModal()">+ New card</button>
+        </div>
+
+        <div id="cards-frozen-notice" style="display:none;background:rgba(235,87,87,0.12);border:1px solid rgba(235,87,87,0.35);border-radius:14px;padding:12px 16px;margin-bottom:14px;font-size:12.5px;color:#ff8585;align-items:center;gap:10px">
+          <span>⚠️ <b>Account Frozen:</b> All card transactions and new applications are temporarily suspended.</span>
         </div>
 
         <div id="card-carousel-wrap">
@@ -1286,7 +1307,7 @@ img,svg{max-width:100%}
         <div class="topbar">
           <div>
             <h2>Admin Console</h2>
-            <small style="color:var(--muted);font-size:12px">Logged in as Tom Harrison</small>
+            <small style="color:var(--muted);font-size:12px">Logged in as Lead Administrator</small>
           </div>
           <div style="display:flex;gap:8px;align-items:center">
             <button class="btn btn-ghost" style="padding:6px 14px;font-size:12px;height:34px" onclick="enterApp()">Client View</button>
@@ -1435,12 +1456,15 @@ img,svg{max-width:100%}
         <h3 id="am-name">—</h3>
         <p class="sub" id="am-email" style="margin-bottom:4px">—</p>
         <div class="am-tags" id="am-tags"></div>
+        <div id="am-frozen-notice" style="display:none;background:rgba(235,87,87,0.15);border:1px solid rgba(235,87,87,0.35);border-radius:12px;padding:9px 12px;font-size:12px;color:#ff8585;margin:10px 0;text-align:center;font-weight:600">
+          ⚠️ ACCOUNT IS CURRENTLY FROZEN — Outgoing client transactions blocked
+        </div>
         <p style="font-family:'Sora';font-size:26px;font-weight:700;margin:6px 0 18px" id="am-bal">—</p>
       </div>
       <button class="btn btn-gold" id="am-promote" onclick="admPromote()">Promote tier</button>
       <button class="btn btn-ghost" id="am-demote" onclick="admDemote()">Demote tier</button>
-      <button class="btn btn-ghost" onclick="admFund('add')" style="color:var(--green);border-color:#BFE7D4">＋ Add funds</button>
-      <button class="btn btn-ghost" onclick="admFund('deduct')" style="color:var(--red);border-color:#F3C1C1">－ Deduct funds</button>
+      <button class="btn btn-ghost" onclick="admFund('add')" style="color:var(--green);border-color:#BFE7D4">＋ Add funds (Deposit)</button>
+      <button class="btn btn-ghost" onclick="admFund('deduct')" style="color:var(--red);border-color:#F3C1C1">－ Deduct funds (Debit)</button>
       <button class="btn btn-dark" id="am-freeze" onclick="admFreeze()">Freeze account</button>
       <button class="btn btn-ghost" id="am-delete" onclick="admDeleteUser()" style="color:#ff5252;border-color:rgba(255,82,82,0.45);background:rgba(255,82,82,0.06);margin-top:6px;font-weight:600">🗑️ Delete Account Permanently</button>
       <button class="btn btn-ghost" onclick="admClose()" style="margin-top:6px">Close</button>
@@ -1450,11 +1474,22 @@ img,svg{max-width:100%}
       <p class="sub" style="text-align:center" id="am-amt-sub">—</p>
       <input class="inp" id="am-amt-in" inputmode="numeric" placeholder="$0.00" style="font-family:'Sora';font-size:34px;font-weight:700;text-align:center;letter-spacing:-.5px">
       <div class="amt-chips">
-        <button onclick="setAmt(100)">$100</button>
-        <button onclick="setAmt(500)">$500</button>
-        <button onclick="setAmt(1000)">$1,000</button>
-        <button onclick="setAmt(5000)">$5,000</button>
+        <button type="button" onclick="setAmt(100)">$100</button>
+        <button type="button" onclick="setAmt(500)">$500</button>
+        <button type="button" onclick="setAmt(1000)">$1,000</button>
+        <button type="button" onclick="setAmt(5000)">$5,000</button>
+        <button type="button" onclick="setAmt(25000)">$25,000</button>
+        <button type="button" onclick="setAmt(100000)">$100,000</button>
       </div>
+
+      <div style="text-align:left;margin:16px 0 14px">
+        <label id="am-tx-name-lbl" style="display:block;font-size:11.5px;font-weight:600;color:var(--gold-2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Deposit Name / Sender Name *</label>
+        <input class="inp" id="am-tx-name" placeholder="e.g. JPMorgan Chase Wire, Federal Reserve, Citadel Securities" style="font-size:13.5px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);color:#fff;outline:none;box-sizing:border-box;margin-bottom:12px;width:100%" autocomplete="off">
+        
+        <label id="am-tx-desc-lbl" style="display:block;font-size:11.5px;font-weight:600;color:var(--gold-2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Description / Reference Memo *</label>
+        <input class="inp" id="am-tx-desc" placeholder="e.g. Portfolio Allocation, Q3 Dividend, Institutional Credit" style="font-size:13.5px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);color:#fff;outline:none;box-sizing:border-box;margin-bottom:6px;width:100%" autocomplete="off">
+      </div>
+
       <button class="btn btn-gold" id="am-amt-go" onclick="admConfirmAmt()">Confirm</button>
       <button class="btn btn-ghost" onclick="admBack()">Back</button>
     </div>
@@ -1477,6 +1512,30 @@ img,svg{max-width:100%}
       <button class="btn btn-ghost" style="flex:1" onclick="closeAdminPinModal()">Cancel</button>
     </div>
     <p style="margin-top:14px;font-size:11px;color:var(--muted)">Default Admin PIN: <b>0000</b></p>
+  </div>
+</div>
+
+<!-- Modal: Account Frozen Security Notice -->
+<div class="modal-bg" id="modal-frozen-alert" onclick="if(event.target===this)closeFrozenModal()">
+  <div class="sheet" style="max-width:440px;text-align:center">
+    <div style="width:54px;height:54px;border-radius:16px;background:rgba(235,87,87,0.15);border:1px solid rgba(235,87,87,0.35);color:#ff5252;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:26px">
+      🔒
+    </div>
+    <h3 style="font-family:'Sora';font-size:20px;color:#fff;margin-bottom:6px" id="frozen-modal-title">Account Temporarily Restricted</h3>
+    <p class="sub" style="font-size:12px;color:#ff6b6b;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:14px" id="frozen-modal-reason">Security & Risk Compliance Active</p>
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px;font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:20px;text-align:left">
+      <p style="margin:0 0 8px">Your Modern Crest Private Banking account has been designated as <b style="color:#ff6b6b">FROZEN</b> by Executive Treasury Compliance.</p>
+      <ul style="margin:0;padding-left:18px;font-size:12.5px;color:rgba(255,255,255,0.65)">
+        <li>Outgoing wire transfers & ACH settlements are blocked</li>
+        <li>Debit and Obsidian metal card spending is suspended</li>
+        <li>Bill payments and liquidity sweeps are deactivated</li>
+      </ul>
+      <p style="margin:8px 0 0;font-size:12px;color:var(--gold-2)">Inbound wire deposits and treasury credits remain unaffected.</p>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-gold" style="flex:1;background:var(--grad-gold);color:#1A1405" onclick="closeFrozenModal();openConciergeModal()">Contact Concierge Desk</button>
+      <button class="btn btn-ghost" style="flex:1" onclick="closeFrozenModal()">Dismiss</button>
+    </div>
   </div>
 </div>
 
@@ -2003,6 +2062,54 @@ function pinKey(k){
   pin+=k;drawPin();
   if(pin.length===4)setTimeout(()=>{if(pin==='0000'){enterAdmin();}else{toast('Welcome back, Adaeze');enterApp();}},250);
 }
+function getCurrentActiveUser(){
+  try {
+    const raw = localStorage.getItem('mcb_users');
+    if (raw) ADM_USERS = JSON.parse(raw);
+  } catch(e){}
+  const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : (sessionRole==='user'?'u1':'u1');
+  let u = ADM_USERS.find(x => x.id === currentUserId);
+  if (!u && ADM_USERS.length > 0) u = ADM_USERS[0];
+  return u;
+}
+
+function showFrozenModal(reason){
+  const m = document.getElementById('modal-frozen-alert');
+  if(!m) return;
+  const reasonEl = document.getElementById('frozen-modal-reason');
+  if(reasonEl && reason) reasonEl.textContent = reason;
+  m.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeFrozenModal(){
+  const m = document.getElementById('modal-frozen-alert');
+  if(m) m.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function renderFrozenBanner(){
+  const u = getCurrentActiveUser();
+  const isFrozen = u && u.status === 'frozen';
+  
+  const banner = document.getElementById('frozen-account-banner');
+  const badge = document.getElementById('account-frozen-badge');
+  const sendBtn = document.querySelector('.action-send');
+  const cardsNotice = document.getElementById('cards-frozen-notice');
+  
+  if (banner) banner.style.display = isFrozen ? 'block' : 'none';
+  if (badge) badge.style.display = isFrozen ? 'inline-block' : 'none';
+  if (cardsNotice) cardsNotice.style.display = isFrozen ? 'flex' : 'none';
+  if (sendBtn) {
+    if (isFrozen) {
+      sendBtn.style.opacity = '0.55';
+      sendBtn.style.filter = 'grayscale(0.4)';
+    } else {
+      sendBtn.style.opacity = '1';
+      sendBtn.style.filter = '';
+    }
+  }
+}
+
 function updateStatsUI(){
   let inc = 0, exp = 0;
   txData.forEach(t => {
@@ -2018,6 +2125,11 @@ function updateStatsUI(){
 }
 
 function updateBalanceUI(){
+  const u = getCurrentActiveUser();
+  if (u && typeof u.balance === 'number') {
+    BALANCE = u.balance;
+  }
+  
   const balEl = document.getElementById('bal');
   if (balEl) balEl.textContent = balHidden ? '$ ••••••' : fmtBal(BALANCE);
   
@@ -2026,19 +2138,23 @@ function updateBalanceUI(){
   
   const balSubEl = document.getElementById('bal-sub');
   if (balSubEl) {
-    const eur = BALANCE * 0.92;
-    const tStr = state.tier.charAt(0).toUpperCase() + state.tier.slice(1);
-    balSubEl.innerHTML = balHidden ? 'Tap the eye to reveal' : '≈ €'+eur.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' &nbsp;&middot;&nbsp; '+tStr+' tier &middot; limit '+fmtLimit(tierLimit());
+    if (balHidden) {
+      balSubEl.innerHTML = 'Tap the eye to reveal';
+    } else if (u && u.status === 'frozen') {
+      balSubEl.innerHTML = '<span style="color:#ff6b6b;font-weight:700">⚠️ Status: Restricted (Frozen)</span> &nbsp;&middot;&nbsp; Outgoing operations suspended';
+    } else {
+      const eur = BALANCE * 0.92;
+      const tStr = state.tier.charAt(0).toUpperCase() + state.tier.slice(1);
+      balSubEl.innerHTML = '≈ €'+eur.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' &nbsp;&middot;&nbsp; '+tStr+' tier &middot; limit '+fmtLimit(tierLimit());
+    }
   }
   
   const cardSettleBal = document.getElementById('card-settle-bal');
   if (cardSettleBal) cardSettleBal.textContent = balHidden ? '$ ••••••' : fmtBal(BALANCE);
   const cardSettleAcct = document.getElementById('card-settle-acct');
   if (cardSettleAcct) {
-    const currentUserId = (window.Clerk && window.Clerk.user) ? window.Clerk.user.id : (sessionRole==='user'?'u1':'u1');
-    const u = ADM_USERS.find(x => x.id === currentUserId);
     const acctNum = u ? u.accountNumber : '4829104820';
-    cardSettleAcct.textContent = 'Checking ••' + acctNum.slice(-4);
+    cardSettleAcct.textContent = 'Checking ••' + (acctNum ? acctNum.slice(-4) : '4820');
   }
   
   updateStatsUI();
@@ -2048,12 +2164,18 @@ function updateBalanceUI(){
 function enterApp(){
   sessionRole = 'user';
   
+  try {
+    const raw = localStorage.getItem('mcb_users');
+    if (raw) ADM_USERS = JSON.parse(raw);
+  } catch(e){}
+
+  let u = null;
   if (window.Clerk && window.Clerk.user) {
     const user = window.Clerk.user;
     let name = user.fullName || user.firstName || (user.primaryEmailAddress ? user.primaryEmailAddress.emailAddress.split('@')[0] : "User");
     let email = user.primaryEmailAddress ? user.primaryEmailAddress.emailAddress : "user@crest.com";
     
-    let u = ADM_USERS.find(x => x.id === user.id);
+    u = ADM_USERS.find(x => x.id === user.id);
     if (!u) {
       const hash = Math.abs((user.id + name).split('').reduce((acc, ch) => acc * 31 + ch.charCodeAt(0), 10482018 + ADM_USERS.length * 7919)) % 9000000000 + 1000000000;
       u = { id: user.id, name: name, email: email, tier: 'basic', balance: 0.00, status: 'active', kyc: 'verified', joined: 'Today', accountNumber: hash.toString() };
@@ -2068,9 +2190,14 @@ function enterApp(){
       localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
       syncUsersToServer(ADM_USERS);
     }
-    
-    BALANCE = u.balance;
-    state.tier = u.tier;
+  } else {
+    u = ADM_USERS.find(x => x.id === 'u1');
+    if (!u && ADM_USERS.length > 0) u = ADM_USERS[0];
+  }
+
+  if (u) {
+    BALANCE = Number(u.balance) || 0;
+    state.tier = u.tier || 'basic';
     
     let allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
     txData = allTxs.filter(t => t.userId === u.id);
@@ -2080,12 +2207,10 @@ function enterApp(){
     document.querySelectorAll('.card-foot b:first-child').forEach(b => { if(b) b.textContent = u.name.toUpperCase(); });
     const pEmail = document.querySelector('.p-head span');
     if (pEmail) pEmail.textContent = u.email;
-  } else {
-    let allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
-    txData = allTxs.filter(t => t.userId === 'u1');
   }
 
   updateBalanceUI();
+  renderFrozenBanner();
   renderNav();
   renderTx();
   renderUserCards();
@@ -2109,11 +2234,14 @@ let txFilter='all',txSearch='';
 function txIcon(t){return t==='in'
  ?'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 7L7 17M8 7h9v9"/></svg>'
  :'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M16 17H7V8"/></svg>';}
-function txRow(t){return `<div class="tx"><div class="tx-ico ${t.type}">${txIcon(t.type)}</div>
- <div class="tx-mid"><b>${t.n}</b><span>${t.d}</span></div>
- <span class="tx-amt ${t.type==='in'?'pos':'neg'}">${t.type==='in'?'+':''}${Math.abs(t.a).toLocaleString('en-US',{style:'currency',currency:'USD'})}</span></div>`;}
+function txRow(t){
+  const descHtml = t.desc ? `<span style="color:var(--muted);font-weight:400"> · ${t.desc}</span>` : '';
+  return `<div class="tx"><div class="tx-ico ${t.type}">${txIcon(t.type)}</div>
+ <div class="tx-mid"><b>${t.n}</b><span>${t.d}${descHtml}</span></div>
+ <span class="tx-amt ${t.type==='in'?'pos':'neg'}">${t.type==='in'?'+':''}${Math.abs(t.a).toLocaleString('en-US',{style:'currency',currency:'USD'})}</span></div>`;
+}
 function renderTx(){
-  const list=txData.filter(t=>(txFilter==='all'||t.type===txFilter||t.cat===txFilter)&&(t.n.toLowerCase().includes(txSearch)));
+  const list=txData.filter(t=>(txFilter==='all'||t.type===txFilter||t.cat===txFilter)&&((t.n||'').toLowerCase().includes(txSearch) || (t.desc||'').toLowerCase().includes(txSearch)));
   const txListEl = document.getElementById('tx-list');
   if(txListEl) {
     txListEl.innerHTML=list.length?list.map(txRow).join(''):'<p style="text-align:center;color:var(--muted);padding:24px;font-size:14px">No transactions found</p>';
@@ -2193,6 +2321,12 @@ function getActiveCardIndex(){
   return Math.min(cards.length - 1, Math.max(0, Math.round(c.scrollLeft / (c.firstElementChild.offsetWidth + 14))));
 }
 function toggleFreeze(){
+  const curUser = getCurrentActiveUser();
+  if (curUser && curUser.status === 'frozen') {
+    toast('⚠️ Account is frozen: Card controls are disabled.');
+    showFrozenModal('Card Operations Suspended');
+    return;
+  }
   const cards = getUserCards();
   if(cards.length === 0){
     toast('No cards issued yet. Apply for a card first.');
@@ -2320,6 +2454,14 @@ function fmtAmt(el){
   if(v)el.value='$'+v;else el.value='';
 }
 function openSheet(which){
+  if(which === 'send'){
+    const curUser = getCurrentActiveUser();
+    if(curUser && curUser.status === 'frozen'){
+      toast('⚠️ Account Frozen: Outgoing transfers are suspended.');
+      showFrozenModal('Outgoing Transfers Suspended');
+      return;
+    }
+  }
   document.getElementById('sheet-send').style.display=which==='send'?'block':'none';
   document.getElementById('sheet-confirm').style.display=which==='confirm'?'block':'none';
   renderContacts();
@@ -2328,6 +2470,12 @@ function openSheet(which){
 }
 function closeSheet(){document.getElementById('modal').classList.remove('open');document.body.style.overflow='';}
 function confirmSend(){
+  const curUser = getCurrentActiveUser();
+  if(curUser && curUser.status === 'frozen'){
+    toast('⚠️ Transaction Blocked: Your account is frozen.');
+    showFrozenModal('Outgoing Transfers Blocked');
+    return;
+  }
   const recNameIn = document.getElementById('send-rec-name');
   const recAcctIn = document.getElementById('send-rec-acct');
   const recBankIn = document.getElementById('send-rec-bank');
@@ -2797,7 +2945,7 @@ function admApprove(id){
   u.tier=u.target||'premium';u.kyc='verified';u.target=null;
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   syncUsersToServer(ADM_USERS);
-  admLog(u.name+' upgraded to '+TIER_INFO[u.tier].name+' tier by Tom Harrison');
+  admLog(u.name+' upgraded to '+TIER_INFO[u.tier].name+' tier by Lead Administrator');
   toast(u.name+' approved · now '+TIER_INFO[u.tier].name);renderAdmin();
 }
 function admReject(id){
@@ -2805,7 +2953,7 @@ function admReject(id){
   u.kyc='rejected';u.target=null;
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   syncUsersToServer(ADM_USERS);
-  admLog('Upgrade rejected for '+u.name+' by Tom Harrison');
+  admLog('Upgrade rejected for '+u.name+' by Lead Administrator');
   toast('Upgrade rejected for '+u.name);renderAdmin();
 }
 
@@ -2822,7 +2970,9 @@ function admOpen(id){
   const pr=document.getElementById('am-promote'),de=document.getElementById('am-demote'),fr=document.getElementById('am-freeze');
   if(ti>=2||u.status==='frozen'){pr.disabled=true;pr.style.opacity=.45;}else{pr.disabled=false;pr.style.opacity=1;pr.textContent='Promote to '+TIER_ORDER[ti+1].charAt(0).toUpperCase()+TIER_ORDER[ti+1].slice(1);}
   if(ti<=0||u.status==='frozen'){de.disabled=true;de.style.opacity=.45;}else{de.disabled=false;de.style.opacity=1;de.textContent='Demote to '+TIER_ORDER[ti-1].charAt(0).toUpperCase()+TIER_ORDER[ti-1].slice(1);}
-  fr.textContent=u.status==='frozen'?'Unfreeze account':'Freeze account';
+  fr.textContent=u.status==='frozen'?'❄️ Unfreeze account':'🔒 Freeze account';
+  const fzNotice = document.getElementById('am-frozen-notice');
+  if(fzNotice) fzNotice.style.display = u.status==='frozen' ? 'block' : 'none';
   document.getElementById('modal3').classList.add('open');
   document.body.style.overflow='hidden';
 }
@@ -2838,23 +2988,31 @@ function admPromote(){
   u.tier=TIER_ORDER[ti+1];if(u.kyc==='pending'&&u.target===u.tier){u.kyc='verified';u.target=null;}
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   syncUsersToServer(ADM_USERS);
-  admLog(u.name+' promoted to '+TIER_INFO[u.tier].name+' by Tom Harrison');toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');admOpen(u.id);renderAdmin();
+  admLog(u.name+' promoted to '+TIER_INFO[u.tier].name+' by Lead Administrator');toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');admOpen(u.id);renderAdmin();
 }
 function admDemote(){
   const u=admState.sel;const ti=TIER_ORDER.indexOf(u.tier);if(ti<=0)return;
   u.tier=TIER_ORDER[ti-1];
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   syncUsersToServer(ADM_USERS);
-  admLog(u.name+' demoted to '+TIER_INFO[u.tier].name+' by Tom Harrison');toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');admOpen(u.id);renderAdmin();
+  admLog(u.name+' demoted to '+TIER_INFO[u.tier].name+' by Lead Administrator');toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');admOpen(u.id);renderAdmin();
 }
 function admFreeze(){
   const u=admState.sel;
   u.status=u.status==='frozen'?'active':'frozen';
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   syncUsersToServer(ADM_USERS);
-  admLog((u.status==='frozen'?'Account frozen: ':'Account unfrozen: ')+u.name+' by Tom Harrison');
+  admLog((u.status==='frozen'?'Account frozen: ':'Account unfrozen: ')+u.name+' by Lead Administrator');
   toast(u.status==='frozen'?u.name+' frozen':u.name+' reactivated');
-  sendTelegramAlert(`🔒 <b>ACCOUNT STATUS CHANGED</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>New Status:</b> <b>${u.status.toUpperCase()}</b>\n<b>Admin:</b> Tom Harrison`);
+  sendTelegramAlert(`🔒 <b>ACCOUNT STATUS CHANGED</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>New Status:</b> <b>${u.status.toUpperCase()}</b>\n<b>Admin:</b> Lead Administrator`);
+  
+  // Real-time sync if current active user is the one being toggled
+  const cur = getCurrentActiveUser();
+  if (cur && cur.id === u.id) {
+    cur.status = u.status;
+    renderFrozenBanner();
+  }
+  
   admOpen(u.id);renderAdmin();
 }
 function admDeleteUser(){
@@ -2886,23 +3044,53 @@ function admDeleteUser(){
   localStorage.setItem('mcb_cards', JSON.stringify(allCards));
 
   // 4. Send Telegram Broadcast Notice
-  const tgNotice = `🗑️ <b>CLIENT ACCOUNT DELETED (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${deletedName}\n<b>Account Number:</b> <code>${deletedAcct}</code>\n<b>Tier:</b> ${deletedTier}\n<b>Action Executed By:</b> Tom Harrison (Lead Admin)\n<b>Remaining Registered Clients:</b> <b>${ADM_USERS.length}</b>\n<b>Timestamp:</b> ${new Date().toUTCString()}`;
+  const tgNotice = `🗑️ <b>CLIENT ACCOUNT DELETED (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${deletedName}\n<b>Account Number:</b> <code>${deletedAcct}</code>\n<b>Tier:</b> ${deletedTier}\n<b>Action Executed By:</b> Lead Administrator\n<b>Remaining Registered Clients:</b> <b>${ADM_USERS.length}</b>\n<b>Timestamp:</b> ${new Date().toUTCString()}`;
   sendTelegramAlert(tgNotice);
 
   // 5. Post deletion sync to backend daemon
   syncUsersToServer(ADM_USERS, { action: 'delete_user', userId: deletedId });
 
   // 6. Audit log & UI feedback
-  admLog(`Account permanently deleted: ${deletedName} (${deletedAcct}) by Tom Harrison`);
+  admLog(`Account permanently deleted: ${deletedName} (${deletedAcct}) by Lead Administrator`);
   toast(`Account permanently deleted: ${deletedName}`);
   admClose();
   renderAdmin();
 }
 function admFund(mode){
   admState.amtMode=mode;const u=admState.sel;
-  document.getElementById('am-amt-title').textContent=mode==='add'?'Add funds':'Deduct funds';
+  document.getElementById('am-amt-title').textContent=mode==='add'?'Add funds (Deposit)':'Deduct funds (Debit)';
   document.getElementById('am-amt-sub').textContent=(mode==='add'?'Credit':'Debit')+' '+u.name+' · current balance '+fmtBal(u.balance);
   document.getElementById('am-amt-in').value='';
+  
+  const nameLbl = document.getElementById('am-tx-name-lbl');
+  const nameIn = document.getElementById('am-tx-name');
+  const descLbl = document.getElementById('am-tx-desc-lbl');
+  const descIn = document.getElementById('am-tx-desc');
+  
+  if (mode === 'add') {
+    if (nameLbl) nameLbl.textContent = 'Deposit Name / Sender Name *';
+    if (nameIn) {
+      nameIn.placeholder = 'e.g. JPMorgan Chase Wire, Federal Reserve, Citadel Securities';
+      nameIn.value = '';
+    }
+    if (descLbl) descLbl.textContent = 'Description / Reference Memo *';
+    if (descIn) {
+      descIn.placeholder = 'e.g. Portfolio Allocation, Q3 Dividend, Institutional Credit';
+      descIn.value = '';
+    }
+  } else {
+    if (nameLbl) nameLbl.textContent = 'Debit Name / Beneficiary Name *';
+    if (nameIn) {
+      nameIn.placeholder = 'e.g. Institutional Custody Fee, Tax Reserve, Asset Debit';
+      nameIn.value = '';
+    }
+    if (descLbl) descLbl.textContent = 'Debit Memo / Audit Note *';
+    if (descIn) {
+      descIn.placeholder = 'e.g. Compliance Liquidation, Custodial Adjustment';
+      descIn.value = '';
+    }
+  }
+
   document.getElementById('am-amt-go').textContent=mode==='add'?'Confirm & credit':'Confirm & debit';
   document.getElementById('am-amt-go').style.background=mode==='add'?'var(--grad-gold)':'linear-gradient(135deg,#E05A5A,#B92E2E)';
   document.getElementById('am-amt-go').style.color=mode==='add'?'#231A05':'#fff';
@@ -2915,33 +3103,67 @@ function admConfirmAmt(){
   const amt=parseFloat(raw);
   if(!amt||amt<=0){toast('Enter a valid amount');return;}
   if(admState.amtMode==='deduct'&&amt>u.balance){toast('Amount exceeds user balance');return;}
-  u.balance=admState.amtMode==='add'?u.balance+amt:Math.max(0,u.balance-amt);
+
+  const isAdd = admState.amtMode === 'add';
+  const nameEl = document.getElementById('am-tx-name');
+  const descEl = document.getElementById('am-tx-desc');
+  let txName = (nameEl ? nameEl.value.trim() : '');
+  let txDesc = (descEl ? descEl.value.trim() : '');
+
+  // Prompt admin if empty so every deposit has a custom deposit name and description
+  if (!txName) {
+    const promptLabel = isAdd ? "Enter custom Deposit Name / Sender Name:" : "Enter custom Debit Name / Reason:";
+    const defaultPlaceholder = isAdd ? "Institutional Treasury Wire" : "Custodial Adjustment";
+    const userEntered = prompt(promptLabel, defaultPlaceholder);
+    if (!userEntered || !userEntered.trim()) {
+      toast(isAdd ? 'Deposit name is required' : 'Debit name is required');
+      if (nameEl) nameEl.focus();
+      return;
+    }
+    txName = userEntered.trim();
+  }
+
+  if (!txDesc) {
+    const promptDesc = isAdd ? "Enter Description / Reference Memo:" : "Enter Debit Description / Reference Memo:";
+    const defaultMemo = isAdd ? "Capital Allocation" : "Administrative Settlement";
+    const userEnteredDesc = prompt(promptDesc, defaultMemo);
+    txDesc = (userEnteredDesc && userEnteredDesc.trim()) ? userEnteredDesc.trim() : (isAdd ? "Capital Allocation" : "Settlement");
+  }
+
+  u.balance = isAdd ? (Number(u.balance) || 0) + amt : Math.max(0, (Number(u.balance) || 0) - amt);
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   syncUsersToServer(ADM_USERS);
 
-  const isAdd = admState.amtMode === 'add';
   const newTx = {
     userId: u.id,
-    n: isAdd ? "Deposit from Tom Harrison" : "Debit by Tom Harrison",
+    n: txName,
+    desc: txDesc,
     d: "Today · " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
     a: isAdd ? amt : -amt,
     type: isAdd ? "in" : "out",
-    cat: "transfer"
+    cat: isAdd ? "transfer" : "card"
   };
   let allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
   allTxs.unshift(newTx);
   localStorage.setItem('mcb_txs', JSON.stringify(allTxs));
 
-  if (window.Clerk && window.Clerk.user && window.Clerk.user.id === u.id) {
-    BALANCE = u.balance;
+  // Determine current active user in client session and update client balance immediately
+  const cur = getCurrentActiveUser();
+  if (cur && (cur.id === u.id || (window.Clerk && window.Clerk.user && window.Clerk.user.id === u.id))) {
+    BALANCE = Number(u.balance) || 0;
     txData.unshift(newTx);
     renderTx();
     updateBalanceUI();
+    renderFrozenBanner();
   }
 
-  admLog(fmtBal(amt)+(admState.amtMode==='add'?' added to ':' deducted from ')+u.name);
-  toast((admState.amtMode==='add'?'Credited ':'Debited ')+fmtBal(amt)+' → '+u.name);
-  admView('menu');admOpen(u.id);renderAdmin();
+  sendTelegramAlert(`💵 <b>ADMIN ${isAdd ? 'DEPOSIT' : 'DEBIT'} EXECUTED</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>Amount:</b> <b>${isAdd ? '+' : '-'}${fmtBal(amt)}</b>\n<b>Transaction Name:</b> ${txName}\n<b>Memo / Ref:</b> ${txDesc}\n<b>New Balance:</b> <b>${fmtBal(u.balance)}</b>\n<b>Authorized By:</b> Lead Administrator`);
+
+  admLog(fmtBal(amt)+(isAdd ? ' added to ' : ' deducted from ')+u.name+' ('+txName+')');
+  toast((isAdd ? 'Credited ' : 'Debited ')+fmtBal(amt)+' → '+u.name);
+  admView('menu');
+  admOpen(u.id);
+  renderAdmin();
 }
 
 function enterAdmin(){
@@ -3010,6 +3232,11 @@ function copyFullBankingDetails(){
 
 // Pay Bills Modal
 function openPayBillsModal(){
+  const user = getCurrentActiveUser();
+  if (user && user.status === 'frozen') {
+    showFrozenModal('Bill payments and recurring settlement authorizations');
+    return;
+  }
   document.getElementById('modal-bills').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -3021,6 +3248,12 @@ function setBillAmt(v){
   document.getElementById('bill-amt-in').value = '$' + v.toLocaleString();
 }
 function confirmPayBill(){
+  const user = getCurrentActiveUser();
+  if (user && user.status === 'frozen') {
+    closePayBillsModal();
+    showFrozenModal('Bill payments');
+    return;
+  }
   const raw = document.getElementById('bill-amt-in').value.replace(/[^0-9.]/g,'');
   const amt = parseFloat(raw);
   const provider = document.getElementById('bill-provider').value;
@@ -3038,6 +3271,7 @@ function confirmPayBill(){
   const newTx = {
     userId: currentUserId,
     n: "Bill Payment — " + provider,
+    desc: "Utility & Service Settlement",
     d: "Today · " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
     a: -amt,
     type: "out",
@@ -3057,6 +3291,11 @@ function confirmPayBill(){
 // New Card Modal
 let selNewCardStyle = 'dark';
 function openNewCardModal(){
+  const user = getCurrentActiveUser();
+  if (user && user.status === 'frozen') {
+    showFrozenModal('Issuance of new sovereign debit cards and virtual spending lines');
+    return;
+  }
   document.getElementById('modal-newcard').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -3072,6 +3311,12 @@ function selCardStyle(style){
   });
 }
 function confirmNewCard(){
+  const user = getCurrentActiveUser();
+  if (user && user.status === 'frozen') {
+    closeNewCardModal();
+    showFrozenModal('Sovereign card issuance');
+    return;
+  }
   const style = selNewCardStyle || 'dark';
   const label = document.getElementById('newcard-label').value.trim() || 'Virtual Debit Card';
   const randomLast4 = Math.floor(1000 + Math.random() * 9000);
@@ -3267,7 +3512,7 @@ function sendConciergeMsg(){
     } else if(txt.toLowerCase().includes('card') || txt.toLowerCase().includes('metal')){
       botMsg.textContent = 'Your physical obsidian-tungsten metal card request has been placed with executive courier dispatch. Delivery ETA is 2-3 business days.';
     } else if(txt.toLowerCase().includes('wealth') || txt.toLowerCase().includes('consultation')){
-      botMsg.textContent = 'I will coordinate a calendar invitation with Senior Portfolio Director Tom Harrison for your comprehensive wealth and yield review.';
+      botMsg.textContent = 'I will coordinate a calendar invitation with our Senior Private Wealth Director for your comprehensive wealth and yield review.';
     } else {
       botMsg.textContent = 'Understood. I am processing your instruction immediately and ensuring all Modern Crest private banking resources are allocated for you.';
     }
@@ -3397,6 +3642,54 @@ renderNav();renderTx();
   type="text/javascript"
 ></script>
 <script>
+  // Clean up any historical test transactions mentioning Tom Harrison
+  (function cleanHistoricalTxs() {
+    try {
+      let allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
+      let modified = false;
+      allTxs.forEach(t => {
+        if (t.n && t.n.includes('Tom Harrison')) {
+          t.n = t.n.replace(/Tom Harrison/g, 'Institutional Treasury');
+          if (!t.desc) t.desc = 'Institutional Wire Settlement';
+          modified = true;
+        }
+      });
+      if (modified) {
+        localStorage.setItem('mcb_txs', JSON.stringify(allTxs));
+      }
+    } catch(e) {}
+  })();
+
+  // Synchronize multi-tab updates between admin dashboard and client banking view
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'mcb_users' || e.key === 'mcb_txs') {
+      try {
+        const storedUsers = JSON.parse(localStorage.getItem('mcb_users')) || [];
+        if (storedUsers.length) ADM_USERS = storedUsers;
+        const cur = getCurrentActiveUser();
+        if (cur) {
+          const updated = ADM_USERS.find(x => x.id === cur.id);
+          if (updated) {
+            BALANCE = Number(updated.balance) || 0;
+            updateBalanceUI();
+            renderFrozenBanner();
+          }
+        }
+        if (e.key === 'mcb_txs' && cur) {
+          const allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
+          txData = allTxs.filter(t => !t.userId || t.userId === cur.id);
+          renderTx();
+          updateBalanceUI();
+        }
+        if (typeof renderAdmin === 'function') {
+          renderAdmin();
+        }
+      } catch(err) {
+        console.warn('Storage sync error:', err);
+      }
+    }
+  });
+
   window.addEventListener('load', async function () {
     try {
       await window.Clerk.load();

