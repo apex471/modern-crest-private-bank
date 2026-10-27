@@ -513,6 +513,13 @@ a{text-decoration:none;color:inherit}
         <div id="am-frozen-notice" style="display:none;background:rgba(235,87,87,0.15);border:1px solid rgba(235,87,87,0.35);border-radius:12px;padding:9px 12px;font-size:12px;color:#ff8585;margin-bottom:12px;text-align:center;font-weight:600">
           ⚠️ ACCOUNT IS CURRENTLY FROZEN — Outgoing client transactions blocked
         </div>
+        <div id="am-unlock-box" style="display:none;background:rgba(200,165,90,0.12);border:1px solid var(--gold);border-radius:12px;padding:12px;margin-bottom:12px;text-align:left">
+          <div style="font-weight:700;color:var(--gold);font-size:12px;margin-bottom:4px;display:flex;align-items:center;gap:6px">
+            🔓 PENDING CLIENT UNLOCK REQUEST
+          </div>
+          <div id="am-unlock-details" style="font-size:12px;color:#cbd5e1;line-height:1.5;margin-bottom:10px"></div>
+          <button class="btn btn-green" style="padding:7px 12px;font-size:12px;width:100%" onclick="admUnfreeze(admState.sel.id)">Approve & Unfreeze Account</button>
+        </div>
         <p style="font-family:'Sora';font-size:26px;font-weight:700;margin-bottom:20px" id="am-bal">—</p>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px">
@@ -722,7 +729,7 @@ function renderAdmin(){
   if(storedUsers) ADM_USERS = JSON.parse(storedUsers);
 
   const total = ADM_USERS.length;
-  const pending = ADM_USERS.filter(u=>u.kyc==='pending');
+  const pending = ADM_USERS.filter(u=>u.kyc==='pending' || (u.status==='frozen' && u.unlockRequest));
   const held = ADM_USERS.reduce((s,u)=>s+u.balance,0);
   const frozen = ADM_USERS.filter(u=>u.status==='frozen').length;
 
@@ -734,6 +741,56 @@ function renderAdmin(){
 
   document.getElementById('adm-pend-n').textContent = pending.length;
   document.getElementById('adm-pending').innerHTML = pending.length ? pending.map(u=>{
+    if(u.status === 'frozen' && u.unlockRequest){
+      const req = u.unlockRequest;
+      return `
+      <div class="pend-card frozen" style="border:1.5px solid var(--gold)">
+        <div class="pend-user">
+          <div class="avatar">${admInitials(u.name)}</div>
+          <div style="flex:1">
+            <b>${u.name}</b>
+            <small>${u.email} · Acct #${u.accountNumber || '—'} · Status: <span style="color:#ff6b6b;font-weight:700">FROZEN</span></small>
+          </div>
+          <span class="adm-tag" style="background:rgba(200,165,90,0.2);color:var(--gold);border:1px solid var(--gold)">UNLOCK REQUEST</span>
+        </div>
+        <div class="kyc-cred-box" style="border-color:rgba(200,165,90,0.3)">
+          <div class="kyc-cred-head">
+            <div>
+              <span class="kyc-target-tag" style="color:var(--gold)">Request: Account Unfreeze & Credential Verification</span>
+              <span class="kyc-date">${req.submittedAt}</span>
+            </div>
+            <span class="kyc-status-chip" style="background:rgba(200,165,90,0.25);color:var(--gold)">Pending Clearance</span>
+          </div>
+          <div class="kyc-cred-grid">
+            <div class="kcg-item">
+              <small>Client Name</small>
+              <b>${u.name}</b>
+            </div>
+            <div class="kcg-item">
+              <small>Verification Document</small>
+              <b>${req.docType} (<code>${req.docNum}</code>)</b>
+            </div>
+            <div class="kcg-item doc-item" style="grid-column:span 2">
+              <small>Attached Document File</small>
+              <div class="doc-badge" onclick="admInspectDoc('${u.name.replace(/'/g,"\\'")}','${req.docType.replace(/'/g,"\\'")}','${(req.fileName||'id_scan.pdf').replace(/'/g,"\\'")}')">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><circle cx="10" cy="13" r="2"/></svg>
+                <span>${req.fileName || 'verification_doc.pdf'}</span>
+                <span class="doc-action">Inspect</span>
+              </div>
+            </div>
+            <div class="kcg-item" style="grid-column:span 2">
+              <small>Client Explanation / Note</small>
+              <p style="margin:4px 0 0;font-size:12.5px;color:#e2e8f0;font-style:italic">"${req.note}"</p>
+            </div>
+          </div>
+        </div>
+        <div class="pend-actions">
+          <button class="btn btn-green" onclick="admUnfreeze('${u.id}')">Approve & Unfreeze Account</button>
+          <button class="btn btn-redghost" onclick="admRejectUnlock('${u.id}')">Reject Unlock Request</button>
+        </div>
+      </div>`;
+    }
+
     const k = u.kycDetails || {
       name: u.name,
       dob: '1990-01-01',
@@ -880,6 +937,35 @@ function admReject(id){
   renderAdmin();
 }
 
+function admUnfreeze(id){
+  const u = ADM_USERS.find(x => x.id === id);
+  if(!u) return;
+  u.status = 'active';
+  delete u.unlockRequest;
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
+  admLog('Account unfrozen and restored by Lead Administrator: ' + u.name);
+  toast(u.name + ' unfrozen and fully active');
+  sendTelegramAlert(`🟢 <b>ACCOUNT RESTORED & UNFROZEN</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>New Status:</b> <b>ACTIVE</b>\n<b>Compliance Officer:</b> Lead Administrator`);
+  
+  if(admState.sel && admState.sel.id === u.id) admOpen(u.id);
+  renderAdmin();
+}
+
+function admRejectUnlock(id){
+  const u = ADM_USERS.find(x => x.id === id);
+  if(!u) return;
+  delete u.unlockRequest;
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
+  admLog('Unlock request rejected for: ' + u.name);
+  toast('Unlock request rejected for ' + u.name);
+  sendTelegramAlert(`❌ <b>UNLOCK REQUEST REJECTED</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>Status:</b> Remains FROZEN`);
+  
+  if(admState.sel && admState.sel.id === u.id) admOpen(u.id);
+  renderAdmin();
+}
+
 function admOpen(id){
   const u=ADM_USERS.find(x=>x.id===id);if(!u)return;
   admState.sel=u;
@@ -897,6 +983,21 @@ function admOpen(id){
   }
   const frNotice = document.getElementById('am-frozen-notice');
   if(frNotice) frNotice.style.display = u.status==='frozen' ? 'block' : 'none';
+  
+  const unBox = document.getElementById('am-unlock-box');
+  const unDet = document.getElementById('am-unlock-details');
+  if(u.status === 'frozen' && u.unlockRequest){
+    if(unBox) unBox.style.display = 'block';
+    if(unDet) {
+      unDet.innerHTML = `<b>Submitted:</b> ${u.unlockRequest.submittedAt}<br>
+<b>Document:</b> ${u.unlockRequest.docType} (<code>${u.unlockRequest.docNum}</code>)<br>
+<b>Attachment:</b> <code>${u.unlockRequest.fileName || 'verification_scan.pdf'}</code><br>
+<b>Note:</b> <i>"${u.unlockRequest.note || 'Identity verified'}"</i>`;
+    }
+  } else {
+    if(unBox) unBox.style.display = 'none';
+  }
+  
   admView('menu');
   document.getElementById('modal3').classList.add('open');
   document.body.style.overflow='hidden';
@@ -930,6 +1031,7 @@ function admDemote(){
 function admFreeze(){
   const u=admState.sel;
   u.status=u.status==='frozen'?'active':'frozen';
+  if(u.status === 'active') delete u.unlockRequest;
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   syncUsersToServer(ADM_USERS);
   admLog((u.status==='frozen'?'Account frozen: ':'Account unfrozen: ')+u.name);

