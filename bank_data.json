@@ -11,12 +11,12 @@
       "kyc": "verified",
       "joined": "Mar 2025",
       "profileDetails": {
-        "name": "Adaeze Okafor",
-        "country": "US",
-        "phone": "+1 (555) 382-9012",
-        "dob": "1992-06-15",
         "addr": "1400 Park Ave, Suite 22B",
         "city": "New York",
+        "country": "US",
+        "dob": "1992-06-15",
+        "name": "Adaeze Okafor",
+        "phone": "+1 (555) 382-9012",
         "state": "NY",
         "zip": "10017"
       }
@@ -47,22 +47,22 @@
       "id": "u4",
       "name": "Tolu Adeyemi",
       "email": "tolu.adeyemi@crestmail.com",
-      "tier": "basic",
+      "tier": "premium",
       "balance": 0,
       "status": "active",
-      "kyc": "pending",
-      "target": "premium",
+      "kyc": "verified",
+      "target": null,
       "joined": "Sep 2026",
       "accountNumber": "6281940172",
       "kycDetails": {
-        "name": "Tolu Adeyemi",
-        "dob": "1988-06-14",
-        "nat": "United States",
-        "idType": "Passport",
-        "idFile": "us_passport_adeyemi.pdf",
-        "ssnLast4": "6192",
-        "addrType": "Bank Statement",
         "addrFile": "chase_statement_sept2026.pdf",
+        "addrType": "Bank Statement",
+        "dob": "1988-06-14",
+        "idFile": "us_passport_adeyemi.pdf",
+        "idType": "Passport",
+        "name": "Tolu Adeyemi",
+        "nat": "United States",
+        "ssnLast4": "6192",
         "submittedAt": "Today · 08:30 AM"
       }
     },
@@ -78,14 +78,14 @@
       "joined": "Oct 2026",
       "accountNumber": "5192840192",
       "kycDetails": {
-        "name": "Jonas Berg",
-        "dob": "1984-11-03",
-        "nat": "Germany",
-        "idType": "National ID Card",
-        "idFile": "personalausweis_berg.pdf",
-        "ssnLast4": "4081",
-        "addrType": "Utility Bill",
         "addrFile": "berlin_energy_bill.pdf",
+        "addrType": "Utility Bill",
+        "dob": "1984-11-03",
+        "idFile": "personalausweis_berg.pdf",
+        "idType": "National ID Card",
+        "name": "Jonas Berg",
+        "nat": "Germany",
+        "ssnLast4": "4081",
         "submittedAt": "Yesterday · 16:20"
       }
     },
@@ -93,22 +93,22 @@
       "id": "u6",
       "name": "Amina Diallo",
       "email": "amina.diallo@crestmail.com",
-      "tier": "premium",
+      "tier": "private",
       "balance": 0,
       "status": "active",
-      "kyc": "pending",
+      "kyc": "verified",
       "joined": "Oct 2026",
       "accountNumber": "9182736450",
-      "target": "private",
+      "target": null,
       "kycDetails": {
-        "name": "Amina Diallo",
-        "dob": "1992-03-29",
-        "nat": "United Kingdom",
-        "idType": "Driver License",
-        "idFile": "uk_driving_licence_diallo.pdf",
-        "ssnLast4": "8835",
-        "addrType": "Lease Agreement",
         "addrFile": "london_tenancy_signed.pdf",
+        "addrType": "Lease Agreement",
+        "dob": "1992-03-29",
+        "idFile": "uk_driving_licence_diallo.pdf",
+        "idType": "Driver License",
+        "name": "Amina Diallo",
+        "nat": "United Kingdom",
+        "ssnLast4": "8835",
         "submittedAt": "Yesterday · 19:45"
       }
     },
@@ -122,6 +122,28 @@
       "kyc": "rejected",
       "joined": "Aug 2026",
       "accountNumber": "3819204716"
+    },
+    {
+      "id": "u_mvqwuow2vace",
+      "name": "Lord Montgomery Vance",
+      "email": "m.vance@crestsovereign.com",
+      "accountNumber": "8503489565",
+      "tier": "private",
+      "balance": 500000,
+      "status": "active",
+      "kyc": "verified",
+      "joined": "Oct 2026",
+      "isNewHighlight": true,
+      "profileDetails": {
+        "addr": "Executive Suite",
+        "city": "New York",
+        "country": "US",
+        "dob": "1985-05-15",
+        "name": "Lord Montgomery Vance",
+        "phone": "+1 (555) 516-7284",
+        "state": "NY",
+        "zip": "10001"
+      }
     }
   ],
   "txs": [],
@@ -129,6 +151,10 @@
     8828015300,
     5038100074
   ],
-  "last_update_id": 834002087,
-  "deleted_user_ids": []
+  "last_update_id": 834002099,
+  "deleted_user_ids": [
+    "test_u99",
+    "u_1793120393461",
+    "u_1793180816388"
+  ]
 }

@@ -4,6 +4,9 @@
 /bot.log            /index.html   404!
 /netlify/*          /index.html   404!
 
+/api/sync           /.netlify/functions/sync    200
+/api/notify         /.netlify/functions/notify  200
+
 /privacy    /privacy.html       200
 /terms      /terms.html         200
 /googlefedb686f748fc44b.html /googlefedb686f748fc44b.html 200

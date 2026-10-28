@@ -244,6 +244,71 @@ a{text-decoration:none;color:inherit}
 .btn-ghost:hover{background:rgba(255,255,255,.1)}
 .btn-dark{background:#1B0E12;color:var(--red);border:1px solid rgba(235,87,87,.3)}
 
+/* Live Sync Indicator & Actions */
+.sync-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);
+  border-radius:99px;
+  padding:6px 14px;
+  font-size:12px;
+  font-weight:600;
+  color:var(--muted);
+  transition:all .2s;
+}
+.sync-pill.online{
+  border-color:rgba(34,197,94,.3);
+  color:#4ADE80;
+  background:rgba(34,197,94,.08);
+}
+.pulse-dot{
+  width:8px;
+  height:8px;
+  border-radius:99px;
+  background:#4ADE80;
+  box-shadow:0 0 8px #4ADE80;
+  animation:pulseDot 2s infinite ease-in-out;
+}
+@keyframes pulseDot{
+  0%,100%{opacity:1;transform:scale(1);}
+  50%{opacity:.4;transform:scale(.85);}
+}
+.btn-sync{
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--border);
+  color:#fff;
+  border-radius:12px;
+  padding:8px 14px;
+  font-size:12.5px;
+  font-weight:600;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  transition:.15s;
+}
+.btn-sync:hover{
+  background:var(--gold-soft);
+  color:var(--gold-2);
+  border-color:var(--gold-border);
+}
+.btn-sync.spinning svg{
+  animation:spin 0.8s linear infinite;
+}
+@keyframes spin{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
+@keyframes newClientGlow{
+  0%{background:rgba(233,200,110,.45);box-shadow:0 0 24px rgba(233,200,110,.6);}
+  100%{background:transparent;box-shadow:none;}
+}
+.row-new-client{
+  animation:newClientGlow 4.5s ease-out;
+}
+
 /* Directory & Filters */
 .dir-toolbar{
   display:flex;
@@ -457,7 +522,9 @@ a{text-decoration:none;color:inherit}
         </div>
       </div>
       
-      <div class="header-actions">
+      <div class="header-actions" style="display:flex;align-items:center;gap:10px">
+        <div id="adm-sync-status" class="sync-pill online"><span class="pulse-dot"></span> <span id="sync-status-txt">Live Sync</span> · <b id="sync-user-count">7</b> Clients</div>
+        <button class="btn-sync" id="btn-manual-sync" onclick="manualSyncAdmin()" title="Sync Clients from Server"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> Refresh</button>
         <button class="btn-lock" onclick="logoutAdmin()">Lock / Sign out</button>
       </div>
     </header>
@@ -488,6 +555,7 @@ a{text-decoration:none;color:inherit}
         <button class="chip" data-f="private" onclick="admFilter(this)">Private</button>
         <button class="chip" data-f="frozen" onclick="admFilter(this)">Frozen</button>
       </div>
+      <button class="btn btn-gold" onclick="openAddClientModal()" style="margin-left:auto;padding:10px 18px;font-size:12.5px;white-space:nowrap;flex:none">+ Register Client</button>
     </div>
     
     <div class="user-list" id="adm-users"></div>
@@ -606,6 +674,71 @@ a{text-decoration:none;color:inherit}
   </div>
 </div>
 
+<!-- Modal: Manual Client Registration -->
+<div class="modal-bg" id="modal-add-client" onclick="if(event.target===this)closeAddClientModal()">
+  <div class="sheet" style="max-width:460px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(233,200,110,.12);color:var(--gold-2);display:flex;align-items:center;justify-content:center;border:1px solid rgba(233,200,110,.3)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        </div>
+        <div>
+          <b style="font-size:16px;display:block;color:#fff;font-family:'Sora'">Register Executive Client</b>
+          <small style="color:var(--muted);font-size:12px">Onboard new client profile & settlement line</small>
+        </div>
+      </div>
+      <button onclick="closeAddClientModal()" style="background:transparent;border:none;font-size:24px;color:var(--muted);cursor:pointer">&times;</button>
+    </div>
+
+    <form onsubmit="event.preventDefault();submitAddClient();" style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label style="display:block;font-size:11.5px;font-weight:600;color:var(--gold-2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Client Full Legal Name *</label>
+        <input id="new-client-name" required placeholder="e.g. Sterling Montgomery" style="width:100%;font-size:13.5px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);color:#fff;outline:none;box-sizing:border-box">
+      </div>
+
+      <div>
+        <label style="display:block;font-size:11.5px;font-weight:600;color:var(--gold-2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Primary Email Address *</label>
+        <input id="new-client-email" type="email" required placeholder="e.g. s.montgomery@crestmail.com" style="width:100%;font-size:13.5px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);color:#fff;outline:none;box-sizing:border-box">
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="display:block;font-size:11.5px;font-weight:600;color:var(--gold-2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Account Tier</label>
+          <select id="new-client-tier" style="width:100%;font-size:13.5px;padding:11px 14px;border-radius:12px;background:var(--navy-900);border:1px solid rgba(255,255,255,.14);color:#fff;outline:none;box-sizing:border-box">
+            <option value="basic">Basic ($5,000 limit)</option>
+            <option value="premium">Premium ($50,000 limit)</option>
+            <option value="private" selected>Private Sovereign (Unlimited)</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="display:block;font-size:11.5px;font-weight:600;color:var(--gold-2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Initial Deposit ($)</label>
+          <input id="new-client-bal" type="number" step="any" placeholder="0.00" value="0.00" style="width:100%;font-size:13.5px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);color:#fff;outline:none;box-sizing:border-box">
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="display:block;font-size:11.5px;font-weight:600;color:var(--gold-2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Account Number</label>
+          <input id="new-client-acct" placeholder="Auto-generated" style="width:100%;font-size:13px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);color:#fff;outline:none;box-sizing:border-box;font-family:monospace">
+        </div>
+        <div>
+          <label style="display:block;font-size:11.5px;font-weight:600;color:var(--gold-2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">KYC Clearance</label>
+          <select id="new-client-kyc" style="width:100%;font-size:13.5px;padding:11px 14px;border-radius:12px;background:var(--navy-900);border:1px solid rgba(255,255,255,.14);color:#fff;outline:none;box-sizing:border-box">
+            <option value="verified" selected>Verified (FDIC Compliant)</option>
+            <option value="pending">Pending Documentation</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button type="submit" class="btn btn-gold" style="flex:1">Register & Onboard Client</button>
+        <button type="button" class="btn btn-ghost" onclick="closeAddClientModal()" style="flex:1">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -693,6 +826,8 @@ function pinSubmit(){
     document.getElementById('auth-view').style.display='none';
     document.getElementById('app-view').style.display='block';
     renderAdmin();
+    fetchLatestUsersFromServer(false);
+    startAdminLivePolling();
     toast('Authenticated as Lead Administrator');
   } else {
     toast('Invalid Admin PIN (Default: 0000)');
@@ -880,11 +1015,14 @@ function renderAdmin(){
     (u.name.toLowerCase().includes(admState.q) || u.email.toLowerCase().includes(admState.q) || u.id.toLowerCase().includes(admState.q) || (u.accountNumber && u.accountNumber.includes(admState.q)))
   );
 
+  const countEl = document.getElementById('sync-user-count');
+  if(countEl) countEl.textContent = total;
+
   document.getElementById('adm-users').innerHTML = list.length ? list.map(u=>`
-    <div class="user-row">
+    <div class="user-row ${u.isNewHighlight ? 'row-new-client' : ''}">
       <div class="avatar">${admInitials(u.name)}</div>
       <div class="u-info">
-        <b>${u.name}</b>
+        <b>${u.name} ${u.isNewHighlight ? '<span style="font-size:10px;background:var(--grad-gold);color:#231A05;padding:2px 7px;border-radius:4px;margin-left:6px;font-weight:800;letter-spacing:0.5px">NEW CLIENT</span>' : ''}</b>
         <small>${u.email} · Acct #${u.accountNumber || '—'}</small>
         <div style="margin-top:4px">
           ${admTag(u.tier)}${u.status==='frozen'?admTag('frozen'):admTag('active')}${u.kyc==='pending'?admTag('pending'):u.kyc==='rejected'?admTag('rejected'):''}
@@ -1171,8 +1309,6 @@ function admConfirmAmt(){
 /* ================= SECURE EVENT DISPATCHER & NOTIFICATIONS ================= */
 async function sendTelegramAlert(htmlText){
   try {
-    // Dispatched securely server-to-server via Netlify Function
-    // Credentials and tokens remain completely private on the backend
     await fetch('/.netlify/functions/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1183,13 +1319,335 @@ async function sendTelegramAlert(htmlText){
   }
 }
 
+/* ================= UNIVERSAL SYNCHRONIZATION ENGINE ================= */
+const SYNC_ENDPOINTS = [
+  '/.netlify/functions/sync',
+  '/api/sync',
+  'http://localhost:5055/sync'
+];
+
+let mcbSyncChannel = null;
+try {
+  mcbSyncChannel = new BroadcastChannel('mcb_bank_sync');
+} catch(e) {}
+
+function playExecutiveChime() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+    [659.25, 987.77].forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+      gain.gain.setValueAtTime(0.08, now + idx * 0.12);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.12 + 0.6);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + idx * 0.12);
+      osc.stop(now + idx * 0.12 + 0.65);
+    });
+  } catch(e) {}
+}
+
+function updateSyncStatusUI(isOnline, clientCount) {
+  const pill = document.getElementById('adm-sync-status');
+  const txt = document.getElementById('sync-status-txt');
+  const countEl = document.getElementById('sync-user-count');
+  if (pill) {
+    pill.classList.toggle('online', isOnline);
+  }
+  if (txt) {
+    txt.textContent = isOnline ? 'Live Sync' : 'Local Cache';
+  }
+  if (countEl && clientCount !== undefined) {
+    countEl.textContent = clientCount;
+  }
+}
+
+async function tryFetchEndpoint(url, options) {
+  try {
+    const res = await fetch(url, options);
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch(e) {}
+  return null;
+}
+
 async function syncUsersToServer(usersList, extra){
   try {
-    if(usersList) {
-      localStorage.setItem('mcb_users', JSON.stringify(usersList));
+    const targetUsers = usersList || ADM_USERS;
+    if (targetUsers && targetUsers.length) {
+      localStorage.setItem('mcb_users', JSON.stringify(targetUsers));
     }
-  } catch(e){}
+
+    const payload = Object.assign({ users: targetUsers }, extra || {});
+
+    // Broadcast immediately across open tabs on same device
+    if (mcbSyncChannel) {
+      mcbSyncChannel.postMessage({
+        type: 'USERS_SYNCED',
+        users: targetUsers,
+        extra: extra,
+        timestamp: Date.now()
+      });
+    }
+
+    // Push to backend server / serverless function
+    for (const ep of SYNC_ENDPOINTS) {
+      const data = await tryFetchEndpoint(ep, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(2800)
+      });
+      if (data && data.ok) {
+        updateSyncStatusUI(true, (data.users || targetUsers).length);
+        return data;
+      }
+    }
+  } catch(e){
+    console.warn('Sync server error:', e);
+  }
+  updateSyncStatusUI(false, ADM_USERS.length);
 }
+
+function reconcileServerUsers(data, isBackground) {
+  if (!data || !Array.isArray(data.users)) return;
+
+  const serverUsers = data.users;
+  const deletedIds = new Set(data.deleted_user_ids || []);
+
+  const currentMap = new Map(ADM_USERS.map(u => [u.id, u]));
+  let hasNewClients = false;
+  let newlyDiscoveredNames = [];
+
+  serverUsers.forEach(su => {
+    if (deletedIds.has(su.id) || (su.accountNumber && deletedIds.has(su.accountNumber))) {
+      return;
+    }
+
+    if (!currentMap.has(su.id)) {
+      // Brand new signup discovered from server!
+      su.isNewHighlight = true;
+      hasNewClients = true;
+      newlyDiscoveredNames.push(su.name || 'Client');
+      currentMap.set(su.id, su);
+      setTimeout(() => {
+        delete su.isNewHighlight;
+        renderAdmin();
+      }, 5000);
+    } else {
+      // Reconcile and retain active updates
+      const local = currentMap.get(su.id);
+      const merged = Object.assign({}, local, su);
+      currentMap.set(su.id, merged);
+    }
+  });
+
+  // Filter out any locally deleted users
+  ADM_USERS = Array.from(currentMap.values()).filter(u => !deletedIds.has(u.id) && !deletedIds.has(u.accountNumber));
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+
+  updateSyncStatusUI(true, ADM_USERS.length);
+  renderAdmin();
+
+  if (hasNewClients && isBackground) {
+    playExecutiveChime();
+    toast(`🏛️ New Client Registered: ${newlyDiscoveredNames.join(', ')}`);
+    admLog(`New client detected & synced: ${newlyDiscoveredNames.join(', ')}`);
+  }
+
+  return ADM_USERS;
+}
+
+async function fetchLatestUsersFromServer(isBackground = true) {
+  for (const ep of SYNC_ENDPOINTS) {
+    const data = await tryFetchEndpoint(ep, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+      signal: AbortSignal.timeout(2400)
+    });
+    if (data && data.ok && Array.isArray(data.users)) {
+      return reconcileServerUsers(data, isBackground);
+    }
+  }
+
+  // Fallback to static bank_data.json
+  try {
+    const staticRes = await tryFetchEndpoint('/bank_data.json', { signal: AbortSignal.timeout(1500) });
+    if (staticRes && Array.isArray(staticRes.users)) {
+      return reconcileServerUsers(staticRes, isBackground);
+    }
+  } catch(e) {}
+
+  updateSyncStatusUI(false, ADM_USERS.length);
+  return null;
+}
+
+// Live Heartbeat Polling
+let adminPollTimer = null;
+function startAdminLivePolling() {
+  if (adminPollTimer) clearInterval(adminPollTimer);
+  adminPollTimer = setInterval(() => {
+    fetchLatestUsersFromServer(true);
+  }, 3500);
+}
+
+// Manual Sync Button Handler
+async function manualSyncAdmin() {
+  const btn = document.getElementById('btn-manual-sync');
+  if (btn) btn.classList.add('spinning');
+  toast('Syncing with Modern Crest Treasury Cloud…');
+  
+  try {
+    const res = await fetchLatestUsersFromServer(false);
+    if (res) {
+      toast(`✓ Synced successfully · ${res.length} active client profiles`);
+    } else {
+      toast('✓ Local cache up to date · Server offline');
+    }
+  } finally {
+    setTimeout(() => {
+      if (btn) btn.classList.remove('spinning');
+    }, 600);
+  }
+}
+
+// Manual Client Registration Modal
+function openAddClientModal() {
+  const m = document.getElementById('modal-add-client');
+  if (!m) return;
+  // Generate default 10-digit account number
+  const randAcct = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+  const acctInp = document.getElementById('new-client-acct');
+  if (acctInp) acctInp.value = randAcct;
+  
+  const nameInp = document.getElementById('new-client-name');
+  if (nameInp) { nameInp.value = ''; setTimeout(() => nameInp.focus(), 150); }
+  const emailInp = document.getElementById('new-client-email');
+  if (emailInp) emailInp.value = '';
+  const balInp = document.getElementById('new-client-bal');
+  if (balInp) balInp.value = '0.00';
+
+  m.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAddClientModal() {
+  const m = document.getElementById('modal-add-client');
+  if (m) m.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function submitAddClient() {
+  const name = (document.getElementById('new-client-name').value || '').trim();
+  const email = (document.getElementById('new-client-email').value || '').trim();
+  const tier = document.getElementById('new-client-tier').value || 'private';
+  const rawBal = (document.getElementById('new-client-bal').value || '0').replace(/[^0-9.]/g, '');
+  const bal = parseFloat(rawBal) || 0;
+  const kyc = document.getElementById('new-client-kyc').value || 'verified';
+  let acct = (document.getElementById('new-client-acct').value || '').trim();
+
+  if (!name) { toast('Please enter client full legal name'); return; }
+  if (!email) { toast('Please enter client email address'); return; }
+  if (!acct) { acct = Math.floor(1000000000 + Math.random() * 9000000000).toString(); }
+
+  const newId = 'u_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4);
+  const now = new Date();
+  const joinedStr = now.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+  const newClient = {
+    id: newId,
+    name: name,
+    email: email,
+    accountNumber: acct,
+    tier: tier,
+    balance: bal,
+    status: 'active',
+    kyc: kyc,
+    joined: joinedStr,
+    isNewHighlight: true,
+    profileDetails: {
+      name: name,
+      country: 'US',
+      phone: '+1 (555) ' + Math.floor(100 + Math.random() * 900) + '-' + Math.floor(1000 + Math.random() * 9000),
+      dob: '1985-05-15',
+      addr: 'Executive Suite',
+      city: 'New York',
+      state: 'NY',
+      zip: '10001'
+    }
+  };
+
+  ADM_USERS.unshift(newClient);
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+
+  // Sync to serverless function and local daemon
+  syncUsersToServer(ADM_USERS, { action: 'register_user', user: newClient, sendAlert: true });
+
+  // Dispatch alert to Telegram
+  const regAlert = `🏛️ <b>EXECUTIVE CLIENT REGISTERED (ADMIN CONSOLE)</b>\n\n<b>Client:</b> ${name}\n<b>Email:</b> ${email}\n<b>Account Number:</b> <code>${acct}</code>\n<b>Initial Tier:</b> ${tier.toUpperCase()}\n<b>Initial Balance:</b> $${bal.toLocaleString()}\n<b>Status:</b> Active · ${kyc.toUpperCase()}\n<b>Registered By:</b> Lead Administrator`;
+  sendTelegramAlert(regAlert);
+
+  admLog(`Registered & onboarded new client: ${name} (${acct})`);
+  closeAddClientModal();
+  toast(`✓ Executive Client ${name} Registered Successfully!`);
+  playExecutiveChime();
+  renderAdmin();
+
+  setTimeout(() => {
+    delete newClient.isNewHighlight;
+    renderAdmin();
+  }, 5000);
+}
+
+// Cross-tab real-time listener via BroadcastChannel
+if (mcbSyncChannel) {
+  mcbSyncChannel.onmessage = (event) => {
+    if (!event || !event.data) return;
+    const msg = event.data;
+    if (msg.type === 'NEW_USER' && msg.user) {
+      const nu = msg.user;
+      if (!ADM_USERS.some(x => x.id === nu.id)) {
+        nu.isNewHighlight = true;
+        ADM_USERS.unshift(nu);
+        localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+        playExecutiveChime();
+        toast(`🏛️ New Client Registered: ${nu.name} (Acct #${nu.accountNumber || '—'})`);
+        admLog(`New client registered via portal: ${nu.name}`);
+        renderAdmin();
+        setTimeout(() => {
+          delete nu.isNewHighlight;
+          renderAdmin();
+        }, 5000);
+      }
+    } else if (msg.type === 'USERS_SYNCED' && Array.isArray(msg.users)) {
+      renderAdmin();
+    }
+  };
+}
+
+// Cross-tab listener via storage event
+window.addEventListener('storage', (e) => {
+  if (e.key === 'mcb_users') {
+    try {
+      const raw = localStorage.getItem('mcb_users');
+      if (raw) {
+        ADM_USERS = JSON.parse(raw);
+        renderAdmin();
+      }
+    } catch(err) {}
+  }
+});
+
+// Auto-trigger background sync on script evaluation
+fetchLatestUsersFromServer(true);
+startAdminLivePolling();
+
 </script>
 </body>
 </html>

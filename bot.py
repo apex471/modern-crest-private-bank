@@ -14,6 +14,12 @@ Features:
 
 import os
 import sys
+
+# Auto-detect and switch to local venv if available
+_venv_python = os.path.join(os.path.dirname(os.path.abspath(__file__)), "venv", "bin", "python3")
+if os.path.exists(_venv_python) and sys.executable != _venv_python:
+    os.execv(_venv_python, [_venv_python] + sys.argv)
+
 import time
 import json
 import logging
@@ -620,7 +626,38 @@ def sync_data():
                         db["txs"] = [t for t in db.get("txs", []) if t.get("userId") != del_id]
                         logger.info(f"User {del_id} deleted via web admin sync. Remaining users: {len(db['users'])}")
 
-                if "users" in incoming and isinstance(incoming["users"], list):
+                elif action == "register_user":
+                    new_u = incoming.get("user")
+                    if new_u:
+                        if not new_u.get("id"):
+                            new_u["id"] = f"u_{int(time.time()*1000)}"
+                        if not new_u.get("accountNumber"):
+                            # Deterministic account number
+                            seed = sum(ord(c) for c in (new_u.get("name", "") + new_u.get("email", "")))
+                            new_u["accountNumber"] = str((seed * 7919 + 10482018) % 9000000000 + 1000000000)
+                        if new_u.get("id") not in deleted_ids and new_u.get("accountNumber") not in deleted_ids:
+                            existing_idx = None
+                            for idx, u in enumerate(db.get("users", [])):
+                                if u.get("id") == new_u.get("id") or (u.get("email") and new_u.get("email") and u.get("email").lower() == new_u.get("email").lower()):
+                                    existing_idx = idx
+                                    break
+                            if existing_idx is not None:
+                                db["users"][existing_idx].update(new_u)
+                            else:
+                                db["users"].append(new_u)
+                                logger.info(f"New client {new_u.get('name')} registered & synced to bot. Total: {len(db['users'])}")
+
+                elif action == "update_user":
+                    up_u = incoming.get("user")
+                    if up_u and up_u.get("id"):
+                        for idx, u in enumerate(db.get("users", [])):
+                            if u.get("id") == up_u.get("id") or (u.get("accountNumber") and u.get("accountNumber") == up_u.get("accountNumber")):
+                                db["users"][idx].update(up_u)
+                                logger.info(f"Updated client {db['users'][idx].get('name')} via sync.")
+                                break
+
+                # Also process bulk users if provided
+                if "users" in incoming and isinstance(incoming["users"], list) and action != "delete_user":
                     filtered_users = []
                     for u in incoming["users"]:
                         uid = u.get("id")
@@ -628,30 +665,18 @@ def sync_data():
                         if (uid and uid in deleted_ids) or (uacc and uacc in deleted_ids):
                             continue
                         filtered_users.append(u)
-                    
-                    if action == "delete_user":
-                        pass
-                    elif action == "register_user":
-                        new_u = incoming.get("user")
-                        if new_u and new_u.get("id") not in deleted_ids:
-                            existing_ids = {u.get("id"): idx for idx, u in enumerate(db.get("users", []))}
-                            if new_u.get("id") in existing_ids:
-                                db["users"][existing_ids[new_u.get("id")]] = new_u
+
+                    # Bidirectional merge: preserve existing user records while incorporating web updates
+                    db_user_map = {u.get("id"): u for u in db.get("users", []) if u.get("id")}
+                    for u in filtered_users:
+                        uid = u.get("id")
+                        if uid:
+                            if uid in db_user_map:
+                                db_user_map[uid].update(u)
                             else:
-                                db["users"].append(new_u)
-                                logger.info(f"New client {new_u.get('name')} registered & synced to bot. Total: {len(db['users'])}")
-                    else:
-                        # Bidirectional merge: preserve existing user records while incorporating web updates
-                        db_user_map = {u.get("id"): u for u in db.get("users", []) if u.get("id")}
-                        for u in filtered_users:
-                            uid = u.get("id")
-                            if uid:
-                                if uid in db_user_map:
-                                    db_user_map[uid].update(u)
-                                else:
-                                    db_user_map[uid] = u
-                        db["users"] = list(db_user_map.values())
-                        logger.info(f"Synchronized users database via web API. Total registered users: {len(db['users'])}")
+                                db_user_map[uid] = u
+                    db["users"] = list(db_user_map.values())
+                    logger.info(f"Synchronized users database via web API. Total registered users: {len(db['users'])}")
 
                 if "txs" in incoming and isinstance(incoming["txs"], list):
                     db["txs"] = incoming["txs"]

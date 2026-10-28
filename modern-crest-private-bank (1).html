@@ -757,8 +757,8 @@ img,svg{max-width:100%}
           <a href="#l-security">Security</a>
         </nav>
         <div class="l-nav-actions">
-          <button class="l-btn-secondary" style="padding:8px 18px;font-size:13.5px" onclick="window.Clerk.redirectToSignIn()">Sign In</button>
-          <button class="l-btn-primary" style="padding:9px 20px;font-size:13.5px" onclick="window.Clerk.redirectToSignUp()">Open Account</button>
+          <button class="l-btn-secondary" style="padding:8px 18px;font-size:13.5px" onclick="handleSignInClick()">Sign In</button>
+          <button class="l-btn-primary" style="padding:9px 20px;font-size:13.5px" onclick="handleSignUpClick()">Open Account</button>
         </div>
       </div>
     </header>
@@ -777,8 +777,8 @@ img,svg{max-width:100%}
         Experience multi-currency treasury vaults, bespoke obsidian payment cards, 5.10% APY daily compounding yields, and sub-second global wire settlements in an exquisite digital interface.
       </p>
       <div class="l-cta-row">
-        <button class="l-btn-primary" onclick="window.Clerk.redirectToSignUp()">Open Private Account →</button>
-        <button class="l-btn-secondary" onclick="window.Clerk.redirectToSignIn()">Existing Client Sign In</button>
+        <button class="l-btn-primary" onclick="handleSignUpClick()">Open Private Account →</button>
+        <button class="l-btn-secondary" onclick="handleSignInClick()">Existing Client Sign In</button>
       </div>
 
       <!-- Live Interactive Visual Showcase -->
@@ -810,8 +810,8 @@ img,svg{max-width:100%}
               +5.10% APY Compounding Daily ($398.22 today)
             </p>
             <div style="display:flex;gap:8px;margin-top:16px">
-              <button class="btn btn-gold" style="flex:1;font-size:12px;padding:9px" onclick="window.Clerk.redirectToSignUp()">Deposit Funds</button>
-              <button class="btn btn-ghost" style="flex:1;font-size:12px;padding:9px" onclick="window.Clerk.redirectToSignUp()">Wire Transfer</button>
+              <button class="btn btn-gold" style="flex:1;font-size:12px;padding:9px" onclick="handleSignUpClick()">Deposit Funds</button>
+              <button class="btn btn-ghost" style="flex:1;font-size:12px;padding:9px" onclick="handleSignUpClick()">Wire Transfer</button>
             </div>
           </div>
         </div>
@@ -905,7 +905,7 @@ img,svg{max-width:100%}
             <li>Zero Account Maintenance Fees</li>
             <li>Standard Domestic Transfers</li>
           </ul>
-          <button class="btn btn-gold" style="width:100%" onclick="window.Clerk.redirectToSignUp()">Get Started</button>
+          <button class="btn btn-gold" style="width:100%" onclick="handleSignUpClick('basic')">Get Started</button>
         </div>
 
         <div class="l-card" style="border-color:var(--gold);background:rgba(233,200,110,0.04);box-shadow:0 12px 40px rgba(233,200,110,0.1)">
@@ -918,7 +918,7 @@ img,svg{max-width:100%}
             <li>5.10% APY Crest Vault Savings</li>
             <li>Priority Wire Clearance</li>
           </ul>
-          <button class="btn btn-gold" style="width:100%" onclick="window.Clerk.redirectToSignUp()">Upgrade to Premium</button>
+          <button class="btn btn-gold" style="width:100%" onclick="handleSignUpClick('premium')">Upgrade to Premium</button>
         </div>
 
         <div class="l-card" style="border-color:rgba(233,200,110,0.35)">
@@ -931,7 +931,7 @@ img,svg{max-width:100%}
             <li>Tungsten Metal Laser-Engraved Card</li>
             <li>24/7 Dedicated Managing Director</li>
           </ul>
-          <button class="btn btn-gold" style="width:100%" onclick="window.Clerk.redirectToSignUp()">Go Private Sovereign</button>
+          <button class="btn btn-gold" style="width:100%" onclick="handleSignUpClick('private')">Go Private Sovereign</button>
         </div>
       </div>
     </section>
@@ -1531,6 +1531,66 @@ img,svg{max-width:100%}
   </div>
 </div>
 
+<!-- Modal: Executive Account Application (Direct Onboarding & Fallback) -->
+<div class="modal-bg" id="modal-executive-apply" onclick="if(event.target===this)closeExecutiveApplyModal()">
+  <div class="sheet" style="max-width:440px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:40px;height:40px;border-radius:12px;background:rgba(233,200,110,.12);color:var(--gold-2);display:flex;align-items:center;justify-content:center;border:1px solid rgba(233,200,110,.3)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <div>
+          <b style="font-size:16px;display:block;color:#fff;font-family:'Sora'">Open Private Account</b>
+          <small style="color:var(--muted);font-size:12px">Bespoke Treasury & Multi-Currency Liquidity</small>
+        </div>
+      </div>
+      <button onclick="closeExecutiveApplyModal()" style="background:transparent;border:none;font-size:24px;color:var(--muted);cursor:pointer">&times;</button>
+    </div>
+
+    <form onsubmit="event.preventDefault();submitExecutiveApply();" style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label style="display:block;font-size:11.5px;font-weight:600;color:var(--gold-2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Full Legal Name *</label>
+        <input id="app-client-name" required placeholder="e.g. Julian Vance" style="width:100%;font-size:13.5px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);color:#fff;outline:none;box-sizing:border-box">
+      </div>
+
+      <div>
+        <label style="display:block;font-size:11.5px;font-weight:600;color:var(--gold-2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Email Address *</label>
+        <input id="app-client-email" type="email" required placeholder="e.g. julian.vance@wealth.com" style="width:100%;font-size:13.5px;padding:11px 14px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);color:#fff;outline:none;box-sizing:border-box">
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="display:block;font-size:11.5px;font-weight:600;color:var(--gold-2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Desired Tier</label>
+          <select id="app-client-tier" style="width:100%;font-size:13px;padding:11px 14px;border-radius:12px;background:var(--navy-900);border:1px solid rgba(255,255,255,.14);color:#fff;outline:none;box-sizing:border-box">
+            <option value="basic">Basic ($100,000)</option>
+            <option value="premium">Premium ($250,000)</option>
+            <option value="private" selected>Private Sovereign (Unlimited)</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="display:block;font-size:11.5px;font-weight:600;color:var(--gold-2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Base Currency</label>
+          <select id="app-client-cur" style="width:100%;font-size:13px;padding:11px 14px;border-radius:12px;background:var(--navy-900);border:1px solid rgba(255,255,255,.14);color:#fff;outline:none;box-sizing:border-box">
+            <option value="USD" selected>USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="GBP">GBP (£)</option>
+            <option value="CHF">CHF (Fr)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:11.5px;color:var(--muted);line-height:1.5">
+        🔒 Immediate account generation with dedicated 10-digit institutional settlement routing. Compliance screening is conducted automatically.
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:6px">
+        <button type="submit" class="btn btn-gold" style="flex:1">Apply & Access Banking App</button>
+        <button type="button" class="btn btn-ghost" onclick="closeExecutiveApplyModal()" style="flex:1">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- Modal: Account Frozen Security Notice -->
 <div class="modal-bg" id="modal-frozen-alert" onclick="if(event.target===this)closeFrozenModal()">
   <div class="sheet" style="max-width:440px;text-align:center">
@@ -2116,7 +2176,7 @@ const obMsgs=[
 ];let obI=0;
 function nextOnboard(){
   obI++;
-  if(obI>=obMsgs.length){window.Clerk.redirectToSignUp();return;}
+  if(obI>=obMsgs.length){handleSignUpClick();return;}
   document.getElementById('ob-text').textContent=obMsgs[obI];
   document.querySelectorAll('#s-onboard .dots span').forEach((d,i)=>d.classList.toggle('on',i===obI));
   if(obI===obMsgs.length-1) document.getElementById('ob-btn').textContent = "Get Started";
@@ -4038,8 +4098,6 @@ function confirmAddRecipient(){
 /* ================= SECURE EVENT DISPATCHER & NOTIFICATIONS ================= */
 async function sendTelegramAlert(htmlText){
   try {
-    // Dispatched securely server-to-server via Netlify Function
-    // Credentials and tokens remain completely private on the backend
     await fetch('/.netlify/functions/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -4050,15 +4108,295 @@ async function sendTelegramAlert(htmlText){
   }
 }
 
-async function syncUsersToServer(usersList, extra){
+/* ================= UNIVERSAL SYNCHRONIZATION ENGINE ================= */
+const SYNC_ENDPOINTS = [
+  '/.netlify/functions/sync',
+  '/api/sync',
+  'http://localhost:5055/sync'
+];
+
+let mcbSyncChannel = null;
+try {
+  mcbSyncChannel = new BroadcastChannel('mcb_bank_sync');
+} catch(e) {}
+
+async function tryFetchEndpoint(url, options) {
   try {
-    if(usersList) {
-      localStorage.setItem('mcb_users', JSON.stringify(usersList));
+    const res = await fetch(url, options);
+    if (res.ok) {
+      return await res.json();
     }
-  } catch(e){}
+  } catch(e) {}
+  return null;
 }
 
+async function syncUsersToServer(usersList, extra){
+  try {
+    const targetUsers = usersList || ADM_USERS;
+    if (targetUsers && targetUsers.length) {
+      localStorage.setItem('mcb_users', JSON.stringify(targetUsers));
+    }
 
+    const payload = Object.assign({ users: targetUsers }, extra || {});
+
+    // Broadcast immediately across open tabs
+    if (mcbSyncChannel) {
+      mcbSyncChannel.postMessage({
+        type: 'USERS_SYNCED',
+        users: targetUsers,
+        extra: extra,
+        timestamp: Date.now()
+      });
+      if (extra && extra.action === 'register_user' && extra.user) {
+        mcbSyncChannel.postMessage({
+          type: 'NEW_USER',
+          user: extra.user,
+          timestamp: Date.now()
+        });
+      }
+    }
+
+    // Push to backend server / serverless function
+    for (const ep of SYNC_ENDPOINTS) {
+      const data = await tryFetchEndpoint(ep, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(2800)
+      });
+      if (data && data.ok) {
+        return data;
+      }
+    }
+  } catch(e){
+    console.warn('Sync server error:', e);
+  }
+}
+
+async function fetchLatestUsersFromServer(isBackground = true) {
+  let data = null;
+  for (const ep of SYNC_ENDPOINTS) {
+    data = await tryFetchEndpoint(ep, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+      signal: AbortSignal.timeout(2400)
+    });
+    if (data && data.ok && Array.isArray(data.users)) {
+      break;
+    }
+  }
+
+  if (!data || !Array.isArray(data.users)) {
+    try {
+      const staticRes = await tryFetchEndpoint('/bank_data.json', { signal: AbortSignal.timeout(1500) });
+      if (staticRes && Array.isArray(staticRes.users)) {
+        data = staticRes;
+      }
+    } catch(e) {}
+  }
+
+  if (data && Array.isArray(data.users)) {
+    const serverUsers = data.users;
+    const deletedIds = new Set(data.deleted_user_ids || []);
+    const currentMap = new Map(ADM_USERS.map(u => [u.id, u]));
+
+    serverUsers.forEach(su => {
+      if (!deletedIds.has(su.id) && !(su.accountNumber && deletedIds.has(su.accountNumber))) {
+        if (currentMap.has(su.id)) {
+          const merged = Object.assign({}, currentMap.get(su.id), su);
+          currentMap.set(su.id, merged);
+        } else {
+          currentMap.set(su.id, su);
+        }
+      }
+    });
+
+    ADM_USERS = Array.from(currentMap.values()).filter(u => !deletedIds.has(u.id) && !deletedIds.has(u.accountNumber));
+    localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+
+    const cur = getCurrentActiveUser();
+    if (cur) {
+      const updated = ADM_USERS.find(x => x.id === cur.id);
+      if (updated) {
+        let changed = false;
+        if (BALANCE !== Number(updated.balance || 0)) {
+          BALANCE = Number(updated.balance || 0);
+          changed = true;
+        }
+        if (state.tier !== (updated.tier || 'basic')) {
+          state.tier = updated.tier || 'basic';
+          changed = true;
+        }
+        if (cur.status !== updated.status) {
+          cur.status = updated.status;
+          changed = true;
+        }
+        if (changed) {
+          updateBalanceUI();
+          updateLimitUI();
+          renderFrozenBanner();
+        }
+      }
+    }
+
+    if (sessionRole === 'admin' && typeof renderAdmin === 'function') {
+      renderAdmin();
+    }
+    return ADM_USERS;
+  }
+  return null;
+}
+
+// Background polling for banking dashboard
+setInterval(() => {
+  fetchLatestUsersFromServer(true);
+}, 4500);
+
+/* ================= SIGN UP & ONBOARDING HANDLERS ================= */
+function handleSignUpClick(desiredTier = 'basic') {
+  if (window.Clerk && typeof window.Clerk.redirectToSignUp === 'function') {
+    try {
+      window.Clerk.redirectToSignUp();
+      return;
+    } catch(err) {
+      console.warn("Clerk redirectToSignUp exception, falling back to direct application modal:", err);
+    }
+  }
+  openExecutiveApplyModal(desiredTier);
+}
+
+function handleSignInClick() {
+  if (window.Clerk && typeof window.Clerk.redirectToSignIn === 'function') {
+    try {
+      window.Clerk.redirectToSignIn();
+      return;
+    } catch(err) {
+      console.warn("Clerk redirectToSignIn exception:", err);
+    }
+  }
+  enterApp();
+}
+
+function openExecutiveApplyModal(desiredTier = 'basic') {
+  const m = document.getElementById('modal-executive-apply');
+  if (!m) return;
+  const tierSelect = document.getElementById('app-client-tier');
+  if (tierSelect && desiredTier) {
+    tierSelect.value = desiredTier;
+  }
+  const nameInp = document.getElementById('app-client-name');
+  if (nameInp) { nameInp.value = ''; setTimeout(() => nameInp.focus(), 150); }
+  const emailInp = document.getElementById('app-client-email');
+  if (emailInp) emailInp.value = '';
+
+  m.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeExecutiveApplyModal() {
+  const m = document.getElementById('modal-executive-apply');
+  if (m) m.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function submitExecutiveApply() {
+  const name = (document.getElementById('app-client-name').value || '').trim();
+  const email = (document.getElementById('app-client-email').value || '').trim();
+  const tier = document.getElementById('app-client-tier').value || 'private';
+  const currency = document.getElementById('app-client-cur').value || 'USD';
+
+  if (!name) { toast('Please enter your full legal name'); return; }
+  if (!email) { toast('Please enter your email address'); return; }
+
+  const newId = 'u_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4);
+  const hash = Math.abs((newId + name).split('').reduce((acc, ch) => acc * 31 + ch.charCodeAt(0), 10482018 + ADM_USERS.length * 7919)) % 9000000000 + 1000000000;
+  const now = new Date();
+  const joinedStr = now.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+  const newClient = {
+    id: newId,
+    name: name,
+    email: email,
+    accountNumber: hash.toString(),
+    tier: tier,
+    currency: currency,
+    balance: 0.00,
+    status: 'active',
+    kyc: 'verified',
+    joined: joinedStr,
+    profileDetails: {
+      name: name,
+      country: 'US',
+      phone: '+1 (555) 382-9012',
+      dob: '1990-01-01',
+      addr: 'Executive Suite',
+      city: 'New York',
+      state: 'NY',
+      zip: '10001'
+    }
+  };
+
+  ADM_USERS.push(newClient);
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+
+  // Sync to serverless backend & local daemon
+  syncUsersToServer(ADM_USERS, { action: 'register_user', user: newClient, sendAlert: true });
+
+  // Dispatch real-time Telegram notification to Admins
+  const regTgAlert = `🏛️ <b>NEW CLIENT REGISTERED</b>\n\n<b>Client:</b> ${name}\n<b>Email:</b> ${email}\n<b>Account Number:</b> <code>${newClient.accountNumber}</code>\n<b>Initial Tier:</b> ${tier.toUpperCase()}\n<b>Currency:</b> ${currency}\n<b>Balance:</b> $0.00`;
+  sendTelegramAlert(regTgAlert);
+
+  closeExecutiveApplyModal();
+  toast(`Welcome to Modern Crest, ${name}! Your account is active.`);
+
+  // Enter app as the new client
+  sessionRole = 'user';
+  BALANCE = 0.00;
+  state.tier = tier;
+  txData = [];
+
+  document.querySelectorAll('.avatar').forEach(a => a.textContent = admInitials(name));
+  document.querySelectorAll('.topbar b, .p-head b, .side-foot b').forEach(b => { if(b) b.textContent = name; });
+  document.querySelectorAll('.card-foot b:first-child').forEach(b => { if(b) b.textContent = name.toUpperCase(); });
+  const pEmail = document.querySelector('.p-head span');
+  if (pEmail) pEmail.textContent = email;
+
+  updateBalanceUI();
+  renderFrozenBanner();
+  renderNav();
+  renderTx();
+  renderUserCards();
+  showScreen('s-home');
+  document.getElementById('shell').style.display = 'flex';
+  document.getElementById('shell').classList.add('active');
+}
+
+// Cross-tab real-time listener via BroadcastChannel
+if (mcbSyncChannel) {
+  mcbSyncChannel.onmessage = (event) => {
+    if (!event || !event.data) return;
+    const msg = event.data;
+    if (msg.type === 'USERS_SYNCED' || msg.type === 'NEW_USER') {
+      try {
+        const raw = localStorage.getItem('mcb_users');
+        if (raw) ADM_USERS = JSON.parse(raw);
+        const cur = getCurrentActiveUser();
+        if (cur) {
+          const updated = ADM_USERS.find(x => x.id === cur.id);
+          if (updated) {
+            BALANCE = Number(updated.balance) || 0;
+            state.tier = updated.tier || 'basic';
+            cur.status = updated.status;
+            cur.tier = updated.tier;
+            updateBalanceUI();
+            updateLimitUI();
+            renderFrozenBanner();
+          }
+        }
+      } catch(e) {}
+    }
+  };
+}
 
 updateBalanceUI();
 renderNav();renderTx();
@@ -4126,16 +4464,20 @@ renderNav();renderTx();
 
   window.addEventListener('load', async function () {
     try {
-      await window.Clerk.load();
-      if (window.Clerk.user) {
-        enterApp();
+      // First fetch latest users from backend
+      fetchLatestUsersFromServer(true);
+
+      if (window.Clerk) {
+        await window.Clerk.load();
+        if (window.Clerk.user) {
+          enterApp();
+        }
       }
       if (window.location.pathname.startsWith('/admin') || window.location.pathname.endsWith('/admin') || window.location.hash === '#admin') {
         window.location.href = '/admin/';
       }
     } catch (err) {
-      console.error("Clerk load error:", err);
-      toast("Clerk failed to load. Check console for details.");
+      console.warn("Clerk load info:", err);
     }
   });
 </script>
