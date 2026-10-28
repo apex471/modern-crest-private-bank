@@ -1514,15 +1514,41 @@ function admDemote(){
   admOpen(u.id);renderAdmin();
 }
 function admFreeze(){
-  const u=admState.sel;
-  u.status=u.status==='frozen'?'active':'frozen';
+  const selUser = admState.sel;
+  if(!selUser) return;
+  let u = ADM_USERS.find(x => x.id === selUser.id) || selUser;
+  admState.sel = u;
+
+  u.status = (u.status === 'frozen') ? 'active' : 'frozen';
+  u.updatedAt = Date.now();
   if(u.status === 'active') delete u.unlockRequest;
+
+  const idx = ADM_USERS.findIndex(x => x.id === u.id);
+  if(idx >= 0) {
+    ADM_USERS[idx] = u;
+  } else {
+    ADM_USERS.push(u);
+  }
+
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
-  syncUsersToServer(ADM_USERS);
+  syncUsersToServer(ADM_USERS, { action: 'update_user', user: u });
+
+  if(mcbSyncChannel){
+    try {
+      mcbSyncChannel.postMessage({
+        type: 'USERS_SYNCED',
+        users: ADM_USERS,
+        user: u,
+        timestamp: Date.now()
+      });
+    } catch(e){}
+  }
+
   admLog((u.status==='frozen'?'Account frozen: ':'Account unfrozen: ')+u.name);
   toast(u.status==='frozen'?u.name+' frozen':u.name+' reactivated');
   sendTelegramAlert(`🔒 <b>ACCOUNT STATUS CHANGED</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>New Status:</b> <b>${u.status.toUpperCase()}</b>\n<b>Timestamp:</b> ${new Date().toUTCString()}`);
-  admOpen(u.id);renderAdmin();
+  admOpen(u.id);
+  renderAdmin();
 }
 function admDeleteUser(){
   const u=admState.sel;
@@ -1634,12 +1660,15 @@ function admConfirmAmt(){
 
   const newTx = {
     userId: u.id,
+    accountNumber: u.accountNumber,
+    email: u.email,
     n: txName,
     desc: txDesc,
     d: "Today · " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
     a: isAdd ? amt : -amt,
     type: isAdd ? "in" : "out",
-    cat: isAdd ? "transfer" : "card"
+    cat: isAdd ? "transfer" : "card",
+    timestamp: Date.now()
   };
   let allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
   allTxs.unshift(newTx);
@@ -1825,6 +1854,8 @@ function reconcileServerUsers(data, isBackground) {
           merged.status = local.status;
           merged.kyc = local.kyc;
           merged.updatedAt = local.updatedAt;
+        } else if (local.status === 'frozen' && localUpdated >= suUpdated) {
+          merged.status = 'frozen';
         } else if (suUpdated === 0 && localBal > 0 && suBal === 0) {
           merged.balance = local.balance;
         }
@@ -1832,6 +1863,22 @@ function reconcileServerUsers(data, isBackground) {
       currentMap.set(su.id, merged);
     }
   });
+
+  // Reconcile transactions from server into local cache
+  if (Array.isArray(data.txs) && data.txs.length > 0) {
+    let localTxs = [];
+    try { localTxs = JSON.parse(localStorage.getItem('mcb_txs')) || []; } catch(e) {}
+    const txMap = new Map();
+    const txKey = t => (t.userId || '') + '_' + (t.accountNumber || '') + '_' + (t.d || '') + '_' + (t.a || '') + '_' + (t.n || '');
+    localTxs.forEach(t => txMap.set(txKey(t), t));
+    data.txs.forEach(t => {
+      const k = txKey(t);
+      if (!txMap.has(k)) {
+        txMap.set(k, t);
+      }
+    });
+    localStorage.setItem('mcb_txs', JSON.stringify(Array.from(txMap.values())));
+  }
 
   // Filter out any locally deleted users
   ADM_USERS = Array.from(currentMap.values()).filter(u => !deletedIds.has(u.id) && !deletedIds.has(u.accountNumber));

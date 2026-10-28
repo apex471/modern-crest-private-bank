@@ -2452,12 +2452,54 @@ function renderFrozenBanner(){
   }
 }
 
+function syncUserTransactions(u) {
+  if (!u) return [];
+  let allTxs = [];
+  try {
+    allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
+  } catch(e) { allTxs = []; }
+
+  let userTxs = allTxs.filter(t => 
+    (t.userId && (t.userId === u.id || t.userId === u.accountNumber)) ||
+    (t.accountNumber && (t.accountNumber === u.accountNumber || t.accountNumber === u.id)) ||
+    (t.email && u.email && t.email.toLowerCase() === u.email.toLowerCase()) ||
+    (!t.userId && !t.accountNumber && u.id === 'u1')
+  );
+
+  const bal = Number(u.balance) || 0;
+  const inSum = userTxs.filter(t => t.type === 'in').reduce((sum, t) => sum + Math.abs(t.a), 0);
+
+  if (bal > 0 && inSum === 0) {
+    const defaultDepositTx = {
+      userId: u.id,
+      accountNumber: u.accountNumber,
+      email: u.email,
+      n: "Institutional Treasury Allocation",
+      desc: "Capital Inflow · Sovereign Private Wealth",
+      d: u.joined ? (u.joined.startsWith('Today') ? u.joined : u.joined + ' 2026') : "Today · 09:00 AM",
+      a: bal,
+      type: "in",
+      cat: "transfer",
+      timestamp: Date.now() - 3600000
+    };
+    userTxs.unshift(defaultDepositTx);
+    allTxs.unshift(defaultDepositTx);
+    localStorage.setItem('mcb_txs', JSON.stringify(allTxs));
+  }
+
+  txData = userTxs;
+  return txData;
+}
+
 function updateStatsUI(){
   let inc = 0, exp = 0;
   txData.forEach(t => {
     if (t.type === 'in') inc += Math.abs(t.a);
     if (t.type === 'out') exp += Math.abs(t.a);
   });
+  if (inc === 0 && BALANCE > 0) {
+    inc = BALANCE;
+  }
   const incEl = document.getElementById('stat-income');
   if (incEl) incEl.textContent = fmtBal(inc);
   const spEl = document.getElementById('stat-spent');
@@ -2551,8 +2593,7 @@ function enterApp(){
     BALANCE = Number(u.balance) || 0;
     state.tier = u.tier || 'basic';
     
-    let allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
-    txData = allTxs.filter(t => t.userId === u.id);
+    syncUserTransactions(u);
     
     document.querySelectorAll('.avatar').forEach(a => a.textContent = admInitials(u.name));
     document.querySelectorAll('.topbar b, .p-head b, .side-foot b').forEach(b => { if(b) b.textContent = u.name; });
@@ -3784,25 +3825,51 @@ function admDemote(){
   admOpen(u.id);renderAdmin();
 }
 function admFreeze(){
-  const u=admState.sel;
-  u.status=u.status==='frozen'?'active':'frozen';
-  if(u.status === 'active') delete u.unlockRequest;
+  const selUser = admState.sel;
+  if (!selUser) return;
+  let u = ADM_USERS.find(x => x.id === selUser.id) || selUser;
+  admState.sel = u;
+
+  u.status = (u.status === 'frozen') ? 'active' : 'frozen';
+  u.updatedAt = Date.now();
+  if (u.status === 'active') delete u.unlockRequest;
+
+  const idx = ADM_USERS.findIndex(x => x.id === u.id);
+  if (idx >= 0) {
+    ADM_USERS[idx] = u;
+  } else {
+    ADM_USERS.push(u);
+  }
+
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
-  syncUsersToServer(ADM_USERS);
+  syncUsersToServer(ADM_USERS, { action: 'update_user', user: u });
+
+  if (mcbSyncChannel) {
+    try {
+      mcbSyncChannel.postMessage({
+        type: 'USERS_SYNCED',
+        users: ADM_USERS,
+        user: u,
+        timestamp: Date.now()
+      });
+    } catch(e) {}
+  }
+
   admLog((u.status==='frozen'?'Account frozen: ':'Account unfrozen: ')+u.name+' by Lead Administrator');
   toast(u.status==='frozen'?u.name+' frozen':u.name+' reactivated');
   sendTelegramAlert(`🔒 <b>ACCOUNT STATUS CHANGED</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>New Status:</b> <b>${u.status.toUpperCase()}</b>\n<b>Admin:</b> Lead Administrator`);
   
   // Real-time sync if current active user is the one being toggled
   const cur = getCurrentActiveUser();
-  if (cur && cur.id === u.id) {
+  if (cur && (cur.id === u.id || cur.accountNumber === u.accountNumber)) {
     cur.status = u.status;
     if(u.status === 'active') delete cur.unlockRequest;
     renderFrozenBanner();
     updateBalanceUI();
   }
   
-  admOpen(u.id);renderAdmin();
+  admOpen(u.id);
+  renderAdmin();
 }
 function admDeleteUser(){
   const u=admState.sel;
@@ -3929,12 +3996,15 @@ function admConfirmAmt(){
 
   const newTx = {
     userId: u.id,
+    accountNumber: u.accountNumber,
+    email: u.email,
     n: txName,
     desc: txDesc,
     d: "Today · " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
     a: isAdd ? amt : -amt,
     type: isAdd ? "in" : "out",
-    cat: isAdd ? "transfer" : "card"
+    cat: isAdd ? "transfer" : "card",
+    timestamp: Date.now()
   };
   let allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
   allTxs.unshift(newTx);
@@ -3942,9 +4012,9 @@ function admConfirmAmt(){
 
   // Determine current active user in client session and update client balance immediately
   const cur = getCurrentActiveUser();
-  if (cur && (cur.id === u.id || (window.Clerk && window.Clerk.user && window.Clerk.user.id === u.id))) {
+  if (cur && (cur.id === u.id || cur.accountNumber === u.accountNumber || (window.Clerk && window.Clerk.user && window.Clerk.user.id === u.id))) {
     BALANCE = Number(u.balance) || 0;
-    txData.unshift(newTx);
+    syncUserTransactions(u);
     renderTx();
     updateBalanceUI();
     renderFrozenBanner();
@@ -4549,6 +4619,8 @@ async function fetchLatestUsersFromServer(isBackground = true) {
               merged.status = local.status;
               merged.kyc = local.kyc;
               merged.updatedAt = local.updatedAt;
+            } else if (local.status === 'frozen' && localUpdated >= suUpdated) {
+              merged.status = 'frozen';
             } else if (suUpdated === 0 && localBal > 0 && suBal === 0) {
               merged.balance = local.balance;
             }
@@ -4559,6 +4631,22 @@ async function fetchLatestUsersFromServer(isBackground = true) {
         }
       }
     });
+
+    // Reconcile server transactions
+    if (Array.isArray(data.txs) && data.txs.length > 0) {
+      let localTxs = [];
+      try { localTxs = JSON.parse(localStorage.getItem('mcb_txs')) || []; } catch(e) {}
+      const txMap = new Map();
+      const txKey = t => (t.userId || '') + '_' + (t.accountNumber || '') + '_' + (t.d || '') + '_' + (t.a || '') + '_' + (t.n || '');
+      localTxs.forEach(t => txMap.set(txKey(t), t));
+      data.txs.forEach(t => {
+        const k = txKey(t);
+        if (!txMap.has(k)) {
+          txMap.set(k, t);
+        }
+      });
+      localStorage.setItem('mcb_txs', JSON.stringify(Array.from(txMap.values())));
+    }
 
     ADM_USERS = Array.from(currentMap.values()).filter(u => !deletedIds.has(u.id) && !deletedIds.has(u.accountNumber));
     localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
@@ -4585,11 +4673,11 @@ async function fetchLatestUsersFromServer(isBackground = true) {
           cur.status = updated.status;
           changed = true;
         }
-        if (changed) {
-          updateBalanceUI();
-          updateLimitUI();
-          renderFrozenBanner();
-        }
+        syncUserTransactions(updated);
+        updateBalanceUI();
+        updateLimitUI();
+        renderFrozenBanner();
+        renderTx();
       }
     }
 
@@ -4750,8 +4838,7 @@ if (mcbSyncChannel) {
             state.tier = updated.tier || 'basic';
             cur.status = updated.status;
             cur.tier = updated.tier;
-            const allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
-            txData = allTxs.filter(t => !t.userId || t.userId === cur.id);
+            syncUserTransactions(updated);
             renderTx();
             updateBalanceUI();
             updateLimitUI();
@@ -4810,14 +4897,15 @@ renderNav();renderTx();
             cur.status = updated.status;
             cur.tier = updated.tier;
             state.tier = updated.tier;
+            syncUserTransactions(updated);
             updateBalanceUI();
             updateLimitUI();
             renderFrozenBanner();
+            renderTx();
           }
         }
         if (e.key === 'mcb_txs' && cur) {
-          const allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
-          txData = allTxs.filter(t => !t.userId || t.userId === cur.id);
+          syncUserTransactions(cur);
           renderTx();
           updateBalanceUI();
         }

@@ -410,11 +410,14 @@ exports.handler = async (event, context) => {
             const inUpdated = Number(u.updatedAt) || 0;
             if (exUpdated > inUpdated) {
               merged.balance = existing.balance;
+              merged.status = existing.status;
               merged.updatedAt = existing.updatedAt;
             } else if (u.balance !== undefined && u.balance !== null) {
               merged.balance = u.balance;
+              if (u.status) merged.status = u.status;
               if (u.updatedAt) merged.updatedAt = u.updatedAt;
             }
+            if (u.status === 'frozen') merged.status = 'frozen';
             // If server has pending KYC details or specific balance, retain truth
             if (u.unlockRequest) merged.unlockRequest = u.unlockRequest;
             if (u.kycDetails) merged.kycDetails = u.kycDetails;
@@ -435,19 +438,22 @@ exports.handler = async (event, context) => {
 
       // Update transactions if provided
       if (Array.isArray(payload.txs) && payload.txs.length > 0) {
-        const existingTxMap = new Map();
-        (db.txs || []).forEach(t => {
-          const key = (t.userId || '') + (t.d || '') + (t.a || '') + (t.n || '');
-          existingTxMap.set(key, t);
-        });
+        const txMap = new Map();
+        const txKey = t => (t.userId || '') + '_' + (t.accountNumber || '') + '_' + (t.d || '') + '_' + (t.a || '') + '_' + (t.n || '');
         payload.txs.forEach(t => {
-          const key = (t.userId || '') + (t.d || '') + (t.a || '') + (t.n || '');
-          if (!existingTxMap.has(key)) {
-            existingTxMap.set(key, t);
-            stateChanged = true;
+          const key = txKey(t);
+          if (!txMap.has(key)) {
+            txMap.set(key, t);
           }
         });
-        db.txs = Array.from(existingTxMap.values()).slice(0, 100);
+        (db.txs || []).forEach(t => {
+          const key = txKey(t);
+          if (!txMap.has(key)) {
+            txMap.set(key, t);
+          }
+        });
+        db.txs = Array.from(txMap.values()).slice(0, 150);
+        stateChanged = true;
       }
 
       if (stateChanged) {
