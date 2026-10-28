@@ -3535,7 +3535,10 @@ function admDeleteUser(){
   renderAdmin();
 }
 function admFund(mode){
-  admState.amtMode=mode;const u=admState.sel;
+  admState.amtMode=mode;
+  if (!admState.sel) return;
+  const u = ADM_USERS.find(x => x.id === admState.sel.id) || admState.sel;
+  admState.sel = u;
   document.getElementById('am-amt-title').textContent=mode==='add'?'Add funds (Deposit)':'Deduct funds (Debit)';
   document.getElementById('am-amt-sub').textContent=(mode==='add'?'Credit':'Debit')+' '+u.name+' · current balance '+fmtBal(u.balance);
   document.getElementById('am-amt-in').value='';
@@ -3576,11 +3579,18 @@ function admFund(mode){
 }
 function setAmt(v){document.getElementById('am-amt-in').value='$'+v.toLocaleString();}
 function admConfirmAmt(){
-  const u=admState.sel;
+  const selUser = admState.sel;
+  if (!selUser) { toast('No client selected'); return; }
+  
+  // Resolve current user from ADM_USERS to avoid stale pointer
+  let u = ADM_USERS.find(x => x.id === selUser.id) || selUser;
+  admState.sel = u;
+
   const raw=document.getElementById('am-amt-in').value.replace(/[^0-9.]/g,'');
   const amt=parseFloat(raw);
-  if(!amt||amt<=0){toast('Enter a valid amount');return;}
-  if(admState.amtMode==='deduct'&&amt>u.balance){toast('Amount exceeds user balance');return;}
+  if(!amt||amt<=0||isNaN(amt)){toast('Enter a valid amount');return;}
+  const curBal = Number(u.balance) || 0;
+  if(admState.amtMode==='deduct'&&amt>curBal){toast('Amount exceeds user balance');return;}
 
   const isAdd = admState.amtMode === 'add';
   const nameEl = document.getElementById('am-tx-name');
@@ -3588,29 +3598,23 @@ function admConfirmAmt(){
   let txName = (nameEl ? nameEl.value.trim() : '');
   let txDesc = (descEl ? descEl.value.trim() : '');
 
-  // Prompt admin if empty so every deposit has a custom deposit name and description
-  if (!txName) {
-    const promptLabel = isAdd ? "Enter custom Deposit Name / Sender Name:" : "Enter custom Debit Name / Reason:";
-    const defaultPlaceholder = isAdd ? "Institutional Treasury Wire" : "Custodial Adjustment";
-    const userEntered = prompt(promptLabel, defaultPlaceholder);
-    if (!userEntered || !userEntered.trim()) {
-      toast(isAdd ? 'Deposit name is required' : 'Debit name is required');
-      if (nameEl) nameEl.focus();
-      return;
-    }
-    txName = userEntered.trim();
+  const defaultTxName = isAdd ? "Institutional Treasury Wire" : "Custodial Adjustment";
+  const defaultMemo = isAdd ? "Capital Allocation" : "Administrative Settlement";
+
+  if (!txName) txName = defaultTxName;
+  if (!txDesc) txDesc = defaultMemo;
+
+  u.balance = isAdd ? (curBal + amt) : Math.max(0, curBal - amt);
+  u.updatedAt = Date.now();
+  
+  const idx = ADM_USERS.findIndex(x => x.id === u.id);
+  if (idx >= 0) {
+    ADM_USERS[idx] = u;
+  } else {
+    ADM_USERS.push(u);
   }
 
-  if (!txDesc) {
-    const promptDesc = isAdd ? "Enter Description / Reference Memo:" : "Enter Debit Description / Reference Memo:";
-    const defaultMemo = isAdd ? "Capital Allocation" : "Administrative Settlement";
-    const userEnteredDesc = prompt(promptDesc, defaultMemo);
-    txDesc = (userEnteredDesc && userEnteredDesc.trim()) ? userEnteredDesc.trim() : (isAdd ? "Capital Allocation" : "Settlement");
-  }
-
-  u.balance = isAdd ? (Number(u.balance) || 0) + amt : Math.max(0, (Number(u.balance) || 0) - amt);
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
-  syncUsersToServer(ADM_USERS);
 
   const newTx = {
     userId: u.id,
@@ -3633,6 +3637,20 @@ function admConfirmAmt(){
     renderTx();
     updateBalanceUI();
     renderFrozenBanner();
+  }
+
+  syncUsersToServer(ADM_USERS, { action: 'update_user', user: u, txs: allTxs });
+
+  if (mcbSyncChannel) {
+    try {
+      mcbSyncChannel.postMessage({
+        type: 'USERS_SYNCED',
+        users: ADM_USERS,
+        txs: allTxs,
+        user: u,
+        timestamp: Date.now()
+      });
+    } catch(e) {}
   }
 
   sendTelegramAlert(`💵 <b>ADMIN ${isAdd ? 'DEPOSIT' : 'DEBIT'} EXECUTED</b>\n\n<b>Client:</b> ${u.name}\n<b>Account Number:</b> <code>${u.accountNumber || 'N/A'}</code>\n<b>Amount:</b> <b>${isAdd ? '+' : '-'}${fmtBal(amt)}</b>\n<b>Transaction Name:</b> ${txName}\n<b>Memo / Ref:</b> ${txDesc}\n<b>New Balance:</b> <b>${fmtBal(u.balance)}</b>\n<b>Authorized By:</b> Lead Administrator`);
@@ -4190,6 +4208,7 @@ async function fetchLatestUsersFromServer(isBackground = true) {
     try {
       const staticRes = await tryFetchEndpoint('/bank_data.json', { signal: AbortSignal.timeout(1500) });
       if (staticRes && Array.isArray(staticRes.users)) {
+        staticRes.isStaticFallback = true;
         data = staticRes;
       }
     } catch(e) {}
@@ -4203,7 +4222,26 @@ async function fetchLatestUsersFromServer(isBackground = true) {
     serverUsers.forEach(su => {
       if (!deletedIds.has(su.id) && !(su.accountNumber && deletedIds.has(su.accountNumber))) {
         if (currentMap.has(su.id)) {
-          const merged = Object.assign({}, currentMap.get(su.id), su);
+          const local = currentMap.get(su.id);
+          let merged;
+          if (data.isStaticFallback) {
+            merged = Object.assign({}, su, local);
+          } else {
+            merged = Object.assign({}, local, su);
+            const localBal = Number(local.balance) || 0;
+            const suBal = Number(su.balance) || 0;
+            const localUpdated = Number(local.updatedAt) || 0;
+            const suUpdated = Number(su.updatedAt) || 0;
+            if (localUpdated > suUpdated) {
+              merged.balance = local.balance;
+              merged.tier = local.tier;
+              merged.status = local.status;
+              merged.kyc = local.kyc;
+              merged.updatedAt = local.updatedAt;
+            } else if (suUpdated === 0 && localBal > 0 && suBal === 0) {
+              merged.balance = local.balance;
+            }
+          }
           currentMap.set(su.id, merged);
         } else {
           currentMap.set(su.id, su);
@@ -4213,6 +4251,11 @@ async function fetchLatestUsersFromServer(isBackground = true) {
 
     ADM_USERS = Array.from(currentMap.values()).filter(u => !deletedIds.has(u.id) && !deletedIds.has(u.accountNumber));
     localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+
+    if (admState && admState.sel) {
+      const updatedSel = ADM_USERS.find(x => x.id === admState.sel.id);
+      if (updatedSel) admState.sel = updatedSel;
+    }
 
     const cur = getCurrentActiveUser();
     if (cur) {
@@ -4378,8 +4421,16 @@ if (mcbSyncChannel) {
     const msg = event.data;
     if (msg.type === 'USERS_SYNCED' || msg.type === 'NEW_USER') {
       try {
-        const raw = localStorage.getItem('mcb_users');
-        if (raw) ADM_USERS = JSON.parse(raw);
+        if (Array.isArray(msg.users)) {
+          ADM_USERS = msg.users;
+          localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+        } else {
+          const raw = localStorage.getItem('mcb_users');
+          if (raw) ADM_USERS = JSON.parse(raw);
+        }
+        if (Array.isArray(msg.txs)) {
+          localStorage.setItem('mcb_txs', JSON.stringify(msg.txs));
+        }
         const cur = getCurrentActiveUser();
         if (cur) {
           const updated = ADM_USERS.find(x => x.id === cur.id);
@@ -4388,10 +4439,16 @@ if (mcbSyncChannel) {
             state.tier = updated.tier || 'basic';
             cur.status = updated.status;
             cur.tier = updated.tier;
+            const allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
+            txData = allTxs.filter(t => !t.userId || t.userId === cur.id);
+            renderTx();
             updateBalanceUI();
             updateLimitUI();
             renderFrozenBanner();
           }
+        }
+        if (sessionRole === 'admin' && typeof renderAdmin === 'function') {
+          renderAdmin();
         }
       } catch(e) {}
     }

@@ -327,6 +327,15 @@ exports.handler = async (event, context) => {
             const existing = userMap.get(u.id);
             // Merge attributes carefully
             const merged = Object.assign({}, existing, u);
+            const exUpdated = Number(existing.updatedAt) || 0;
+            const inUpdated = Number(u.updatedAt) || 0;
+            if (exUpdated > inUpdated) {
+              merged.balance = existing.balance;
+              merged.updatedAt = existing.updatedAt;
+            } else if (u.balance !== undefined && u.balance !== null) {
+              merged.balance = u.balance;
+              if (u.updatedAt) merged.updatedAt = u.updatedAt;
+            }
             // If server has pending KYC details or specific balance, retain truth
             if (u.unlockRequest) merged.unlockRequest = u.unlockRequest;
             if (u.kycDetails) merged.kycDetails = u.kycDetails;

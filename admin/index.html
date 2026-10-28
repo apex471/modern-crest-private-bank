@@ -1219,7 +1219,10 @@ function admDeleteUser(){
   renderAdmin();
 }
 function admFund(mode){
-  admState.amtMode=mode;const u=admState.sel;
+  admState.amtMode=mode;
+  if (!admState.sel) return;
+  const u = ADM_USERS.find(x => x.id === admState.sel.id) || admState.sel;
+  admState.sel = u;
   document.getElementById('am-amt-title').textContent=mode==='add'?'Credit Account (Deposit)':'Debit Account (Withdrawal)';
   document.getElementById('am-amt-sub').textContent=(mode==='add'?'Credit ':'Debit ')+u.name+' · Current balance '+fmtBal(u.balance);
   document.getElementById('am-amt-in').value='';
@@ -1242,46 +1245,45 @@ function admFund(mode){
 }
 function setAmt(v){document.getElementById('am-amt-in').value='$'+v.toLocaleString();}
 function admConfirmAmt(){
-  const u=admState.sel;
-  const raw=document.getElementById('am-amt-in').value.replace(/[^0-9.]/g,'');
-  const amt=parseFloat(raw);
-  if(!amt||amt<=0){toast('Enter a valid amount');return;}
-  if(admState.amtMode==='deduct'&&amt>u.balance){toast('Amount exceeds user balance');return;}
+  const selUser = admState.sel;
+  if(!selUser){ toast('No client selected'); return; }
+  
+  // Resolve current user from ADM_USERS to avoid stale pointer
+  let u = ADM_USERS.find(x => x.id === selUser.id) || selUser;
+  admState.sel = u;
+
+  const raw = document.getElementById('am-amt-in').value.replace(/[^0-9.]/g,'');
+  const amt = parseFloat(raw);
+  if(!amt || isNaN(amt) || amt <= 0){ toast('Enter a valid amount'); return; }
+  
+  const curBal = Number(u.balance) || 0;
+  if(admState.amtMode === 'deduct' && amt > curBal){ toast('Amount exceeds user balance'); return; }
   
   const isAdd = admState.amtMode === 'add';
-  let txName = (document.getElementById('am-tx-name') ? document.getElementById('am-tx-name').value.trim() : '');
-  let txDesc = (document.getElementById('am-tx-desc') ? document.getElementById('am-tx-desc').value.trim() : '');
+  const nameInp = document.getElementById('am-tx-name');
+  const descInp = document.getElementById('am-tx-desc');
+  let txName = (nameInp ? nameInp.value.trim() : '');
+  let txDesc = (descInp ? descInp.value.trim() : '');
 
-  // Prompt admin if empty so there is always a custom deposit name and description!
-  if(!txName){
-    const defaultTxName = isAdd ? "Institutional Wire Deposit" : "Direct Account Debit";
-    const enteredName = prompt(
-      isAdd 
-        ? "Please enter the Deposit Name / Sender Name (e.g. Federal Reserve Wire, Citadel Securities, Client Deposit):" 
-        : "Please enter the Debit / Beneficiary Name:",
-      defaultTxName
-    );
-    if(enteredName === null) return;
-    txName = enteredName.trim() || defaultTxName;
-    if(document.getElementById('am-tx-name')) document.getElementById('am-tx-name').value = txName;
+  // Default txName and txDesc if omitted
+  const defaultTxName = isAdd ? "Institutional Wire Deposit" : "Direct Account Debit";
+  const defaultDesc = isAdd ? "Private Banking Funds Inflow" : "Authorized Institutional Settlement";
+
+  if(!txName) txName = defaultTxName;
+  if(!txDesc) txDesc = defaultDesc;
+
+  u.balance = isAdd ? (curBal + amt) : Math.max(0, curBal - amt);
+  u.updatedAt = Date.now();
+  
+  // Ensure the user in ADM_USERS has the updated values
+  const idx = ADM_USERS.findIndex(x => x.id === u.id);
+  if(idx >= 0) {
+    ADM_USERS[idx] = u;
+  } else {
+    ADM_USERS.push(u);
   }
 
-  if(!txDesc){
-    const defaultDesc = isAdd ? "Private Banking Funds Inflow" : "Authorized Institutional Settlement";
-    const enteredDesc = prompt(
-      isAdd 
-        ? "Please enter a Description / Reference Memo for this deposit (e.g. Q3 Distribution, Client Retainer, Capital Wire):" 
-        : "Please enter a Description / Reference Memo for this debit:",
-      defaultDesc
-    );
-    if(enteredDesc === null) return;
-    txDesc = enteredDesc.trim() || defaultDesc;
-    if(document.getElementById('am-tx-desc')) document.getElementById('am-tx-desc').value = txDesc;
-  }
-
-  u.balance = isAdd ? u.balance + amt : Math.max(0, u.balance - amt);
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
-  syncUsersToServer(ADM_USERS);
 
   const newTx = {
     userId: u.id,
@@ -1290,11 +1292,27 @@ function admConfirmAmt(){
     d: "Today · " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
     a: isAdd ? amt : -amt,
     type: isAdd ? "in" : "out",
-    cat: "transfer"
+    cat: isAdd ? "transfer" : "card"
   };
   let allTxs = JSON.parse(localStorage.getItem('mcb_txs')) || [];
   allTxs.unshift(newTx);
   localStorage.setItem('mcb_txs', JSON.stringify(allTxs));
+
+  // Sync users AND transactions to server
+  syncUsersToServer(ADM_USERS, { action: 'update_user', user: u, txs: allTxs });
+
+  // Broadcast to other tabs immediately
+  if (mcbSyncChannel) {
+    try {
+      mcbSyncChannel.postMessage({
+        type: 'USERS_SYNCED',
+        users: ADM_USERS,
+        txs: allTxs,
+        user: u,
+        timestamp: Date.now()
+      });
+    } catch(e) {}
+  }
 
   admLog(fmtBal(amt)+(isAdd?' credited to ':' debited from ')+u.name+' ('+txName+')');
   toast((isAdd?'Credited ':'Debited ')+fmtBal(amt)+' → '+u.name);
@@ -1443,7 +1461,27 @@ function reconcileServerUsers(data, isBackground) {
     } else {
       // Reconcile and retain active updates
       const local = currentMap.get(su.id);
-      const merged = Object.assign({}, local, su);
+      let merged;
+      if (data.isStaticFallback) {
+        // Static fallback bank_data.json should NEVER overwrite locally updated active fields
+        merged = Object.assign({}, su, local);
+      } else {
+        merged = Object.assign({}, local, su);
+        const localBal = Number(local.balance) || 0;
+        const suBal = Number(su.balance) || 0;
+        const localUpdated = Number(local.updatedAt) || 0;
+        const suUpdated = Number(su.updatedAt) || 0;
+
+        if (localUpdated > suUpdated) {
+          merged.balance = local.balance;
+          merged.tier = local.tier;
+          merged.status = local.status;
+          merged.kyc = local.kyc;
+          merged.updatedAt = local.updatedAt;
+        } else if (suUpdated === 0 && localBal > 0 && suBal === 0) {
+          merged.balance = local.balance;
+        }
+      }
       currentMap.set(su.id, merged);
     }
   });
@@ -1451,6 +1489,18 @@ function reconcileServerUsers(data, isBackground) {
   // Filter out any locally deleted users
   ADM_USERS = Array.from(currentMap.values()).filter(u => !deletedIds.has(u.id) && !deletedIds.has(u.accountNumber));
   localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+
+  // Keep admState.sel pointing to current object in ADM_USERS
+  if (admState.sel) {
+    const updatedSel = ADM_USERS.find(x => x.id === admState.sel.id);
+    if (updatedSel) {
+      admState.sel = updatedSel;
+      const balEl = document.getElementById('am-bal');
+      if (balEl && document.getElementById('modal3') && document.getElementById('modal3').classList.contains('open')) {
+        balEl.textContent = fmtBal(updatedSel.balance);
+      }
+    }
+  }
 
   updateSyncStatusUI(true, ADM_USERS.length);
   renderAdmin();
@@ -1480,6 +1530,7 @@ async function fetchLatestUsersFromServer(isBackground = true) {
   try {
     const staticRes = await tryFetchEndpoint('/bank_data.json', { signal: AbortSignal.timeout(1500) });
     if (staticRes && Array.isArray(staticRes.users)) {
+      staticRes.isStaticFallback = true;
       return reconcileServerUsers(staticRes, isBackground);
     }
   } catch(e) {}

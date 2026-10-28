@@ -299,6 +299,7 @@ def handle_deposit(msg):
             return
 
         target_user["balance"] = target_user.get("balance", 0.0) + amt
+        target_user["updatedAt"] = int(time.time() * 1000)
         tx = {
             "userId": target_user["id"],
             "n": "Institutional Wire Deposit",
@@ -783,7 +784,7 @@ def run_polling():
 
                 if cmd in ["/start", "/help"]:
                     handle_start(msg)
-                elif cmd == "/deposit":
+                elif cmd in ["/deposit", "/addfund", "/addfunds", "/add_fund", "/fund"]:
                     handle_deposit(msg)
                 elif cmd == "/approve":
                     handle_approve(msg)
