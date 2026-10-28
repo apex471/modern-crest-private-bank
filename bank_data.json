@@ -144,6 +144,28 @@
         "state": "NY",
         "zip": "10001"
       }
+    },
+    {
+      "id": "u_mvs6u5hl41wx",
+      "name": "Sir Julian Sterling",
+      "email": "julian.sterling@crestvault.ch",
+      "accountNumber": "9568727400",
+      "tier": "private",
+      "balance": 850000,
+      "status": "active",
+      "kyc": "verified",
+      "joined": "Oct 2026",
+      "isNewHighlight": true,
+      "profileDetails": {
+        "name": "Sir Julian Sterling",
+        "country": "US",
+        "phone": "+1 (555) 514-8867",
+        "dob": "1985-05-15",
+        "addr": "Executive Suite",
+        "city": "New York",
+        "state": "NY",
+        "zip": "10001"
+      }
     }
   ],
   "txs": [],
