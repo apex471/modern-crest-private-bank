@@ -125,19 +125,27 @@ a{text-decoration:none;color:inherit}
 /* Stats Grid */
 .adm-stats{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:16px;
+  grid-template-columns:repeat(5,1fr);
+  gap:14px;
   margin-bottom:36px;
 }
 .adm-stat{
   background:var(--surface);
   border:1px solid var(--border);
   border-radius:18px;
-  padding:20px 18px;
+  padding:18px 16px;
   display:flex;
   flex-direction:column;
   position:relative;
   overflow:hidden;
+  cursor:pointer;
+  transition:all .2s ease;
+}
+.adm-stat:hover{
+  transform:translateY(-3px);
+  border-color:var(--gold-border);
+  box-shadow:0 12px 28px rgba(0,0,0,.35);
+  background:rgba(255,255,255,.05);
 }
 .adm-stat::before{
   content:'';
@@ -150,11 +158,13 @@ a{text-decoration:none;color:inherit}
 }
 .as-ico svg{width:20px;height:20px}
 .as-navy{background:rgba(255,255,255,.08);color:#fff}
+.as-blue{background:rgba(59,130,246,.15);color:#60A5FA}
 .as-gold{background:var(--gold-soft);color:var(--gold-2)}
 .as-green{background:rgba(39,174,96,.15);color:var(--green)}
 .as-red{background:rgba(235,87,87,.15);color:var(--red)}
-.adm-stat b{font-family:'Sora';font-size:24px;font-weight:700;letter-spacing:-.5px;margin-bottom:4px}
+.adm-stat b{font-family:'Sora';font-size:22px;font-weight:700;letter-spacing:-.5px;margin-bottom:4px}
 .adm-stat span{font-size:12px;color:var(--muted)}
+.adm-stat span i{font-style:normal;color:var(--gold-2);opacity:.85}
 
 /* Section Titles */
 .sec-head{
@@ -462,9 +472,15 @@ a{text-decoration:none;color:inherit}
 }
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
+@media(max-width:1100px){
+  .adm-stats{grid-template-columns:repeat(3,1fr)}
+}
 @media(max-width:768px){
   .adm-stats{grid-template-columns:repeat(2,1fr)}
   .admin-container{padding:16px 14px 40px}
+}
+@media(max-width:480px){
+  .adm-stats{grid-template-columns:1fr}
 }
 
 </style>
@@ -522,8 +538,14 @@ a{text-decoration:none;color:inherit}
         </div>
       </div>
       
-      <div class="header-actions" style="display:flex;align-items:center;gap:10px">
-        <div id="adm-sync-status" class="sync-pill online"><span class="pulse-dot"></span> <span id="sync-status-txt">Live Sync</span> · <b id="sync-user-count">7</b> Clients</div>
+      <div class="header-actions" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div id="adm-sync-status" class="sync-pill online"><span class="pulse-dot"></span> <span id="sync-status-txt">Live Sync</span> · <b id="sync-user-count">10</b> Clients</div>
+        <button class="btn-sync" id="btn-metrics-modal" onclick="openAdminMetricsModal()" title="View Comprehensive Client Intelligence, Active Roster & Portfolio Details" style="background:rgba(233,200,110,.12);border-color:rgba(233,200,110,.35);color:var(--gold-2)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg> Directory Analytics
+        </button>
+        <button class="btn-sync" id="btn-vault-sync" onclick="restoreTreasuryClients()" title="Safely Recover & Re-sync All Registered Clients from Treasury Vault" style="background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.3);color:#60A5FA">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2.5 2v6h6M2.66 15.57a10 10 0 1 0 .57-8.38l-5.67-5.67"/></svg> Vault Sync
+        </button>
         <button class="btn-sync" id="btn-manual-sync" onclick="manualSyncAdmin()" title="Sync Clients from Server"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> Refresh</button>
         <button class="btn-lock" onclick="logoutAdmin()">Lock / Sign out</button>
       </div>
@@ -739,19 +761,69 @@ a{text-decoration:none;color:inherit}
   </div>
 </div>
 
+<!-- Modal: Comprehensive Client Intelligence & Portfolio Metrics -->
+<div class="modal-bg" id="modal-admin-metrics" onclick="if(event.target===this)closeAdminMetricsModal()">
+  <div class="sheet" style="max-width:720px;padding:26px 24px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:14px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:42px;height:42px;border-radius:14px;background:var(--gold-soft);color:var(--gold-2);display:flex;align-items:center;justify-content:center;border:1px solid var(--gold-border)">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        </div>
+        <div>
+          <h3 style="font-family:'Sora';font-size:18px;margin:0;color:#fff">Client Portfolio Intelligence</h3>
+          <p style="margin:2px 0 0;font-size:12px;color:var(--muted)">Modern Crest Private Wealth · Executive System Audit & Roster Analytics</p>
+        </div>
+      </div>
+      <button onclick="closeAdminMetricsModal()" style="background:transparent;border:none;font-size:24px;color:var(--muted);cursor:pointer">&times;</button>
+    </div>
+
+    <div id="adm-metrics-content">
+      <!-- Dynamically rendered -->
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 /* ================= STATE & STORAGE ================= */
-let ADM_USERS = JSON.parse(localStorage.getItem('mcb_users')) || [
- {id:'u1',name:'Adaeze Okafor',email:'adaeze.okafor@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'verified',joined:'Mar 2025',accountNumber:'4829104820',profileDetails:{name:'Adaeze Okafor',country:'US',phone:'+1 (555) 382-9012',dob:'1992-06-15',addr:'1400 Park Ave, Suite 22B',city:'New York',state:'NY',zip:'10017'}},
- {id:'u2',name:'Chidi Nwosu',email:'chidi.nwosu@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'verified',joined:'Jan 2025',accountNumber:'7391049281'},
- {id:'u3',name:'Maya Kimani',email:'maya.kimani@crestmail.com',tier:'private',balance:0.00,status:'active',kyc:'verified',joined:'Nov 2024',accountNumber:'8192047193'},
- {id:'u4',name:'Tolu Adeyemi',email:'tolu.adeyemi@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'pending',target:'premium',joined:'Sep 2026',accountNumber:'6281940172',kycDetails:{name:'Tolu Adeyemi',dob:'1988-06-14',nat:'United States',idType:'Passport',idFile:'us_passport_adeyemi.pdf',ssnLast4:'6192',addrType:'Bank Statement',addrFile:'chase_statement_sept2026.pdf',submittedAt:'Today · 08:30 AM'}},
- {id:'u5',name:'Jonas Berg',email:'jonas.berg@crestmail.com',tier:'basic',balance:0.00,status:'frozen',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'5192840192',kycDetails:{name:'Jonas Berg',dob:'1984-11-03',nat:'Germany',idType:'National ID Card',idFile:'personalausweis_berg.pdf',ssnLast4:'4081',addrType:'Utility Bill',addrFile:'berlin_energy_bill.pdf',submittedAt:'Yesterday · 16:20'}},
- {id:'u6',name:'Amina Diallo',email:'amina.diallo@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'9182736450',kycDetails:{name:'Amina Diallo',dob:'1992-03-29',nat:'United Kingdom',idType:'Driver License',idFile:'uk_driving_licence_diallo.pdf',ssnLast4:'8835',addrType:'Lease Agreement',addrFile:'london_tenancy_signed.pdf',submittedAt:'Yesterday · 19:45'}},
- {id:'u7',name:'Sofia Reyes',email:'sofia.reyes@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'rejected',joined:'Aug 2026',accountNumber:'3819204716'},
+const TREASURY_VAULT_USERS = [
+  {id:'u1',name:'Adaeze Okafor',email:'adaeze.okafor@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'verified',joined:'Mar 2025',accountNumber:'6252548608',profileDetails:{name:'Adaeze Okafor',country:'US',phone:'+1 (555) 382-9012',dob:'1992-06-15',addr:'1400 Park Ave, Suite 22B',city:'New York',state:'NY',zip:'10017'}},
+  {id:'u2',name:'Chidi Nwosu',email:'chidi.nwosu@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'verified',joined:'Jan 2025',accountNumber:'9422580736'},
+  {id:'u3',name:'Maya Kimani',email:'maya.kimani@crestmail.com',tier:'private',balance:0.00,status:'active',kyc:'verified',joined:'Nov 2024',accountNumber:'8922487808'},
+  {id:'u4',name:'Tolu Adeyemi',email:'tolu.adeyemi@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'pending',target:'premium',joined:'Sep 2026',accountNumber:'3563569152',kycDetails:{addrFile:'chase_statement_sept2026.pdf',addrType:'Bank Statement',dob:'1988-06-14',idFile:'us_passport_adeyemi.pdf',idType:'Passport',name:'Tolu Adeyemi',nat:'United States',ssnLast4:'6192',submittedAt:'Today · 08:30 AM'}},
+  {id:'u5',name:'Jonas Berg',email:'jonas.berg@crestmail.com',tier:'basic',balance:0.00,status:'frozen',kyc:'pending',target:'private',joined:'Oct 2026',accountNumber:'6645872640',kycDetails:{addrFile:'berlin_energy_bill.pdf',addrType:'Utility Bill',dob:'1984-11-03',idFile:'personalausweis_berg.pdf',idType:'National ID Card',name:'Jonas Berg',nat:'Germany',ssnLast4:'4081',submittedAt:'Yesterday · 16:20'}},
+  {id:'u6',name:'Amina Diallo',email:'amina.diallo@crestmail.com',tier:'premium',balance:0.00,status:'active',kyc:'pending',joined:'Oct 2026',accountNumber:'9286706176',target:'private',kycDetails:{addrFile:'london_tenancy_signed.pdf',addrType:'Lease Agreement',dob:'1992-03-29',idFile:'uk_driving_licence_diallo.pdf',idType:'Driver License',name:'Amina Diallo',nat:'United Kingdom',ssnLast4:'8835',submittedAt:'Yesterday · 19:45'}},
+  {id:'u7',name:'Sofia Reyes',email:'sofia.reyes@crestmail.com',tier:'basic',balance:0.00,status:'active',kyc:'rejected',joined:'Aug 2026',accountNumber:'9953654784'},
+  {id:'u_mvqwuow2vace',name:'Lord Montgomery Vance',email:'m.vance@crestsovereign.com',accountNumber:'8503489565',tier:'private',balance:500000.00,status:'active',kyc:'verified',joined:'Oct 2026',profileDetails:{addr:'Executive Suite',city:'New York',country:'US',dob:'1985-05-15',name:'Lord Montgomery Vance',phone:'+1 (555) 516-7284',state:'NY',zip:'10001'}},
+  {id:'u_mvs6u5hl41wx',name:'Sir Julian Sterling',email:'julian.sterling@crestvault.ch',accountNumber:'9568727400',tier:'private',balance:850000.00,status:'active',kyc:'verified',joined:'Oct 2026',profileDetails:{addr:'Executive Suite',city:'New York',country:'US',dob:'1985-05-15',name:'Sir Julian Sterling',phone:'+1 (555) 514-8867',state:'NY',zip:'10001'}},
+  {id:'user_3KRpGBa4gpEFYxExRLeFYCKWgzv',name:'daniel Hendrick',email:'bossdaniels04@gmail.com',tier:'basic',balance:0.00,status:'active',kyc:'verified',joined:'Today',accountNumber:'7380996608'}
 ];
+
+let ADM_USERS = (function(){
+  try {
+    const raw = localStorage.getItem('mcb_users');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        // Automatically ensure any missing baseline vault users are retained
+        const userMap = new Map();
+        TREASURY_VAULT_USERS.forEach(u => userMap.set(u.id, Object.assign({}, u)));
+        parsed.forEach(u => {
+          if (userMap.has(u.id)) {
+            userMap.set(u.id, Object.assign({}, userMap.get(u.id), u));
+          } else {
+            userMap.set(u.id, u);
+          }
+        });
+        const merged = Array.from(userMap.values());
+        localStorage.setItem('mcb_users', JSON.stringify(merged));
+        return merged;
+      }
+    }
+  } catch(e){}
+  return JSON.parse(JSON.stringify(TREASURY_VAULT_USERS));
+})();
 
 // Ensure pending users in existing localStorage have rich kycDetails
 ADM_USERS.forEach(u => {
@@ -859,22 +931,64 @@ function closeDocInspectModal(){
 }
 
 function renderAdmin(){
-  // Ensure we have fresh storage data
+  // Ensure fresh storage data if available
   const storedUsers = localStorage.getItem('mcb_users');
-  if(storedUsers) ADM_USERS = JSON.parse(storedUsers);
+  if(storedUsers) {
+    try {
+      const parsed = JSON.parse(storedUsers);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        // Ensure baseline vault users are retained
+        const userMap = new Map();
+        TREASURY_VAULT_USERS.forEach(u => userMap.set(u.id, Object.assign({}, u)));
+        parsed.forEach(u => {
+          if (userMap.has(u.id)) userMap.set(u.id, Object.assign({}, userMap.get(u.id), u));
+          else userMap.set(u.id, u);
+        });
+        ADM_USERS = Array.from(userMap.values());
+      }
+    } catch(e) {}
+  }
 
   const total = ADM_USERS.length;
-  const pending = ADM_USERS.filter(u=>u.kyc==='pending' || (u.status==='frozen' && u.unlockRequest));
-  const held = ADM_USERS.reduce((s,u)=>s+u.balance,0);
-  const frozen = ADM_USERS.filter(u=>u.status==='frozen').length;
+  const activeUsers = ADM_USERS.filter(u => u.status !== 'frozen');
+  const activeCount = activeUsers.length;
+  const activePct = total ? Math.round((activeCount / total) * 100) : 0;
+  const pending = ADM_USERS.filter(u => u.kyc === 'pending' || (u.status === 'frozen' && u.unlockRequest));
+  const pendingCount = pending.length;
+  const held = ADM_USERS.reduce((s, u) => s + (Number(u.balance) || 0), 0);
+  const frozen = ADM_USERS.filter(u => u.status === 'frozen').length;
+  const basicCount = ADM_USERS.filter(u => (u.tier || 'basic') === 'basic').length;
+  const premiumCount = ADM_USERS.filter(u => u.tier === 'premium').length;
+  const privateCount = ADM_USERS.filter(u => u.tier === 'private').length;
 
-  document.getElementById('adm-stats').innerHTML=`
-    <div class="adm-stat"><div class="as-ico as-navy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5 6.5-5s6.5 1.5 6.5 5"/><circle cx="17" cy="9" r="2.5"/><path d="M16 15.2c2.9.2 5.5 1.5 5.5 4.3"/></svg></div><b>${total}</b><span>Total users</span></div>
-    <div class="adm-stat"><div class="as-ico as-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><b>${pending.length}</b><span>Pending approvals</span></div>
-    <div class="adm-stat"><div class="as-ico as-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><b>${fmtBal(held)}</b><span>Total balance held</span></div>
-    <div class="adm-stat"><div class="as-ico as-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M4 6l16 12M20 6L4 18"/></svg></div><b>${frozen}</b><span>Frozen accounts</span></div>`;
+  document.getElementById('adm-stats').innerHTML = `
+    <div class="adm-stat" onclick="admFilterBy('all')" title="Click to view all registered clients">
+      <div class="as-ico as-navy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5 6.5-5s6.5 1.5 6.5 5"/><circle cx="17" cy="9" r="2.5"/><path d="M16 15.2c2.9.2 5.5 1.5 5.5 4.3"/></svg></div>
+      <b>${total}</b>
+      <span>Total Clients · <i>Show All</i></span>
+    </div>
+    <div class="adm-stat" onclick="admFilterBy('active')" title="Click to filter active accounts only">
+      <div class="as-ico as-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+      <b>${activeCount}</b>
+      <span>Active Accounts · <i>${activePct}% Roster</i></span>
+    </div>
+    <div class="adm-stat" onclick="scrollToPending()" title="Click to review pending KYC applications">
+      <div class="as-ico as-gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+      <b>${pendingCount}</b>
+      <span>Pending KYC · <i>Review (${pendingCount})</i></span>
+    </div>
+    <div class="adm-stat" onclick="openAdminMetricsModal()" title="Click to inspect liquidity analytics & tier breakdown">
+      <div class="as-ico as-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+      <b>${fmtBal(held)}</b>
+      <span>Liquidity Held · <i>Analytics</i></span>
+    </div>
+    <div class="adm-stat" onclick="admFilterBy('frozen')" title="Click to filter frozen accounts">
+      <div class="as-ico as-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <b>${frozen}</b>
+      <span>Frozen Accounts · <i>Inspect</i></span>
+    </div>`;
 
-  document.getElementById('adm-pend-n').textContent = pending.length;
+  document.getElementById('adm-pend-n').textContent = pendingCount;
   document.getElementById('adm-pending').innerHTML = pending.length ? pending.map(u=>{
     if(u.status === 'frozen' && u.unlockRequest){
       const req = u.unlockRequest;
@@ -1010,10 +1124,36 @@ function renderAdmin(){
     </div>`;
   }).join('') : '<p style="color:var(--muted);font-size:13.5px;padding:12px 0">No pending tier approval requests.</p>';
 
-  const list = ADM_USERS.filter(u=>
-    (admState.filter==='all' || u.tier===admState.filter || (admState.filter==='frozen'&&u.status==='frozen')) &&
-    (u.name.toLowerCase().includes(admState.q) || u.email.toLowerCase().includes(admState.q) || u.id.toLowerCase().includes(admState.q) || (u.accountNumber && u.accountNumber.includes(admState.q)))
-  );
+  // Update filter chips with dynamic counts
+  const chipsHtml = `
+    <button class="chip ${admState.filter==='all'?'on':''}" data-f="all" onclick="admFilter(this)">All (${total})</button>
+    <button class="chip ${admState.filter==='active'?'on':''}" data-f="active" onclick="admFilter(this)">Active (${activeCount})</button>
+    <button class="chip ${admState.filter==='basic'?'on':''}" data-f="basic" onclick="admFilter(this)">Basic (${basicCount})</button>
+    <button class="chip ${admState.filter==='premium'?'on':''}" data-f="premium" onclick="admFilter(this)">Premium (${premiumCount})</button>
+    <button class="chip ${admState.filter==='private'?'on':''}" data-f="private" onclick="admFilter(this)">Private (${privateCount})</button>
+    <button class="chip ${admState.filter==='frozen'?'on':''}" data-f="frozen" onclick="admFilter(this)">Frozen (${frozen})</button>
+    <button class="chip ${admState.filter==='pending'?'on':''}" data-f="pending" onclick="admFilter(this)">Pending KYC (${pendingCount})</button>
+  `;
+  const chipsEl = document.getElementById('adm-chips');
+  if (chipsEl) chipsEl.innerHTML = chipsHtml;
+
+  const list = ADM_USERS.filter(u => {
+    let matchFilter = true;
+    if (admState.filter === 'active') matchFilter = u.status !== 'frozen';
+    else if (admState.filter === 'frozen') matchFilter = u.status === 'frozen';
+    else if (admState.filter === 'pending') matchFilter = u.kyc === 'pending' || (u.status === 'frozen' && u.unlockRequest);
+    else if (admState.filter !== 'all') matchFilter = u.tier === admState.filter;
+
+    const q = admState.q;
+    const matchSearch = !q || 
+      (u.name && u.name.toLowerCase().includes(q)) || 
+      (u.email && u.email.toLowerCase().includes(q)) || 
+      (u.id && u.id.toLowerCase().includes(q)) || 
+      (u.accountNumber && u.accountNumber.includes(q)) ||
+      (u.tier && u.tier.toLowerCase().includes(q));
+
+    return matchFilter && matchSearch;
+  });
 
   const countEl = document.getElementById('sync-user-count');
   if(countEl) countEl.textContent = total;
@@ -1023,7 +1163,7 @@ function renderAdmin(){
       <div class="avatar">${admInitials(u.name)}</div>
       <div class="u-info">
         <b>${u.name} ${u.isNewHighlight ? '<span style="font-size:10px;background:var(--grad-gold);color:#231A05;padding:2px 7px;border-radius:4px;margin-left:6px;font-weight:800;letter-spacing:0.5px">NEW CLIENT</span>' : ''}</b>
-        <small>${u.email} · Acct #${u.accountNumber || '—'}</small>
+        <small>${u.email} · Acct #${u.accountNumber || '—'} · Joined ${u.joined || 'Recently'}</small>
         <div style="margin-top:4px">
           ${admTag(u.tier)}${u.status==='frozen'?admTag('frozen'):admTag('active')}${u.kyc==='pending'?admTag('pending'):u.kyc==='rejected'?admTag('rejected'):''}
         </div>
@@ -1042,9 +1182,216 @@ function renderAdmin(){
 function admSearch(v){admState.q=v.toLowerCase();renderAdmin();}
 function admFilter(el){
   admState.filter=el.dataset.f;
-  document.querySelectorAll('#adm-chips .chip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
   renderAdmin();
+}
+function admFilterBy(f){
+  admState.filter = f;
+  renderAdmin();
+}
+function scrollToPending(){
+  const el = document.getElementById('adm-pending');
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function openAdminMetricsModal(){
+  const m = document.getElementById('modal-admin-metrics');
+  if (!m) return;
+  renderAdminMetrics();
+  m.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAdminMetricsModal(){
+  const m = document.getElementById('modal-admin-metrics');
+  if (m) m.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function renderAdminMetrics(){
+  const total = ADM_USERS.length;
+  const activeCount = ADM_USERS.filter(u => u.status !== 'frozen').length;
+  const activePct = total ? Math.round((activeCount / total) * 100) : 0;
+  const pendingCount = ADM_USERS.filter(u => u.kyc === 'pending' || (u.status === 'frozen' && u.unlockRequest)).length;
+  const frozenCount = ADM_USERS.filter(u => u.status === 'frozen').length;
+  const held = ADM_USERS.reduce((s, u) => s + (Number(u.balance) || 0), 0);
+  const avgBal = total ? (held / total) : 0;
+  
+  // Sorted users by balance
+  const sorted = [...ADM_USERS].sort((a,b) => (Number(b.balance)||0) - (Number(a.balance)||0));
+  const highestUser = sorted[0];
+
+  const basicUsers = ADM_USERS.filter(u => (u.tier || 'basic') === 'basic');
+  const premiumUsers = ADM_USERS.filter(u => u.tier === 'premium');
+  const privateUsers = ADM_USERS.filter(u => u.tier === 'private');
+
+  const basicPct = total ? Math.round((basicUsers.length / total) * 100) : 0;
+  const premiumPct = total ? Math.round((premiumUsers.length / total) * 100) : 0;
+  const privatePct = total ? Math.round((privateUsers.length / total) * 100) : 0;
+
+  const verifiedKYC = ADM_USERS.filter(u => u.kyc === 'verified').length;
+  const rejectedKYC = ADM_USERS.filter(u => u.kyc === 'rejected').length;
+
+  const html = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:14px">
+        <small style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px">Total Registered</small>
+        <div style="font-family:'Sora';font-size:26px;font-weight:700;color:#fff;margin:4px 0">${total}</div>
+        <span style="font-size:12px;color:#4ADE80">100% Client Records</span>
+      </div>
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:14px">
+        <small style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px">Active Clients</small>
+        <div style="font-family:'Sora';font-size:26px;font-weight:700;color:#60A5FA;margin:4px 0">${activeCount}</div>
+        <span style="font-size:12px;color:var(--muted)">${activePct}% Operational</span>
+      </div>
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:14px">
+        <small style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px">Total Portfolio (AUM)</small>
+        <div style="font-family:'Sora';font-size:22px;font-weight:700;color:var(--gold-2);margin:4px 0">${fmtBal(held)}</div>
+        <span style="font-size:12px;color:var(--muted)">Avg: ${fmtBal(avgBal)}</span>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+      <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:14px">
+        <b style="font-size:13px;color:#fff;display:block;margin-bottom:10px">Account Tier Distribution</b>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+              <span>Basic Tier ($100k limit)</span>
+              <b>${basicUsers.length} (${basicPct}%)</b>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden">
+              <div style="width:${basicPct}%;height:100%;background:#94A3B8"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+              <span>Premium Tier ($250k limit)</span>
+              <b>${premiumUsers.length} (${premiumPct}%)</b>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden">
+              <div style="width:${premiumPct}%;height:100%;background:#60A5FA"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px">
+              <span style="color:var(--gold-2)">Private Sovereign Tier</span>
+              <b style="color:var(--gold-2)">${privateUsers.length} (${privatePct}%)</b>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden">
+              <div style="width:${privatePct}%;height:100%;background:var(--grad-gold)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:14px">
+        <b style="font-size:13px;color:#fff;display:block;margin-bottom:10px">Compliance & Verification Pipeline</b>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12.5px">
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+            <span style="color:#4ADE80">✓ Verified & Clear</span>
+            <b>${verifiedKYC} Clients</b>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+            <span style="color:var(--gold-2)">⏳ Pending Documentation / Tier Review</span>
+            <b>${pendingCount} Clients</b>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+            <span style="color:#ff8585">🔒 Frozen Accounts</span>
+            <b>${frozenCount} Accounts</b>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:5px 0">
+            <span style="color:var(--muted)">Highest Single Account</span>
+            <b style="color:var(--gold-2)">${highestUser ? highestUser.name.split(' ')[0] + ' (' + fmtBal(highestUser.balance) + ')' : '—'}</b>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:rgba(233,200,110,.05);border:1px solid var(--gold-border);border-radius:14px;padding:14px;margin-bottom:18px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <div>
+          <b style="font-size:13px;color:var(--gold-2);display:block">Direct Roster Filtering & Navigation</b>
+          <span style="font-size:11.5px;color:var(--muted)">Jump straight to target client groups in the directory</span>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-ghost" style="padding:6px 12px;font-size:11.5px;height:auto" onclick="closeAdminMetricsModal();admFilterBy('all')">Show All (${total})</button>
+          <button class="btn btn-ghost" style="padding:6px 12px;font-size:11.5px;height:auto;color:#60A5FA;border-color:rgba(96,165,250,.3)" onclick="closeAdminMetricsModal();admFilterBy('active')">Show Active (${activeCount})</button>
+          <button class="btn btn-ghost" style="padding:6px 12px;font-size:11.5px;height:auto;color:var(--gold-2);border-color:var(--gold-border)" onclick="closeAdminMetricsModal();admFilterBy('pending')">Show Pending (${pendingCount})</button>
+          <button class="btn btn-ghost" style="padding:6px 12px;font-size:11.5px;height:auto;color:#ff8585;border-color:rgba(255,133,133,.3)" onclick="closeAdminMetricsModal();admFilterBy('frozen')">Show Frozen (${frozenCount})</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-top:1px solid var(--border);padding-top:14px">
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" style="padding:8px 14px;font-size:12px;height:auto" onclick="exportClientsCSV()">📥 Export CSV</button>
+        <button class="btn btn-ghost" style="padding:8px 14px;font-size:12px;height:auto" onclick="exportClientsJSON()">📄 Export JSON</button>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-sync" style="background:rgba(59,130,246,.15);border-color:rgba(59,130,246,.4);color:#60A5FA;padding:8px 14px" onclick="restoreTreasuryClients()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2.5 2v6h6M2.66 15.57a10 10 0 1 0 .57-8.38l-5.67-5.67"/></svg> Sync & Recover Treasury Roster
+        </button>
+        <button class="btn btn-gold" style="padding:8px 18px;font-size:12px;height:auto" onclick="closeAdminMetricsModal()">Done</button>
+      </div>
+    </div>
+  `;
+  const el = document.getElementById('adm-metrics-content');
+  if (el) el.innerHTML = html;
+}
+
+function exportClientsCSV() {
+  const headers = ["ID", "Name", "Email", "Account Number", "Tier", "Balance", "Status", "KYC", "Joined"];
+  const rows = ADM_USERS.map(u => [
+    `"${u.id}"`,
+    `"${(u.name || '').replace(/"/g, '""')}"`,
+    `"${(u.email || '').replace(/"/g, '""')}"`,
+    `"${u.accountNumber || ''}"`,
+    `"${u.tier || 'basic'}"`,
+    Number(u.balance || 0).toFixed(2),
+    `"${u.status || 'active'}"`,
+    `"${u.kyc || 'verified'}"`,
+    `"${u.joined || ''}"`
+  ]);
+  const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", `modern_crest_clients_${new Date().toISOString().slice(0,10)}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  toast('Client roster exported to CSV');
+}
+
+function exportClientsJSON() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(ADM_USERS, null, 2));
+  const link = document.createElement("a");
+  link.setAttribute("href", dataStr);
+  link.setAttribute("download", `modern_crest_clients_${new Date().toISOString().slice(0,10)}.json`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  toast('Client roster exported to JSON');
+}
+
+async function restoreTreasuryClients() {
+  toast('Re-syncing roster with Treasury Vault…');
+  const userMap = new Map();
+  TREASURY_VAULT_USERS.forEach(u => userMap.set(u.id, Object.assign({}, u)));
+  ADM_USERS.forEach(u => {
+    if (userMap.has(u.id)) {
+      const v = userMap.get(u.id);
+      userMap.set(u.id, Object.assign({}, v, u));
+    } else {
+      userMap.set(u.id, u);
+    }
+  });
+
+  ADM_USERS = Array.from(userMap.values());
+  localStorage.setItem('mcb_users', JSON.stringify(ADM_USERS));
+  await syncUsersToServer(ADM_USERS, { action: 'sync_users' });
+  renderAdmin();
+  toast(`✓ Treasury Vault Synced: ${ADM_USERS.length} Registered Clients Active`);
 }
 function admLog(txt){
   const now = new Date();

@@ -129,12 +129,65 @@ const DEFAULT_USERS = [
     id: "u7",
     name: "Sofia Reyes",
     email: "sofia.reyes@crestmail.com",
-    accountNumber: "3819204716",
+    accountNumber: "9953654784",
     tier: "basic",
     balance: 0.00,
     status: "active",
     kyc: "rejected",
     joined: "Aug 2026"
+  },
+  {
+    id: "u_mvqwuow2vace",
+    name: "Lord Montgomery Vance",
+    email: "m.vance@crestsovereign.com",
+    accountNumber: "8503489565",
+    tier: "private",
+    balance: 500000.00,
+    status: "active",
+    kyc: "verified",
+    joined: "Oct 2026",
+    profileDetails: {
+      addr: "Executive Suite",
+      city: "New York",
+      country: "US",
+      dob: "1985-05-15",
+      name: "Lord Montgomery Vance",
+      phone: "+1 (555) 516-7284",
+      state: "NY",
+      zip: "10001"
+    }
+  },
+  {
+    id: "u_mvs6u5hl41wx",
+    name: "Sir Julian Sterling",
+    email: "julian.sterling@crestvault.ch",
+    accountNumber: "9568727400",
+    tier: "private",
+    balance: 850000.00,
+    status: "active",
+    kyc: "verified",
+    joined: "Oct 2026",
+    profileDetails: {
+      addr: "Executive Suite",
+      city: "New York",
+      country: "US",
+      dob: "1985-05-15",
+      name: "Sir Julian Sterling",
+      phone: "+1 (555) 514-8867",
+      state: "NY",
+      zip: "10001"
+    }
+  },
+  {
+    id: "user_3KRpGBa4gpEFYxExRLeFYCKWgzv",
+    name: "daniel Hendrick",
+    email: "bossdaniels04@gmail.com",
+    tier: "basic",
+    balance: 0.00,
+    status: "active",
+    kyc: "verified",
+    joined: "Today",
+    accountNumber: "7380996608"
   }
 ];
 
@@ -143,7 +196,7 @@ function loadDatabase() {
     return memoryDb;
   }
 
-  // Try reading from /tmp persistence
+  // 1. Try reading from /tmp persistence
   try {
     if (fs.existsSync(TMP_DATA_FILE)) {
       const raw = fs.readFileSync(TMP_DATA_FILE, 'utf8');
@@ -157,7 +210,33 @@ function loadDatabase() {
     console.warn('Could not read /tmp database cache:', e.message);
   }
 
-  // Initialize fresh database
+  // 2. Try reading from bundled bank_data.json
+  const candidateFiles = [
+    path.join(__dirname, '../../bank_data.json'),
+    path.join(__dirname, '../bank_data.json'),
+    path.join(__dirname, 'bank_data.json'),
+    path.join(process.cwd(), 'bank_data.json')
+  ];
+  for (const f of candidateFiles) {
+    try {
+      if (fs.existsSync(f)) {
+        const raw = fs.readFileSync(f, 'utf8');
+        const parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.users) && parsed.users.length > 0) {
+          memoryDb = {
+            users: parsed.users,
+            txs: parsed.txs || [],
+            deleted_user_ids: parsed.deleted_user_ids || [],
+            last_updated: Date.now()
+          };
+          saveDatabase(memoryDb);
+          return memoryDb;
+        }
+      }
+    } catch(e) {}
+  }
+
+  // 3. Fallback to full DEFAULT_USERS baseline
   memoryDb = {
     users: JSON.parse(JSON.stringify(DEFAULT_USERS)),
     txs: [],
